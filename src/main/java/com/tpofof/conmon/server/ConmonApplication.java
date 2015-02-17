@@ -1,4 +1,4 @@
-package com.tpofof.conmon;
+package com.tpofof.conmon.server;
 
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -6,6 +6,9 @@ import com.mongodb.MongoClient;
 import com.tpofof.conmon.server.config.ConmonConfiguration;
 import com.tpofof.conmon.server.config.MongoConfig;
 import com.tpofof.conmon.server.mongo.DeviceConfigDAO;
+import com.tpofof.conmon.server.mongo.TestCaseDAO;
+import com.tpofof.conmon.server.resources.DeviceConfigResource;
+import com.tpofof.conmon.server.resources.TestCaseResource;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
@@ -29,15 +32,19 @@ public class ConmonApplication extends Application<ConmonConfiguration> {
 	@Override
 	public void run(ConmonConfiguration config, Environment env) throws Exception {
 		/* MONGO */
-		MongoConfig mdbConfig = config.getMongo();
+		MongoConfig mdbConfig = new MongoConfig(); //config.getMongo();
 		MongoClient mongoClient = new MongoClient(mdbConfig.getHost(), mdbConfig.getPort());
 		DB conmonDb = mongoClient.getDB(mdbConfig.getDbname());
 		DBCollection deviceConfigCollection = conmonDb.getCollection("deviceConfig");
 		DeviceConfigDAO deviceConfigDAO = new DeviceConfigDAO(deviceConfigCollection);
+		DBCollection testCaseCollection = conmonDb.getCollection("testCase");
+		TestCaseDAO testCaseDAO = new TestCaseDAO(testCaseCollection);
 		
 		/* RESOURCES */
 		final DeviceConfigResource deviceConfigResource = new DeviceConfigResource(deviceConfigDAO);
 		env.jersey().register(deviceConfigResource);
+		final TestCaseResource testCaseResource = new TestCaseResource(testCaseDAO);
+		env.jersey().register(testCaseResource);
 	}
 
 }
