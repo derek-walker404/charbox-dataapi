@@ -1,4 +1,4 @@
-package com.tpofof.conmon.server.resources;
+package com.tpofof.conmon.server.resources.crud;
 
 import java.util.List;
 
@@ -12,6 +12,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
 import com.tpofof.conmon.server.mongo.GenericMongoDAO;
+import com.tpofof.conmon.server.resources.ResponseUtils;
 
 public class GenericCrudResource<ModelT, DaoT extends GenericMongoDAO<ModelT>> {
 

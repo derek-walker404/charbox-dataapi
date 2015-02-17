@@ -7,8 +7,8 @@ import com.tpofof.conmon.server.config.ConmonConfiguration;
 import com.tpofof.conmon.server.config.MongoConfig;
 import com.tpofof.conmon.server.mongo.DeviceConfigDAO;
 import com.tpofof.conmon.server.mongo.TestCaseDAO;
-import com.tpofof.conmon.server.resources.DeviceConfigResource;
-import com.tpofof.conmon.server.resources.TestCaseResource;
+import com.tpofof.conmon.server.resources.crud.DeviceConfigResource;
+import com.tpofof.conmon.server.resources.crud.TestCaseResource;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
