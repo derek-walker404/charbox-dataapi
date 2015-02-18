@@ -70,7 +70,7 @@ public class DeviceManager implements GenericModelManager<Device> {
 		if (model != null) {
 			DeviceConfiguration config = deviceConfigMan.find(model.getConfigId());
 			if (config != null) {
-				deviceConfigMan.getTestCases(config.getTestCaseIds());
+				cases = deviceConfigMan.getTestCases(config.getTestCaseIds());
 			}
 		}
 		return cases;

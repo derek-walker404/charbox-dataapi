@@ -81,7 +81,7 @@ public class DeviceResource {
 		return ResponseUtils.failure("Could not find Device with device id " + deviceId, 404);
 	}
 	
-	@Path("/register/{deviceId}")
+	@Path("/id/{deviceId}/register")
 	@POST
 	@Timed
 	public JsonNode register(@PathParam("deviceId") Integer deviceId) {
