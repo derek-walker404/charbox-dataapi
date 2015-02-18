@@ -11,21 +11,21 @@ import javax.ws.rs.QueryParam;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
-import com.tpofof.conmon.server.mongo.GenericMongoDAO;
+import com.tpofof.conmon.server.managers.GenericModelManager;
 import com.tpofof.conmon.server.resources.ResponseUtils;
 
-public class GenericCrudResource<ModelT, DaoT extends GenericMongoDAO<ModelT>> {
+public class GenericCrudResource<ModelT, ManagerT extends GenericModelManager<ModelT>> {
 
-	private final DaoT dao;
+	private final ManagerT man;
 	private final Class<ModelT> modelClass;
 	
-	public GenericCrudResource(DaoT dao, Class<ModelT> modelClass) {
-		this.dao = dao;
+	public GenericCrudResource(ManagerT man, Class<ModelT> modelClass) {
+		this.man = man;
 		this.modelClass = modelClass;
 	}
 	
-	protected final DaoT getDao() {
-		return dao;
+	protected final ManagerT getManager() {
+		return man;
 	}
 	
 	@GET
@@ -34,7 +34,7 @@ public class GenericCrudResource<ModelT, DaoT extends GenericMongoDAO<ModelT>> {
 			@QueryParam("offset") Optional<Integer> offset) {
 		int limitVal = limit.isPresent() && limit.get() > 0 ? limit.get() : 20;
 		int offsetVal = offset.isPresent() && offset.get() >= 0 ? offset.get() : 0;
-		List<ModelT> models = dao.find(limitVal, offsetVal);
+		List<ModelT> models = man.find(limitVal, offsetVal);
 		return ResponseUtils.success(ResponseUtils.listData(models, limitVal, offsetVal));
 	}
 	
@@ -42,7 +42,7 @@ public class GenericCrudResource<ModelT, DaoT extends GenericMongoDAO<ModelT>> {
 	@GET
 	@Timed
 	public JsonNode findModel(@PathParam("_id") String id) {
-		ModelT model = dao.find(id);
+		ModelT model = man.find(id);
 		return model == null ?
 				ResponseUtils.failure("Could not find " + modelClass.getSimpleName() + " with id " + id, 404)
 				: ResponseUtils.success(ResponseUtils.modelData(model));
@@ -51,7 +51,7 @@ public class GenericCrudResource<ModelT, DaoT extends GenericMongoDAO<ModelT>> {
 	@POST
 	@Timed
 	public JsonNode postTestCase(ModelT model) {
-		ModelT insertedModel = dao.insert(model);
+		ModelT insertedModel = man.insert(model);
 		return insertedModel == null ?
 				ResponseUtils.failure("Could not create " + modelClass.getSimpleName())
 				: ResponseUtils.success(ResponseUtils.modelData(insertedModel)); 

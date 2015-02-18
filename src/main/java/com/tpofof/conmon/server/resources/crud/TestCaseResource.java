@@ -6,14 +6,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.pofof.conmon.model.TestCase;
-import com.tpofof.conmon.server.mongo.TestCaseDAO;
+import com.tpofof.conmon.server.managers.TestCaseManager;
 
 @Path("/testcases")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class TestCaseResource extends GenericCrudResource<TestCase, TestCaseDAO> {
+public class TestCaseResource extends GenericCrudResource<TestCase, TestCaseManager> {
 
-	public TestCaseResource(TestCaseDAO dao) {
-		super(dao, TestCase.class);
+	public TestCaseResource(TestCaseManager man) {
+		super(man, TestCase.class);
 	}
 }

@@ -6,14 +6,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.pofof.conmon.model.DeviceConfiguration;
-import com.tpofof.conmon.server.mongo.DeviceConfigDAO;
+import com.tpofof.conmon.server.managers.DeviceConfigurationManager;
 
 @Path("/configs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DeviceConfigResource extends GenericCrudResource<DeviceConfiguration, DeviceConfigDAO> {
+public class DeviceConfigResource extends GenericCrudResource<DeviceConfiguration, DeviceConfigurationManager> {
 	
-	public DeviceConfigResource(DeviceConfigDAO dao) {
-		super(dao, DeviceConfiguration.class);
+	public DeviceConfigResource(DeviceConfigurationManager man) {
+		super(man, DeviceConfiguration.class);
 	}
 }

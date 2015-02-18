@@ -6,22 +6,21 @@ import com.google.common.collect.Lists;
 import com.pofof.conmon.model.DeviceConfiguration;
 import com.pofof.conmon.model.TestCase;
 import com.tpofof.conmon.server.mongo.DeviceConfigDAO;
-import com.tpofof.conmon.server.mongo.TestCaseDAO;
 
-public class DeviceConfigurationManager {
+public class DeviceConfigurationManager implements GenericModelManager<DeviceConfiguration> {
 
 	private final DeviceConfigDAO deviceConfigDao;
-	private final TestCaseDAO testCaseDao;
+	private final TestCaseManager testCaseMan;
 	
 	public DeviceConfigurationManager(DeviceConfigDAO deviceConfigDao,
-			TestCaseDAO testCaseDao) {
+			TestCaseManager testCaseMan) {
 		super();
 		this.deviceConfigDao = deviceConfigDao;
-		this.testCaseDao = testCaseDao;
+		this.testCaseMan = testCaseMan;
 	}
 	
 	public DeviceConfiguration getNewConfig() {
-		List<TestCase> cases = testCaseDao.find(6, 0); // TODO: convert to manager and get random set
+		List<TestCase> cases = testCaseMan.find(6, 0); // TODO: convert to manager and get random set
 		List<String> tcIds = Lists.newArrayList();
 		for (TestCase tc : cases) {
 			tcIds.add(tc.get_id());
@@ -29,5 +28,29 @@ public class DeviceConfigurationManager {
 		DeviceConfiguration newConfig = new DeviceConfiguration();
 		newConfig.setTestCaseIds(tcIds);
 		return deviceConfigDao.insert(newConfig);
+	}
+	
+	public List<TestCase> getTestCases(List<String> ids) {
+		List<TestCase> cases = Lists.newArrayList();
+		for (String s : ids) {
+			cases.add(testCaseMan.find(s));
+		}
+		return cases;
+	}
+
+	public DeviceConfiguration find(String id) {
+		return deviceConfigDao.find(id);
+	}
+
+	public List<DeviceConfiguration> find() {
+		return find(20, 0);
+	}
+
+	public List<DeviceConfiguration> find(int limit, int offset) {
+		return deviceConfigDao.find(limit, offset);
+	}
+
+	public DeviceConfiguration insert(DeviceConfiguration model) {
+		return deviceConfigDao.insert(model);
 	}
 }

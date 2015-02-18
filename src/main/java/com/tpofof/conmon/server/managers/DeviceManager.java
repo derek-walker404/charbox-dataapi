@@ -2,11 +2,13 @@ package com.tpofof.conmon.server.managers;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.pofof.conmon.model.Device;
 import com.pofof.conmon.model.DeviceConfiguration;
+import com.pofof.conmon.model.TestCase;
 import com.tpofof.conmon.server.mongo.DeviceDAO;
 
-public class DeviceManager {
+public class DeviceManager implements GenericModelManager<Device> {
 
 	private final DeviceConfigurationManager deviceConfigMan;
 	private final DeviceDAO deviceDao;
@@ -16,11 +18,15 @@ public class DeviceManager {
 		this.deviceConfigMan = deviceConfigMan;
 	}
 	
-	public List<Device> getDevices(int limit, int offset) {
+	public List<Device> find() {
+		return find(10, 0);
+	}
+	
+	public List<Device> find(int limit, int offset) {
 		return deviceDao.find(limit, offset);
 	}
 	
-	public Device getDevice(String id) {
+	public Device find(String id) {
 		return deviceDao.find(id);
 	}
 	
@@ -49,5 +55,24 @@ public class DeviceManager {
 			}
 		}
 		return device;
+	}
+
+	/**
+	 * Use {@link DeviceManager#register(int)}
+	 */
+	@Deprecated
+	public Device insert(Device model) {
+		throw new UnsupportedOperationException("Use {@link DeviceManager#register(int)}");
+	}
+	
+	public List<TestCase> getTestCases(Device model) {
+		List<TestCase> cases = Lists.newArrayList();
+		if (model != null) {
+			DeviceConfiguration config = deviceConfigMan.find(model.getConfigId());
+			if (config != null) {
+				deviceConfigMan.getTestCases(config.getTestCaseIds());
+			}
+		}
+		return cases;
 	}
 }
