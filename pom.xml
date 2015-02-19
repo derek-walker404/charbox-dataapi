@@ -59,6 +59,11 @@
 			<artifactId>dropwizard-assets</artifactId>
 			<version>${dropwizard.version}</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.elasticsearch</groupId>
+		    <artifactId>elasticsearch</artifactId>
+		    <version>1.4.4</version>
+		</dependency>
 	</dependencies>
 	<version>0.1.0</version>
 </project>
