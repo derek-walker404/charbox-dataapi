@@ -2,8 +2,10 @@ package com.tpofof.conmon.server.resources.crud;
 
 import java.util.List;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -11,10 +13,11 @@ import javax.ws.rs.QueryParam;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
+import com.pofof.conmon.model.PersistentModel;
 import com.tpofof.conmon.server.managers.GenericModelManager;
 import com.tpofof.conmon.server.resources.ResponseUtils;
 
-public class GenericCrudResource<ModelT, ManagerT extends GenericModelManager<ModelT>> {
+public class GenericCrudResource<ModelT extends PersistentModel, ManagerT extends GenericModelManager<ModelT>> {
 
 	private final ManagerT man;
 	private final Class<ModelT> modelClass;
@@ -50,10 +53,33 @@ public class GenericCrudResource<ModelT, ManagerT extends GenericModelManager<Mo
 	
 	@POST
 	@Timed
-	public JsonNode postTestCase(ModelT model) {
+	public JsonNode post(ModelT model) {
 		ModelT insertedModel = man.insert(model);
 		return insertedModel == null ?
 				ResponseUtils.failure("Could not create " + modelClass.getSimpleName())
 				: ResponseUtils.success(ResponseUtils.modelData(insertedModel)); 
+	}
+	
+	@Path("/{_id}")
+	@PUT
+	@Timed
+	public JsonNode update(@PathParam("_id") String id, ModelT model) {
+		if (!id.equals(model.get_id())) {
+			return ResponseUtils.failure("Invalid Request: ID's do not match", 400);
+		}
+		ModelT updatedModel = man.update(model);
+		return updatedModel != null
+				? ResponseUtils.success(ResponseUtils.modelData(updatedModel))
+				: ResponseUtils.failure("Could not update the " + modelClass.getSimpleName(), 500);
+	}
+	
+	@Path("/{_id}")
+	@DELETE
+	@Timed
+	public JsonNode delete(@PathParam("_id") String id) {
+		boolean deleteSuccess = man.delete(id);
+		return deleteSuccess
+				? ResponseUtils.success(null)
+				: ResponseUtils.failure("Failed to delete " + modelClass.getSimpleName() + " with id " + id, 500);
 	}
 }

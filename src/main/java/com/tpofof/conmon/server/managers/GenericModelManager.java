@@ -8,4 +8,6 @@ public interface GenericModelManager<ModelT> {
 	public List<ModelT> find();
 	public List<ModelT> find(int limit, int offset);
 	public ModelT insert(ModelT model);
+	public ModelT update(ModelT model);
+	public boolean delete(String id);
 }

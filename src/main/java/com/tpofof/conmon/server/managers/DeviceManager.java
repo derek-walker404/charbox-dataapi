@@ -75,4 +75,12 @@ public class DeviceManager implements GenericModelManager<Device> {
 		}
 		return cases;
 	}
+
+	public Device update(Device model) {
+		return deviceDao.update(model);
+	}
+
+	public boolean delete(String id) {
+		return deviceDao.delete(id);
+	}
 }

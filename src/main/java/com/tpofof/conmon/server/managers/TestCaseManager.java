@@ -29,4 +29,12 @@ public class TestCaseManager implements GenericModelManager<TestCase> {
 		return testCaseDao.insert(model);
 	}
 
+	public TestCase update(TestCase model) {
+		return testCaseDao.update(model);
+	}
+
+	public boolean delete(String id) {
+		return testCaseDao.delete(id);
+	}
+
 }

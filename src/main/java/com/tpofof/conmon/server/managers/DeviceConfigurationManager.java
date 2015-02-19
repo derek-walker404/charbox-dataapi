@@ -53,4 +53,12 @@ public class DeviceConfigurationManager implements GenericModelManager<DeviceCon
 	public DeviceConfiguration insert(DeviceConfiguration model) {
 		return deviceConfigDao.insert(model);
 	}
+
+	public DeviceConfiguration update(DeviceConfiguration model) {
+		return deviceConfigDao.update(model);
+	}
+
+	public boolean delete(String id) {
+		return deviceConfigDao.delete(id);
+	}
 }

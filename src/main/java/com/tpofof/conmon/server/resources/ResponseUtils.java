@@ -18,7 +18,9 @@ public class ResponseUtils {
 		ObjectNode node = mapper.createObjectNode();
 		node.put("success", true);
 		node.put("status", 200);
-		node.put("data", content);
+		if (content != null) {
+			node.put("data", content);
+		}
 		return node;
 	}
 	
