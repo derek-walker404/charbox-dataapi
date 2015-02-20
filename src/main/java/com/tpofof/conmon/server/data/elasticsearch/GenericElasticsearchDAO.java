@@ -2,6 +2,7 @@ package com.tpofof.conmon.server.data.elasticsearch;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -15,7 +16,7 @@ import com.tpofof.conmon.server.data.GenericDAO;
 import com.tpofof.utils.Config;
 import com.tpofof.utils.JsonUtils;
 
-public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel> implements GenericDAO<ModelT> {
+public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel<ModelT>> implements GenericDAO<ModelT> {
 
 	private final Client client;
 	private final Class<ModelT> modelClass;
@@ -32,8 +33,11 @@ public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel> im
 	protected abstract String getType();
 	
 	public ModelT  insert(ModelT model) {
+		if (model.get_id() == null || model.get_id().isEmpty()) {
+			model.set_id(new ObjectId().toString());
+		}
 		IndexResponse response = client.prepareIndex(getIndex(), getType(), model.get_id())
-			.setSource(JsonUtils.toJson(model))
+			.setSource(convert(model))
 			.execute()
 			.actionGet();
 		return model.get_id().equals(response.getId()) ? model : null;
@@ -43,7 +47,7 @@ public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel> im
 		GetResponse response = client.prepareGet(getIndex(), getType(), id)
 				.execute()
 				.actionGet();
-		return JsonUtils.fromJson(response.toString(), modelClass);
+		return convert(response.toString());
 	}
 	
 	public List<ModelT> find(int limit, int offset) {
@@ -53,7 +57,7 @@ public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel> im
 				.actionGet();
 		List<ModelT> models = Lists.newArrayList();
 		for (SearchHit h : response.getHits()) {
-			models.add(JsonUtils.fromJson(h.sourceAsString(), modelClass));
+			models.add(convert(h.sourceAsString()));
 		}
 		return models;
 	}
@@ -81,5 +85,13 @@ public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel> im
 	@Deprecated
 	public boolean delete(String id) {
 		return false;
+	}
+	
+	protected String convert(ModelT model) {
+		return JsonUtils.toJson(model);
+	}
+	
+	protected ModelT convert(String jsonContent) {
+		return JsonUtils.fromJson(jsonContent, modelClass);
 	}
 }

@@ -1,11 +1,17 @@
 package com.tpofof.conmon.server.resources.crud;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.pofof.conmon.model.TimerResult;
+import com.tpofof.conmon.server.data.location.LocationProvider;
 import com.tpofof.conmon.server.managers.TimerResultManager;
 
 @Path("/results")
@@ -15,5 +21,19 @@ public class TimerResultResource extends GenericCrudResource<TimerResult, TimerR
 
 	public TimerResultResource(TimerResultManager man) {
 		super(man, TimerResult.class);
+	}
+	
+	@POST
+	@Timed
+	@Override
+	public JsonNode post(TimerResult model,
+			@Context HttpServletRequest request) {
+		if (model.getClientIp() == null || model.getClientIp().isEmpty()) {
+			// might be a proxy or local host, but something is better than nothing.
+			model.setClientIp(request.getRemoteAddr());
+		}
+		model.setServerLocation(LocationProvider.getLocation(model.getServerIp()));
+		model.setClientLocation(LocationProvider.getLocation(model.getClientIp()));
+		return super.post(model, request);
 	}
 }

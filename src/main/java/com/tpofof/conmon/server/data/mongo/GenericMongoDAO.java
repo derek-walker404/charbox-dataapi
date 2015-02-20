@@ -15,7 +15,7 @@ import com.pofof.conmon.model.PersistentModel;
 import com.tpofof.conmon.server.data.GenericDAO;
 import com.tpofof.utils.JsonUtils;
 
-public abstract class GenericMongoDAO<ModelT extends PersistentModel> implements GenericDAO<ModelT> {
+public abstract class GenericMongoDAO<ModelT extends PersistentModel<ModelT>> implements GenericDAO<ModelT> {
 
 	private final DBCollection collection;
 	private final Class<ModelT> modelClass;
@@ -68,10 +68,14 @@ public abstract class GenericMongoDAO<ModelT extends PersistentModel> implements
 	
 	public ModelT insert(ModelT model) {
 		ObjectId expectedId = new ObjectId();
-		DBObject inserObject = (DBObject)JSON.parse(JsonUtils.toJson(model));
+		DBObject inserObject = (DBObject)JSON.parse(convert(model));
 		inserObject.put("_id", expectedId);
 		getCollection().insert(inserObject);
 		return find(expectedId.toString());
+	}
+	
+	protected String convert(ModelT model) {
+		return JsonUtils.toJson(model);
 	}
 	
 	protected ModelT convert(DBObject obj) {
@@ -87,7 +91,7 @@ public abstract class GenericMongoDAO<ModelT extends PersistentModel> implements
 		if (model == null) {
 			return null;
 		}
-		DBObject updateObj = (DBObject)JSON.parse(JsonUtils.toJson(model));
+		DBObject updateObj = (DBObject)JSON.parse(convert(model));
 		updateObj.removeField("_id");
 		WriteResult wr = getCollection().update(getIdQuery(model.get_id()), updateObj);
 		return wr.getN() == 1 ? model : null;
