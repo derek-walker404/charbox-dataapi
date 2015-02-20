@@ -8,34 +8,17 @@ import com.pofof.conmon.model.DeviceConfiguration;
 import com.pofof.conmon.model.TestCase;
 import com.tpofof.conmon.server.data.mongo.DeviceDAO;
 
-public class DeviceManager implements GenericModelManager<Device> {
+public class DeviceManager extends AbstractModelManager<Device, DeviceDAO> {
 
 	private final DeviceConfigurationManager deviceConfigMan;
-	private final DeviceDAO deviceDao;
 	
 	public DeviceManager(DeviceDAO deviceDao, DeviceConfigurationManager deviceConfigMan) {
-		this.deviceDao = deviceDao;
+		super(deviceDao);
 		this.deviceConfigMan = deviceConfigMan;
 	}
 	
-	public List<Device> find() {
-		return find(10, 0);
-	}
-	
-	public List<Device> find(int limit, int offset) {
-		return deviceDao.find(limit, offset);
-	}
-	
-	public long count() {
-		return deviceDao.count();
-	}
-	
-	public Device find(String id) {
-		return deviceDao.find(id);
-	}
-	
 	public Device findByDeviceId(int deviceId) {
-		Device device = deviceDao.findByDeviceId(deviceId);
+		Device device = getDao().findByDeviceId(deviceId);
 		return device != null 
 				? device
 				: new Device()
@@ -50,7 +33,7 @@ public class DeviceManager implements GenericModelManager<Device> {
 			if (config != null) {
 				device.setConfigId(config.get_id());
 				device.setRegistered(true);
-				Device temp = deviceDao.insert(device);
+				Device temp = getDao().insert(device);
 				if (temp == null) {
 					device.setRegistered(false);
 				} else {
@@ -80,11 +63,8 @@ public class DeviceManager implements GenericModelManager<Device> {
 		return cases;
 	}
 
-	public Device update(Device model) {
-		return deviceDao.update(model);
-	}
-
-	public boolean delete(String id) {
-		return deviceDao.delete(id);
+	@Override
+	public int getDefualtLimit() {
+		return 10; // TODO: config or setting
 	}
 }

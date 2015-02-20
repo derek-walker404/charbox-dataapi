@@ -1,14 +1,14 @@
 package com.tpofof.conmon.server;
 
-import java.util.List;
-
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+
+import java.util.List;
+
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -20,7 +20,6 @@ import com.tpofof.conmon.server.data.elasticsearch.TimerResultEsDAO;
 import com.tpofof.conmon.server.data.mongo.DeviceConfigDAO;
 import com.tpofof.conmon.server.data.mongo.DeviceDAO;
 import com.tpofof.conmon.server.data.mongo.TestCaseDAO;
-import com.tpofof.conmon.server.data.mongo.TimerResultDAO;
 import com.tpofof.conmon.server.managers.DeviceConfigurationManager;
 import com.tpofof.conmon.server.managers.DeviceManager;
 import com.tpofof.conmon.server.managers.TestCaseManager;
@@ -56,7 +55,6 @@ public class ConmonApplication extends Application<ConmonConfiguration> {
 		final DBCollection deviceConfigCollection = conmonDb.getCollection("deviceConfig");
 		final DBCollection testCaseCollection = conmonDb.getCollection("testCase");
 		final DBCollection deviceCollection = conmonDb.getCollection("device");
-		final DBCollection timerResultCollection = conmonDb.getCollection("timerResult");
 		/* ELASTICSEARCH */
 		List<ElasticsearchConfiguration> esConfigs = config.getEsConfigs();
 		TransportClient esClient = new TransportClient();
@@ -68,7 +66,6 @@ public class ConmonApplication extends Application<ConmonConfiguration> {
 		final DeviceConfigDAO deviceConfigDao = new DeviceConfigDAO(deviceConfigCollection);
 		final TestCaseDAO testCaseDao = new TestCaseDAO(testCaseCollection);
 		final DeviceDAO deviceDao = new DeviceDAO(deviceCollection);
-		final TimerResultDAO timerResultDao = new TimerResultDAO(timerResultCollection);
 		/* ES DAO */
 		final TimerResultEsDAO timerResultEsDao = new TimerResultEsDAO(esClient);
 		
@@ -76,7 +73,7 @@ public class ConmonApplication extends Application<ConmonConfiguration> {
 		final TestCaseManager testCaseMan = new TestCaseManager(testCaseDao);
 		final DeviceConfigurationManager deviceConfigMan = new DeviceConfigurationManager(deviceConfigDao, testCaseMan);
 		final DeviceManager deviceMan = new DeviceManager(deviceDao, deviceConfigMan);
-		final TimerResultManager timerResultMan = new TimerResultManager(timerResultDao, timerResultEsDao);
+		final TimerResultManager timerResultMan = new TimerResultManager(timerResultEsDao);
 		
 		/* RESOURCES */
 		final DeviceConfigResource deviceConfigResource = new DeviceConfigResource(deviceConfigMan);
