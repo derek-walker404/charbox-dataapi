@@ -1,5 +1,10 @@
 package com.tpofof.conmon.server;
 
+import java.util.List;
+
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
@@ -9,15 +14,17 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.tpofof.conmon.server.config.ConmonConfiguration;
+import com.tpofof.conmon.server.config.ElasticsearchConfiguration;
 import com.tpofof.conmon.server.config.MongoConfig;
+import com.tpofof.conmon.server.data.elasticsearch.TimerResultEsDAO;
+import com.tpofof.conmon.server.data.mongo.DeviceConfigDAO;
+import com.tpofof.conmon.server.data.mongo.DeviceDAO;
+import com.tpofof.conmon.server.data.mongo.TestCaseDAO;
+import com.tpofof.conmon.server.data.mongo.TimerResultDAO;
 import com.tpofof.conmon.server.managers.DeviceConfigurationManager;
 import com.tpofof.conmon.server.managers.DeviceManager;
 import com.tpofof.conmon.server.managers.TestCaseManager;
 import com.tpofof.conmon.server.managers.TimerResultManager;
-import com.tpofof.conmon.server.mongo.DeviceConfigDAO;
-import com.tpofof.conmon.server.mongo.DeviceDAO;
-import com.tpofof.conmon.server.mongo.TestCaseDAO;
-import com.tpofof.conmon.server.mongo.TimerResultDAO;
 import com.tpofof.conmon.server.resources.DeviceResource;
 import com.tpofof.conmon.server.resources.crud.DeviceConfigResource;
 import com.tpofof.conmon.server.resources.crud.TestCaseResource;
@@ -50,18 +57,26 @@ public class ConmonApplication extends Application<ConmonConfiguration> {
 		final DBCollection testCaseCollection = conmonDb.getCollection("testCase");
 		final DBCollection deviceCollection = conmonDb.getCollection("device");
 		final DBCollection timerResultCollection = conmonDb.getCollection("timerResult");
+		/* ELASTICSEARCH */
+		List<ElasticsearchConfiguration> esConfigs = config.getEsConfigs();
+		TransportClient esClient = new TransportClient();
+		for (ElasticsearchConfiguration c : esConfigs) {
+        	esClient.addTransportAddress(new InetSocketTransportAddress(c.getHost(), c.getPort()));
+		}
 		
 		/* DAO */
 		final DeviceConfigDAO deviceConfigDao = new DeviceConfigDAO(deviceConfigCollection);
 		final TestCaseDAO testCaseDao = new TestCaseDAO(testCaseCollection);
 		final DeviceDAO deviceDao = new DeviceDAO(deviceCollection);
 		final TimerResultDAO timerResultDao = new TimerResultDAO(timerResultCollection);
+		/* ES DAO */
+		final TimerResultEsDAO timerResultEsDao = new TimerResultEsDAO(esClient);
 		
 		/* MANAGERS */
 		final TestCaseManager testCaseMan = new TestCaseManager(testCaseDao);
 		final DeviceConfigurationManager deviceConfigMan = new DeviceConfigurationManager(deviceConfigDao, testCaseMan);
 		final DeviceManager deviceMan = new DeviceManager(deviceDao, deviceConfigMan);
-		final TimerResultManager timerResultMan = new TimerResultManager(timerResultDao);
+		final TimerResultManager timerResultMan = new TimerResultManager(timerResultDao, timerResultEsDao);
 		
 		/* RESOURCES */
 		final DeviceConfigResource deviceConfigResource = new DeviceConfigResource(deviceConfigMan);

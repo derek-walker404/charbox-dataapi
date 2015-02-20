@@ -1,7 +1,8 @@
-package com.tpofof.conmon.server.elasticsearch;
+package com.tpofof.conmon.server.data.elasticsearch;
 
 import java.util.List;
 
+import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
@@ -10,17 +11,16 @@ import org.elasticsearch.search.SearchHit;
 
 import com.google.common.collect.Lists;
 import com.pofof.conmon.model.PersistentModel;
+import com.tpofof.conmon.server.data.GenericDAO;
 import com.tpofof.utils.Config;
 import com.tpofof.utils.JsonUtils;
 
-public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel> {
+public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel> implements GenericDAO<ModelT> {
 
 	private final Client client;
 	private final Class<ModelT> modelClass;
 	
 	public GenericElasticsearchDAO(Client client, Class<ModelT> modelClass) {
-//		this.client = new TransportClient()
-//	        .addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
 		this.client = client;
 		this.modelClass = modelClass;
 	}
@@ -48,6 +48,7 @@ public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel> {
 	
 	public List<ModelT> find(int limit, int offset) {
 		SearchResponse response = client.prepareSearch(getIndex())
+				.setTypes(getType())
 				.execute()
 				.actionGet();
 		List<ModelT> models = Lists.newArrayList();
@@ -55,5 +56,30 @@ public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel> {
 			models.add(JsonUtils.fromJson(h.sourceAsString(), modelClass));
 		}
 		return models;
+	}
+	
+	public long count() {
+		CountResponse response = client.prepareCount()
+				.setIndices(getIndex())
+				.setTypes(getType())
+				.execute()
+				.actionGet();
+		return response.getCount();
+	}
+
+	/**
+	 * NOT SUPPORTED
+	 */
+	@Deprecated
+	public ModelT update(ModelT model) {
+		return null;
+	}
+
+	/**
+	 * NOT SUPPORTED
+	 */
+	@Deprecated
+	public boolean delete(String id) {
+		return false;
 	}
 }

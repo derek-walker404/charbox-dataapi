@@ -3,7 +3,7 @@ package com.tpofof.conmon.server.managers;
 import java.util.List;
 
 import com.pofof.conmon.model.TestCase;
-import com.tpofof.conmon.server.mongo.TestCaseDAO;
+import com.tpofof.conmon.server.data.mongo.TestCaseDAO;
 
 public class TestCaseManager implements GenericModelManager<TestCase> {
 
@@ -23,6 +23,10 @@ public class TestCaseManager implements GenericModelManager<TestCase> {
 
 	public List<TestCase> find(int limit, int offset) {
 		return testCaseDao.find(limit, offset);
+	}
+	
+	public long count() {
+		return testCaseDao.count();
 	}
 
 	public TestCase insert(TestCase model) {

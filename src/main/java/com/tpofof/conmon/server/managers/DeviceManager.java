@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.pofof.conmon.model.Device;
 import com.pofof.conmon.model.DeviceConfiguration;
 import com.pofof.conmon.model.TestCase;
-import com.tpofof.conmon.server.mongo.DeviceDAO;
+import com.tpofof.conmon.server.data.mongo.DeviceDAO;
 
 public class DeviceManager implements GenericModelManager<Device> {
 
@@ -24,6 +24,10 @@ public class DeviceManager implements GenericModelManager<Device> {
 	
 	public List<Device> find(int limit, int offset) {
 		return deviceDao.find(limit, offset);
+	}
+	
+	public long count() {
+		return deviceDao.count();
 	}
 	
 	public Device find(String id) {

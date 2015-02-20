@@ -1,14 +1,18 @@
-package com.tpofof.conmon.server.managers;
+package com.tpofof.conmon.server.data;
 
 import java.util.List;
 
-public interface GenericModelManager<ModelT> {
+public interface GenericDAO<ModelT> {
 
-	public ModelT find(String id);
-	public List<ModelT> find();
 	public List<ModelT> find(int limit, int offset);
+	
 	public long count();
+	
+	public ModelT find(String id);
+	
 	public ModelT insert(ModelT model);
+	
 	public ModelT update(ModelT model);
+	
 	public boolean delete(String id);
 }

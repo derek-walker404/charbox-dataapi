@@ -16,6 +16,7 @@ import com.google.common.base.Optional;
 import com.pofof.conmon.model.PersistentModel;
 import com.tpofof.conmon.server.managers.GenericModelManager;
 import com.tpofof.conmon.server.resources.ResponseUtils;
+import com.tpofof.utils.JsonUtils;
 
 public class GenericCrudResource<ModelT extends PersistentModel, ManagerT extends GenericModelManager<ModelT>> {
 
@@ -39,6 +40,16 @@ public class GenericCrudResource<ModelT extends PersistentModel, ManagerT extend
 		int offsetVal = offset.isPresent() && offset.get() >= 0 ? offset.get() : 0;
 		List<ModelT> models = man.find(limitVal, offsetVal);
 		return ResponseUtils.success(ResponseUtils.listData(models, limitVal, offsetVal));
+	}
+	
+	@Path("/count")
+	@GET
+	@Timed
+	public JsonNode count() {
+		long count = man.count();
+		return count >= 0
+				? ResponseUtils.success(JsonUtils.getObjectNode().put("count", count))
+				: ResponseUtils.failure("Could not retrieve count for " + modelClass.getSimpleName(), 500);
 	}
 	
 	@Path("/{_id}")

@@ -1,4 +1,4 @@
-package com.tpofof.conmon.server.mongo;
+package com.tpofof.conmon.server.data.mongo;
 
 import java.util.List;
 
@@ -12,9 +12,10 @@ import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 import com.pofof.conmon.model.PersistentModel;
+import com.tpofof.conmon.server.data.GenericDAO;
 import com.tpofof.utils.JsonUtils;
 
-public class GenericMongoDAO<ModelT extends PersistentModel> {
+public abstract class GenericMongoDAO<ModelT extends PersistentModel> implements GenericDAO<ModelT> {
 
 	private final DBCollection collection;
 	private final Class<ModelT> modelClass;
@@ -28,8 +29,19 @@ public class GenericMongoDAO<ModelT extends PersistentModel> {
 		return collection;
 	}
 	
+	protected boolean hasSort() {
+		return false;
+	}
+	
+	protected DBObject getSort() {
+		return null;
+	}
+	
 	public List<ModelT> find(int limit, int offset) {
 		DBCursor result = getCollection().find().limit(limit).skip(offset);
+		if (hasSort()) {
+			result.sort(getSort());
+		}
 		List<ModelT> cases = Lists.newArrayList();
 		while (result.hasNext()) {
 			ModelT temp = convert(result.next());
@@ -38,6 +50,10 @@ public class GenericMongoDAO<ModelT extends PersistentModel> {
 			}
 		}
 		return cases;
+	}
+	
+	public long count() {
+		return getCollection().count();
 	}
 	
 	public ModelT find(String id) {

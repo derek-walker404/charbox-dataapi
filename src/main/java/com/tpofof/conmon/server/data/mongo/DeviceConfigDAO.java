@@ -1,4 +1,4 @@
-package com.tpofof.conmon.server.mongo;
+package com.tpofof.conmon.server.data.mongo;
 
 import com.mongodb.DBCollection;
 import com.pofof.conmon.model.DeviceConfiguration;

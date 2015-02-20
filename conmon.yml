@@ -2,3 +2,6 @@ mongo:
   host: localhost
   port: 27017
   dbname: conmon
+esConfigs:
+  - host: localhost
+    port: 9300
