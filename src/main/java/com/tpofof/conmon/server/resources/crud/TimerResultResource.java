@@ -28,12 +28,12 @@ public class TimerResultResource extends GenericCrudResource<TimerResult, TimerR
 	@Override
 	public JsonNode post(TimerResult model,
 			@Context HttpServletRequest request) {
-		if (model.getClientIp() == null || model.getClientIp().isEmpty()) {
+		if (model.getClientLocation().getIp() == null || model.getClientLocation().getIp().isEmpty()) {
 			// might be a proxy or local host, but something is better than nothing.
-			model.setClientIp(request.getRemoteAddr());
+			model.getClientLocation().setIp(request.getRemoteAddr());
 		}
-		model.setServerLocation(LocationProvider.getLocation(model.getServerIp()));
-		model.setClientLocation(LocationProvider.getLocation(model.getClientIp()));
+		model.setServerLocation(LocationProvider.getLocation(model.getServerLocation().getIp()));
+		model.setClientLocation(LocationProvider.getLocation(model.getClientLocation().getIp()));
 		return super.post(model, request);
 	}
 }

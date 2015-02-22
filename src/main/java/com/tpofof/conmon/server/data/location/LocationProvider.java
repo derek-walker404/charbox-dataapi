@@ -28,7 +28,7 @@ public final class LocationProvider {
 	private LocationProvider() { }
 	
 	public static MyLocation getLocation(String ip) {
-		MyLocation loc = new MyLocation();
+		MyLocation loc = new MyLocation().setIp(ip);
 		try {
 			InetAddress ipAddress = InetAddress.getByName(ip);
 			CityResponse cityResponse = reader.city(ipAddress);

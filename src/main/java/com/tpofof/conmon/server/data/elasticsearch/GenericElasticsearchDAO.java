@@ -36,8 +36,9 @@ public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel<Mod
 		if (model.get_id() == null || model.get_id().isEmpty()) {
 			model.set_id(new ObjectId().toString());
 		}
+		String jsonSource = convert(model);
 		IndexResponse response = client.prepareIndex(getIndex(), getType(), model.get_id())
-			.setSource(convert(model))
+			.setSource(jsonSource)
 			.execute()
 			.actionGet();
 		return model.get_id().equals(response.getId()) ? model : null;
