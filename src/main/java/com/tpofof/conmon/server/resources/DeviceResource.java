@@ -1,5 +1,6 @@
 package com.tpofof.conmon.server.resources;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -16,6 +17,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
 import com.pofof.conmon.model.Device;
 import com.pofof.conmon.model.TestCase;
+import com.pofof.conmon.model.TimerResult;
 import com.tpofof.conmon.server.managers.DeviceManager;
 
 @Path("/devices")
@@ -87,5 +89,26 @@ public class DeviceResource {
 	public JsonNode register(@PathParam("deviceId") Integer deviceId) {
 		Device device = deviceMan.register(deviceId);
 		return ResponseUtils.success(ResponseUtils.modelData(device));
+	}
+	
+	@Path("/id/{deviceId}/results")
+	@GET
+	@Timed
+	public JsonNode results(@PathParam("deviceId") Integer deviceId,
+			@QueryParam("limit") Optional<Integer> limit,
+			@QueryParam("offset") Optional<Integer> offset) {
+		int lim = -1;
+		int off = -1;
+		List<TimerResult> results = Collections.emptyList();
+		if (limit.isPresent() && limit.get() > 0 && offset.isPresent() && offset.get() >= 0) {
+			lim = limit.get();
+			off = offset.get();
+			results = deviceMan.getResults(deviceId, lim, off);
+		} else {
+			results = deviceMan.getResults(deviceId);
+			lim = results.size(); // TODO: this is the wrong way to do it
+			off = 0;
+		}
+		return ResponseUtils.success(ResponseUtils.listData(results, lim, off));
 	}
 }

@@ -78,8 +78,8 @@ public class ConmonApplication extends Application<ConmonConfiguration> {
 		/* MANAGERS */
 		final TestCaseManager testCaseMan = new TestCaseManager(testCaseDao);
 		final DeviceConfigurationManager deviceConfigMan = new DeviceConfigurationManager(deviceConfigDao, testCaseMan);
-		final DeviceManager deviceMan = new DeviceManager(deviceDao, deviceConfigMan, testCaseMan);
 		final TimerResultManager timerResultMan = new TimerResultManager(timerResultEsDao);
+		final DeviceManager deviceMan = new DeviceManager(deviceDao, deviceConfigMan, testCaseMan, timerResultMan);
 		
 		/* RESOURCES */
 		final DeviceConfigResource deviceConfigResource = new DeviceConfigResource(deviceConfigMan);

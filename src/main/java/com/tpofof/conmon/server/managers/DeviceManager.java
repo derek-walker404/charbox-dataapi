@@ -6,17 +6,20 @@ import com.google.common.collect.Lists;
 import com.pofof.conmon.model.Device;
 import com.pofof.conmon.model.DeviceConfiguration;
 import com.pofof.conmon.model.TestCase;
+import com.pofof.conmon.model.TimerResult;
 import com.tpofof.conmon.server.data.mongo.DeviceDAO;
 
 public class DeviceManager extends AbstractModelManager<Device, DeviceDAO> {
 
 	private final DeviceConfigurationManager deviceConfigMan;
 	private final TestCaseManager testCaseManager;
+	private final TimerResultManager timerResultsManager;
 	
-	public DeviceManager(DeviceDAO deviceDao, DeviceConfigurationManager deviceConfigMan, TestCaseManager testCaseManager) {
+	public DeviceManager(DeviceDAO deviceDao, DeviceConfigurationManager deviceConfigMan, TestCaseManager testCaseManager, TimerResultManager timerResultsManager) {
 		super(deviceDao);
 		this.deviceConfigMan = deviceConfigMan;
 		this.testCaseManager = testCaseManager;
+		this.timerResultsManager = timerResultsManager;
 	}
 	
 	public Device findByDeviceId(int deviceId) {
@@ -65,5 +68,13 @@ public class DeviceManager extends AbstractModelManager<Device, DeviceDAO> {
 	@Override
 	public int getDefualtLimit() {
 		return 10; // TODO: config or setting
+	}
+	
+	public List<TimerResult> getResults(long deviceId) {
+		return timerResultsManager.getByDevice(deviceId);
+	}
+	
+	public List<TimerResult> getResults(long deviceId, int limit, int offset) {
+		return timerResultsManager.getByDevice(deviceId, limit, offset);
 	}
 }

@@ -6,8 +6,10 @@ import org.bson.types.ObjectId;
 import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 
 import com.google.common.collect.Lists;
@@ -52,10 +54,16 @@ public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel<Mod
 	}
 	
 	public List<ModelT> find(int limit, int offset) {
-		SearchResponse response = client.prepareSearch(getIndex())
-				.setTypes(getType())
-				.execute()
-				.actionGet();
+		return find(null, limit, offset);
+	}
+	
+	public List<ModelT> find(QueryBuilder q, int limit, int offset) {
+		SearchRequestBuilder ps = client.prepareSearch(getIndex())
+				.setTypes(getType());
+		if (q != null) {
+			ps.setQuery(q);
+		}
+		SearchResponse response = ps.execute().actionGet();
 		List<ModelT> models = Lists.newArrayList();
 		for (SearchHit h : response.getHits()) {
 			models.add(convert(h.sourceAsString()));

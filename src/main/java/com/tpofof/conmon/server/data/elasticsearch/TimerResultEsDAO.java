@@ -1,13 +1,14 @@
 package com.tpofof.conmon.server.data.elasticsearch;
 
+import java.util.List;
+
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.QueryBuilders;
 
 import com.pofof.conmon.model.TimerResult;
 
 public class TimerResultEsDAO extends GenericElasticsearchDAO<TimerResult> {
 
-//	private final DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern("yyyy/MM/dd HH:mm:ss");
-	
 	public TimerResultEsDAO(Client client) {
 		super(client, TimerResult.class);
 	}
@@ -17,16 +18,7 @@ public class TimerResultEsDAO extends GenericElasticsearchDAO<TimerResult> {
 		return "timerResult";
 	}
 	
-//	protected String convert(TimerResult model) {
-//		DateTime startTime = new DateTime(model.getStartTime());
-//		ObjectNode node = JsonUtils.parseObject(JsonUtils.toJson(model));
-//		node.put("startTime", startTime.toString(DATE_FORMAT));
-//		return node.toString();
-//	}
-//	
-//	protected TimerResult convert(String jsonContent) {
-//		ObjectNode obj = JsonUtils.parseObject(jsonContent);
-//		obj.put("startTime", new DateTime(obj.get("startTime").asText()).toDate().getTime());
-//		return JsonUtils.fromJson(jsonContent, TimerResult.class);
-//	}
+	public List<TimerResult> getByDevice(long deviceId, int limit, int offset) {
+		return find(QueryBuilders.termQuery("deviceId", deviceId), limit, offset);
+	}
 }
