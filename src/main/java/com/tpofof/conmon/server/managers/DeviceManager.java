@@ -11,10 +11,12 @@ import com.tpofof.conmon.server.data.mongo.DeviceDAO;
 public class DeviceManager extends AbstractModelManager<Device, DeviceDAO> {
 
 	private final DeviceConfigurationManager deviceConfigMan;
+	private final TestCaseManager testCaseManager;
 	
-	public DeviceManager(DeviceDAO deviceDao, DeviceConfigurationManager deviceConfigMan) {
+	public DeviceManager(DeviceDAO deviceDao, DeviceConfigurationManager deviceConfigMan, TestCaseManager testCaseManager) {
 		super(deviceDao);
 		this.deviceConfigMan = deviceConfigMan;
+		this.testCaseManager = testCaseManager;
 	}
 	
 	public Device findByDeviceId(int deviceId) {
@@ -55,10 +57,7 @@ public class DeviceManager extends AbstractModelManager<Device, DeviceDAO> {
 	public List<TestCase> getTestCases(Device model) {
 		List<TestCase> cases = Lists.newArrayList();
 		if (model != null) {
-			DeviceConfiguration config = deviceConfigMan.find(model.getConfigId());
-			if (config != null) {
-				cases = deviceConfigMan.getTestCases(config.getTestCaseIds());
-			}
+			cases = testCaseManager.find();
 		}
 		return cases;
 	}

@@ -2,9 +2,10 @@ package com.tpofof.conmon.server.managers;
 
 import java.util.List;
 
+import com.pofof.conmon.model.PersistentModel;
 import com.tpofof.conmon.server.data.GenericDAO;
 
-public abstract class AbstractModelManager<ModelT, ModelDaoT extends GenericDAO<ModelT>> implements GenericModelManager<ModelT> {
+public abstract class AbstractModelManager<ModelT extends PersistentModel<ModelT>, ModelDaoT extends GenericDAO<ModelT>> implements GenericModelManager<ModelT> {
 
 	private final ModelDaoT dao;
 	
@@ -39,6 +40,9 @@ public abstract class AbstractModelManager<ModelT, ModelDaoT extends GenericDAO<
 	}
 
 	public ModelT update(ModelT model) {
+		if (model.get_id() == null || model.get_id().equals("0")) {
+			return this.insert(model);
+		}
 		return dao.update(model);
 	}
 

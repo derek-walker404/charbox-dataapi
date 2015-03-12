@@ -24,7 +24,6 @@ public class DeviceConfigurationManager extends AbstractModelManager<DeviceConfi
 			tcIds.add(tc.get_id());
 		}
 		DeviceConfiguration newConfig = new DeviceConfiguration();
-		newConfig.setTestCaseIds(tcIds);
 		return getDao().insert(newConfig);
 	}
 	

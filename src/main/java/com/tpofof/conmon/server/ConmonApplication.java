@@ -5,11 +5,17 @@ import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
+import java.util.EnumSet;
 import java.util.List;
 
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
+
+import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
+import com.google.common.base.Joiner;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
@@ -72,7 +78,7 @@ public class ConmonApplication extends Application<ConmonConfiguration> {
 		/* MANAGERS */
 		final TestCaseManager testCaseMan = new TestCaseManager(testCaseDao);
 		final DeviceConfigurationManager deviceConfigMan = new DeviceConfigurationManager(deviceConfigDao, testCaseMan);
-		final DeviceManager deviceMan = new DeviceManager(deviceDao, deviceConfigMan);
+		final DeviceManager deviceMan = new DeviceManager(deviceDao, deviceConfigMan, testCaseMan);
 		final TimerResultManager timerResultMan = new TimerResultManager(timerResultEsDao);
 		
 		/* RESOURCES */
@@ -84,6 +90,17 @@ public class ConmonApplication extends Application<ConmonConfiguration> {
 		env.jersey().register(deviceResource);
 		final TimerResultResource timerResultResource = new TimerResultResource(timerResultMan);
 		env.jersey().register(timerResultResource);
+		
+		/* CORS */
+		final FilterRegistration.Dynamic cors = env.servlets().addFilter("CORS", CrossOriginFilter.class);
+
+	    // Configure CORS parameters
+	    cors.setInitParameter("allowedOrigins", "*");
+	    cors.setInitParameter("allowedHeaders", "X-Requested-With,Content-Type,Accept,Origin");
+	    cors.setInitParameter("allowedMethods", "OPTIONS,GET,PUT,POST,DELETE,HEAD");
+
+	    // Add URL mapping
+	    cors.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
 	}
 
 }

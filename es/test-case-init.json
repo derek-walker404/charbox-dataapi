@@ -18,3 +18,19 @@
 	"name": "netflix",
 	"uri": "https://secure.netflix.com/ffe/siteui/acquisition/home/thisIsNetflix/5x3.5/Lifestyle_bg_This_is_Netflix_lg01.jpg"
 }
+{ 
+	"name": "Think Broadband",
+	"uri": "http://ipv4.download.thinkbroadband.com/5MB.zip"
+}
+{ 
+	"name": "Yahoo!",
+	"uri": "https://s1.yimg.com/bt/api/res/1.2/y5rWut3ucdffHSguJgjf0A--/YXBwaWQ9eW5ld3M7Y2g9MTA4MDtjcj0xO2N3PTE5MTk7ZHg9MTtkeT0wO2ZpPXVsY3JvcDtoPTcwMDtpbD1wbGFuZTtxPTc1O3c9MTI0NA--/http://l.yimg.com/os/publish-images/autos/2015-03-03/56752880-c184-11e4-9104-41f9c58cc772_IMG_4193.JPG"
+}
+{ 
+	"name": "Twitter",
+	"uri": "https://abs.twimg.com/b/front_page/v1/US_CA_3.jpg"
+}
+{ 
+	"name": "Instagram",
+	"uri": "https://instagramstatic-a.akamaihd.net/bluebar/da90a51/images/homepage/screenshot1.jpg"
+}
