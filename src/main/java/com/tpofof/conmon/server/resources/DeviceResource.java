@@ -16,6 +16,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
 import com.pofof.conmon.model.Device;
+import com.pofof.conmon.model.Heartbeat;
 import com.pofof.conmon.model.TestCase;
 import com.pofof.conmon.model.TimerResult;
 import com.tpofof.conmon.server.managers.DeviceManager;
@@ -110,5 +111,26 @@ public class DeviceResource {
 			off = 0;
 		}
 		return ResponseUtils.success(ResponseUtils.listData(results, lim, off));
+	}
+	
+	@Path("/id/{deviceId}/hb")
+	@POST
+	@Timed
+	public JsonNode heartbeat(@PathParam("deviceId") Integer deviceId) {
+		if (deviceMan.findByDeviceId(deviceId) == null) {
+			return ResponseUtils.failure("Could not find device with id " + deviceId, 404);
+		}
+		Heartbeat heartBeat = deviceMan.heartbeat(deviceId, System.currentTimeMillis());;
+		return heartBeat != null 
+				? ResponseUtils.success(ResponseUtils.modelData(heartBeat))
+				: ResponseUtils.failure("Could not register heartbeat for device with id " + deviceId, 500);
+	}
+	
+	@Path("/id/{deviceId}/hb")
+	@GET
+	@Timed
+	public JsonNode getDeviceHeartbeats(@PathParam("deviceId") Integer deviceId) {
+		List<Heartbeat> heartbeats = deviceMan.getHeartbeats(deviceId);
+		return ResponseUtils.success(ResponseUtils.listData(heartbeats, heartbeats.size(), 0));
 	}
 }
