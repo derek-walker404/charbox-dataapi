@@ -13,6 +13,7 @@ import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 import com.pofof.conmon.model.PersistentModel;
 import com.tpofof.conmon.server.data.GenericDAO;
+import com.tpofof.conmon.server.data.SearchResults;
 import com.tpofof.utils.JsonUtils;
 
 public abstract class GenericMongoDAO<ModelT extends PersistentModel<ModelT>> implements GenericDAO<ModelT> {
@@ -37,19 +38,22 @@ public abstract class GenericMongoDAO<ModelT extends PersistentModel<ModelT>> im
 		return null;
 	}
 	
-	public List<ModelT> find(int limit, int offset) {
+	public SearchResults<ModelT> find(int limit, int offset) {
 		DBCursor result = getCollection().find().limit(limit).skip(offset);
 		if (hasSort()) {
 			result.sort(getSort());
 		}
-		List<ModelT> cases = Lists.newArrayList();
+		List<ModelT> models = Lists.newArrayList();
 		while (result.hasNext()) {
 			ModelT temp = convert(result.next());
 			if (temp != null) {
-				cases.add(temp);
+				models.add(temp);
 			}
 		}
-		return cases;
+		return new SearchResults<ModelT>()
+				.setLimit(limit)
+				.setOffset(offset)
+				.setResults(models);
 	}
 	
 	public long count() {

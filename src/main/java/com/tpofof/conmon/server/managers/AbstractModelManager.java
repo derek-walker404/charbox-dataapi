@@ -1,9 +1,8 @@
 package com.tpofof.conmon.server.managers;
 
-import java.util.List;
-
 import com.pofof.conmon.model.PersistentModel;
 import com.tpofof.conmon.server.data.GenericDAO;
+import com.tpofof.conmon.server.data.SearchResults;
 
 public abstract class AbstractModelManager<ModelT extends PersistentModel<ModelT>, ModelDaoT extends GenericDAO<ModelT>> implements GenericModelManager<ModelT> {
 
@@ -23,12 +22,12 @@ public abstract class AbstractModelManager<ModelT extends PersistentModel<ModelT
 	
 	public abstract int getDefualtLimit();
 
-	public List<ModelT> find() {
+	public SearchResults<ModelT> find() {
 		return find(getDefualtLimit(), 0);
 	}
 
-	public List<ModelT> find(int limit, int offset) {
-		return dao.find(limit, offset);
+	public SearchResults<ModelT> find(int limit, int offset) {
+		return dao.find(limit <= 0 ? getDefualtLimit() : limit, offset);
 	}
 
 	public long count() {

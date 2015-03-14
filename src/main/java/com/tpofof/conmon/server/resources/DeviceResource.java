@@ -1,6 +1,5 @@
 package com.tpofof.conmon.server.resources;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -19,6 +18,7 @@ import com.pofof.conmon.model.Device;
 import com.pofof.conmon.model.Heartbeat;
 import com.pofof.conmon.model.TestCase;
 import com.pofof.conmon.model.TimerResult;
+import com.tpofof.conmon.server.data.SearchResults;
 import com.tpofof.conmon.server.managers.DeviceManager;
 
 @Path("/devices")
@@ -38,8 +38,8 @@ public class DeviceResource {
 			@QueryParam("offset") Optional<Integer> offset) {
 		int limitVal = limit.isPresent() && limit.get() > 0 ? limit.get() : 10;
 		int offsetVal = offset.isPresent() && offset.get() >= 0 ? offset.get() : 0;
-		List<Device> devices = deviceMan.find(limitVal, offsetVal);
-		return ResponseUtils.success(ResponseUtils.listData(devices, limitVal, offsetVal));
+		SearchResults<Device> results = deviceMan.find(limitVal, offsetVal);
+		return ResponseUtils.success(ResponseUtils.listData(results));
 	}
 	
 	@Path("/{_id}")
@@ -100,17 +100,15 @@ public class DeviceResource {
 			@QueryParam("offset") Optional<Integer> offset) {
 		int lim = -1;
 		int off = -1;
-		List<TimerResult> results = Collections.emptyList();
+		SearchResults<TimerResult> results;
 		if (limit.isPresent() && limit.get() > 0 && offset.isPresent() && offset.get() >= 0) {
 			lim = limit.get();
 			off = offset.get();
 			results = deviceMan.getResults(deviceId, lim, off);
 		} else {
 			results = deviceMan.getResults(deviceId);
-			lim = results.size(); // TODO: this is the wrong way to do it
-			off = 0;
 		}
-		return ResponseUtils.success(ResponseUtils.listData(results, lim, off));
+		return ResponseUtils.success(ResponseUtils.listData(results));
 	}
 	
 	@Path("/id/{deviceId}/hb")
@@ -130,7 +128,7 @@ public class DeviceResource {
 	@GET
 	@Timed
 	public JsonNode getDeviceHeartbeats(@PathParam("deviceId") Integer deviceId) {
-		List<Heartbeat> heartbeats = deviceMan.getHeartbeats(deviceId);
-		return ResponseUtils.success(ResponseUtils.listData(heartbeats, heartbeats.size(), 0));
+		SearchResults<Heartbeat> results = deviceMan.getHeartbeats(deviceId);
+		return ResponseUtils.success(ResponseUtils.listData(results));
 	}
 }

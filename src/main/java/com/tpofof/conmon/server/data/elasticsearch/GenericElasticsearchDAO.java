@@ -15,6 +15,7 @@ import org.elasticsearch.search.SearchHit;
 import com.google.common.collect.Lists;
 import com.pofof.conmon.model.PersistentModel;
 import com.tpofof.conmon.server.data.GenericDAO;
+import com.tpofof.conmon.server.data.SearchResults;
 import com.tpofof.utils.Config;
 import com.tpofof.utils.JsonUtils;
 
@@ -53,11 +54,11 @@ public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel<Mod
 		return convert(response.toString());
 	}
 	
-	public List<ModelT> find(int limit, int offset) {
+	public SearchResults<ModelT> find(int limit, int offset) {
 		return find(null, limit, offset);
 	}
 	
-	public List<ModelT> find(QueryBuilder q, int limit, int offset) {
+	public SearchResults<ModelT> find(QueryBuilder q, int limit, int offset) {
 		SearchRequestBuilder ps = client.prepareSearch(getIndex())
 				.setTypes(getType());
 		if (q != null) {
@@ -68,7 +69,10 @@ public abstract class GenericElasticsearchDAO<ModelT extends PersistentModel<Mod
 		for (SearchHit h : response.getHits()) {
 			models.add(convert(h.sourceAsString()));
 		}
-		return models;
+		return new SearchResults<ModelT>()
+				.setLimit(limit)
+				.setOffset(offset)
+				.setResults(models);
 	}
 	
 	public long count() {

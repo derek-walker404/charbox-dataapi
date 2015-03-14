@@ -1,11 +1,10 @@
 package com.tpofof.conmon.server.data.elasticsearch;
 
-import java.util.List;
-
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 
 import com.pofof.conmon.model.TimerResult;
+import com.tpofof.conmon.server.data.SearchResults;
 
 public class TimerResultEsDAO extends GenericElasticsearchDAO<TimerResult> {
 
@@ -18,7 +17,7 @@ public class TimerResultEsDAO extends GenericElasticsearchDAO<TimerResult> {
 		return "timerResult";
 	}
 	
-	public List<TimerResult> getByDevice(long deviceId, int limit, int offset) {
+	public SearchResults<TimerResult> getByDevice(long deviceId, int limit, int offset) {
 		return find(QueryBuilders.termQuery("deviceId", deviceId), limit, offset);
 	}
 }

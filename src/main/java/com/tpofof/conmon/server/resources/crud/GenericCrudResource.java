@@ -1,7 +1,5 @@
 package com.tpofof.conmon.server.resources.crud;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -16,11 +14,12 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
 import com.pofof.conmon.model.PersistentModel;
+import com.tpofof.conmon.server.data.SearchResults;
 import com.tpofof.conmon.server.managers.GenericModelManager;
 import com.tpofof.conmon.server.resources.ResponseUtils;
 import com.tpofof.utils.JsonUtils;
 
-public class GenericCrudResource<ModelT extends PersistentModel, ManagerT extends GenericModelManager<ModelT>> {
+public class GenericCrudResource<ModelT extends PersistentModel<ModelT>, ManagerT extends GenericModelManager<ModelT>> {
 
 	private final ManagerT man;
 	private final Class<ModelT> modelClass;
@@ -39,10 +38,10 @@ public class GenericCrudResource<ModelT extends PersistentModel, ManagerT extend
 	public JsonNode findModels(@QueryParam("limit") Optional<Integer> limit,
 			@QueryParam("offset") Optional<Integer> offset,
 			@Context HttpServletRequest request) {
-		int limitVal = limit.isPresent() && limit.get() > 0 ? limit.get() : 20;
+		int limitVal = limit.isPresent() && limit.get() > 0 ? limit.get() : -1;
 		int offsetVal = offset.isPresent() && offset.get() >= 0 ? offset.get() : 0;
-		List<ModelT> models = man.find(limitVal, offsetVal);
-		return ResponseUtils.success(ResponseUtils.listData(models, limitVal, offsetVal));
+		SearchResults<ModelT> results = man.find(limitVal, offsetVal);
+		return ResponseUtils.success(ResponseUtils.listData(results));
 	}
 	
 	@Path("/count")

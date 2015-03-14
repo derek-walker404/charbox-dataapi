@@ -18,7 +18,7 @@ public class DeviceConfigurationManager extends AbstractModelManager<DeviceConfi
 	}
 	
 	public DeviceConfiguration getNewConfig() {
-		List<TestCase> cases = testCaseMan.find(6, 0); // TODO: convert to manager and get random set
+		List<TestCase> cases = testCaseMan.find(6, 0).getResults(); // TODO: convert to manager and get random set
 		List<String> tcIds = Lists.newArrayList();
 		for (TestCase tc : cases) {
 			tcIds.add(tc.get_id());

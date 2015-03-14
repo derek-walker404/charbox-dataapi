@@ -8,6 +8,7 @@ import com.pofof.conmon.model.DeviceConfiguration;
 import com.pofof.conmon.model.Heartbeat;
 import com.pofof.conmon.model.TestCase;
 import com.pofof.conmon.model.TimerResult;
+import com.tpofof.conmon.server.data.SearchResults;
 import com.tpofof.conmon.server.data.mongo.DeviceDAO;
 
 public class DeviceManager extends AbstractModelManager<Device, DeviceDAO> {
@@ -65,7 +66,7 @@ public class DeviceManager extends AbstractModelManager<Device, DeviceDAO> {
 	public List<TestCase> getTestCases(Device model) {
 		List<TestCase> cases = Lists.newArrayList();
 		if (model != null) {
-			cases = testCaseManager.find();
+			cases = testCaseManager.find().getResults();
 		}
 		return cases;
 	}
@@ -75,11 +76,11 @@ public class DeviceManager extends AbstractModelManager<Device, DeviceDAO> {
 		return 10; // TODO: config or setting
 	}
 	
-	public List<TimerResult> getResults(long deviceId) {
+	public SearchResults<TimerResult> getResults(long deviceId) {
 		return timerResultsManager.getByDevice(deviceId);
 	}
 	
-	public List<TimerResult> getResults(long deviceId, int limit, int offset) {
+	public SearchResults<TimerResult> getResults(long deviceId, int limit, int offset) {
 		return timerResultsManager.getByDevice(deviceId, limit, offset);
 	}
 	
@@ -87,7 +88,7 @@ public class DeviceManager extends AbstractModelManager<Device, DeviceDAO> {
 		return hbManager.insert(deviceId, time);
 	}
 	
-	public List<Heartbeat> getHeartbeats(int deviceId) {
+	public SearchResults<Heartbeat> getHeartbeats(int deviceId) {
 		return hbManager.findByDeviceId(deviceId);
 	}
 }

@@ -1,8 +1,7 @@
 package com.tpofof.conmon.server.managers;
 
-import java.util.List;
-
 import com.pofof.conmon.model.Heartbeat;
+import com.tpofof.conmon.server.data.SearchResults;
 import com.tpofof.conmon.server.data.mongo.HeartbeatDAO;
 
 public class HeartbeatManager extends AbstractModelManager<Heartbeat, HeartbeatDAO> {
@@ -21,7 +20,7 @@ public class HeartbeatManager extends AbstractModelManager<Heartbeat, HeartbeatD
 		
 	}
 
-	public List<Heartbeat> findByDeviceId(int deviceId) {
+	public SearchResults<Heartbeat> findByDeviceId(int deviceId) {
 		return getDao().findByDeviceId(deviceId);
 	}
 }

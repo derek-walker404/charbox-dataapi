@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.tpofof.conmon.server.data.SearchResults;
 import com.tpofof.utils.JsonUtils;
 
 public class ResponseUtils {
@@ -41,6 +42,10 @@ public class ResponseUtils {
 		return node;
 	}
 	
+	public static JsonNode listData(SearchResults<?> results) {
+		return listData(results.getResults(), results.getLimit(), results.getOffset());
+	}
+	
 	public static JsonNode listData(List<?> content, int limit, int offset) {
 		ObjectNode node = mapper.createObjectNode();
 		node.put("type", "collection");
@@ -53,8 +58,8 @@ public class ResponseUtils {
 		ObjectNode pagingNode = mapper.createObjectNode();
 		boolean hasMore = content.size() == limit;
 		pagingNode.put("hasMore", hasMore);
-		pagingNode.put("limit", hasMore ? limit : -1);
-		pagingNode.put("offset", hasMore ? (offset + limit) : -1);
+		pagingNode.put("limit", limit);
+		pagingNode.put("offset", offset + limit);
 		node.put("next", pagingNode);
 		return node;
 	}

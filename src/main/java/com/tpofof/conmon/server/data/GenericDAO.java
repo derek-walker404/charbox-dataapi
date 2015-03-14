@@ -1,10 +1,9 @@
 package com.tpofof.conmon.server.data;
 
-import java.util.List;
 
 public interface GenericDAO<ModelT> {
 
-	public List<ModelT> find(int limit, int offset);
+	public SearchResults<ModelT> find(int limit, int offset);
 	
 	public long count();
 	

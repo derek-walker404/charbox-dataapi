@@ -1,8 +1,7 @@
 package com.tpofof.conmon.server.managers;
 
-import java.util.List;
-
 import com.pofof.conmon.model.TimerResult;
+import com.tpofof.conmon.server.data.SearchResults;
 import com.tpofof.conmon.server.data.elasticsearch.TimerResultEsDAO;
 
 public class TimerResultManager extends AbstractModelManager<TimerResult, TimerResultEsDAO> {
@@ -34,11 +33,11 @@ public class TimerResultManager extends AbstractModelManager<TimerResult, TimerR
 		return 20;
 	}
 	
-	public List<TimerResult> getByDevice(long deviceId) {
+	public SearchResults<TimerResult> getByDevice(long deviceId) {
 		return getByDevice(deviceId, getDefualtLimit(), 0);
 	}
 	
-	public List<TimerResult> getByDevice(long deviceId, int limit, int offset) {
+	public SearchResults<TimerResult> getByDevice(long deviceId, int limit, int offset) {
 		return getDao().getByDevice(deviceId, limit, offset);
 	}
 }
