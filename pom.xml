@@ -8,7 +8,7 @@
 	<properties>
 		<dropwizard.version>0.7.1</dropwizard.version>
 	</properties>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<dependencies>
 		<dependency>
 			<groupId>io.dropwizard</groupId>

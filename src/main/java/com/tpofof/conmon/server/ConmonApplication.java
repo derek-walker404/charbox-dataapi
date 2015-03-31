@@ -15,9 +15,11 @@ import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
+import com.codahale.metrics.MetricSet;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
+import com.pofof.conmon.mm.MaxMindService;
 import com.tpofof.conmon.server.config.ConmonConfiguration;
 import com.tpofof.conmon.server.config.ElasticsearchConfiguration;
 import com.tpofof.conmon.server.config.MongoConfig;
@@ -25,17 +27,25 @@ import com.tpofof.conmon.server.data.elasticsearch.TimerResultEsDAO;
 import com.tpofof.conmon.server.data.mongo.DeviceConfigDAO;
 import com.tpofof.conmon.server.data.mongo.DeviceDAO;
 import com.tpofof.conmon.server.data.mongo.HeartbeatDAO;
+import com.tpofof.conmon.server.data.mongo.OutageDAO;
 import com.tpofof.conmon.server.data.mongo.TestCaseDAO;
+import com.tpofof.conmon.server.health.GuavaCacheMetrics;
+import com.tpofof.conmon.server.health.MaxMindAccountHealth;
+import com.tpofof.conmon.server.health.MaxMindConnectionHealth;
 import com.tpofof.conmon.server.managers.DeviceConfigurationManager;
 import com.tpofof.conmon.server.managers.DeviceManager;
 import com.tpofof.conmon.server.managers.HeartbeatManager;
+import com.tpofof.conmon.server.managers.OutageManager;
 import com.tpofof.conmon.server.managers.TestCaseManager;
 import com.tpofof.conmon.server.managers.TimerResultManager;
 import com.tpofof.conmon.server.resources.DeviceResource;
+import com.tpofof.conmon.server.resources.MaxMindResource;
 import com.tpofof.conmon.server.resources.crud.DeviceConfigResource;
 import com.tpofof.conmon.server.resources.crud.HeartbeatResource;
+import com.tpofof.conmon.server.resources.crud.OutageResource;
 import com.tpofof.conmon.server.resources.crud.TestCaseResource;
 import com.tpofof.conmon.server.resources.crud.TimerResultResource;
+import com.tpofof.utils.Config;
 
 public class ConmonApplication extends Application<ConmonConfiguration> {
 
@@ -64,18 +74,22 @@ public class ConmonApplication extends Application<ConmonConfiguration> {
 		final DBCollection testCaseCollection = conmonDb.getCollection("testCase");
 		final DBCollection deviceCollection = conmonDb.getCollection("device");
 		final DBCollection hbCollection = conmonDb.getCollection("hb");
+		final DBCollection outagesCollection = conmonDb.getCollection("outages");
 		/* ELASTICSEARCH */
 		List<ElasticsearchConfiguration> esConfigs = config.getEsConfigs();
 		TransportClient esClient = new TransportClient();
 		for (ElasticsearchConfiguration c : esConfigs) {
         	esClient.addTransportAddress(new InetSocketTransportAddress(c.getHost(), c.getPort()));
 		}
+		/* MAXMIND */
+		MaxMindService maxMindService = new MaxMindService(); // pull args out of constructor?
 		
 		/* MONGO DAO */
 		final DeviceConfigDAO deviceConfigDao = new DeviceConfigDAO(deviceConfigCollection);
 		final TestCaseDAO testCaseDao = new TestCaseDAO(testCaseCollection);
 		final DeviceDAO deviceDao = new DeviceDAO(deviceCollection);
 		final HeartbeatDAO hbDao = new HeartbeatDAO(hbCollection);
+		final OutageDAO outagesDAO = new OutageDAO(outagesCollection);
 		/* ES DAO */
 		final TimerResultEsDAO timerResultEsDao = new TimerResultEsDAO(esClient);
 		
@@ -84,6 +98,7 @@ public class ConmonApplication extends Application<ConmonConfiguration> {
 		final DeviceConfigurationManager deviceConfigMan = new DeviceConfigurationManager(deviceConfigDao, testCaseMan);
 		final TimerResultManager timerResultMan = new TimerResultManager(timerResultEsDao);
 		final HeartbeatManager hbManager = new HeartbeatManager(hbDao);
+		final OutageManager outagesManager = new OutageManager(outagesDAO);
 	 	final DeviceManager deviceMan = new DeviceManager(deviceDao, deviceConfigMan, testCaseMan, timerResultMan, hbManager);
 		
 		/* RESOURCES */
@@ -97,6 +112,20 @@ public class ConmonApplication extends Application<ConmonConfiguration> {
 		env.jersey().register(timerResultResource);
 		final HeartbeatResource hbResource = new HeartbeatResource(hbManager);
 		env.jersey().register(hbResource);
+		final OutageResource outagesResource = new OutageResource(outagesManager);
+		env.jersey().register(outagesResource);
+		final MaxMindResource maxMindResource = new MaxMindResource(maxMindService);
+		env.jersey().register(maxMindResource);
+		
+		/* HEALTH CHECKS */
+		MaxMindAccountHealth maxMindAccountHealth = new MaxMindAccountHealth(maxMindService, Config.get().getInt("location.api.requests.minThreshold"));
+		env.healthChecks().register("mm.account", maxMindAccountHealth);
+		MaxMindConnectionHealth maxMindConnectionHealth = new MaxMindConnectionHealth(maxMindService);
+		env.healthChecks().register("mm.connection", maxMindConnectionHealth);
+		
+		/* METRICS */
+		MetricSet maxMindCacheMetrics = GuavaCacheMetrics.metricsFor("mm.service", maxMindService.getCache());
+		env.metrics().registerAll(maxMindCacheMetrics);
 		
 		/* CORS */
 		final FilterRegistration.Dynamic cors = env.servlets().addFilter("CORS", CrossOriginFilter.class);

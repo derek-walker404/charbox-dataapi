@@ -1,7 +1,7 @@
 mongo:
   host: localhost
   port: 27017
-  dbname: conmon
+  dbname: charbox_alpha_local
 esConfigs:
   - host: localhost
     port: 9300
