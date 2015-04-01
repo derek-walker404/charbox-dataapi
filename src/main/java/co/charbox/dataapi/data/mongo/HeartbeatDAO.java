@@ -2,15 +2,16 @@ package co.charbox.dataapi.data.mongo;
 
 import java.util.List;
 
-import co.charbox.dataapi.data.SearchResults;
+import co.charbox.core.data.SearchResults;
+import co.charbox.core.data.mongo.AbstractMongoDAO;
+import co.charbox.domain.model.Heartbeat;
 
 import com.google.api.client.util.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
-import com.pofof.conmon.model.Heartbeat;
 
-public class HeartbeatDAO extends GenericMongoDAO<Heartbeat> {
+public class HeartbeatDAO extends AbstractMongoDAO<Heartbeat> {
 
 	private static final long HOUR_IN_MS = 1000 * 60 * 60;
 	

@@ -10,22 +10,22 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
-import co.charbox.dataapi.data.SearchResults;
+import co.charbox.core.data.PersistentModel;
+import co.charbox.core.data.SearchResults;
+import co.charbox.core.utils.JsonUtils;
 import co.charbox.dataapi.managers.GenericModelManager;
 import co.charbox.dataapi.resources.ResponseUtils;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
-import com.pofof.conmon.model.PersistentModel;
-import com.tpofof.utils.JsonUtils;
 
-public class GenericCrudResource<ModelT extends PersistentModel<ModelT>, ManagerT extends GenericModelManager<ModelT>> {
+public abstract class AbstractCrudResource<ModelT extends PersistentModel<ModelT>, ManagerT extends GenericModelManager<ModelT>> {
 
 	private final ManagerT man;
 	private final Class<ModelT> modelClass;
 	
-	public GenericCrudResource(ManagerT man, Class<ModelT> modelClass) {
+	public AbstractCrudResource(ManagerT man, Class<ModelT> modelClass) {
 		this.man = man;
 		this.modelClass = modelClass;
 	}

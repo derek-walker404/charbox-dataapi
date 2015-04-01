@@ -1,6 +1,6 @@
 package co.charbox.dataapi.managers;
 
-import co.charbox.dataapi.data.SearchResults;
+import co.charbox.core.data.SearchResults;
 
 public interface GenericModelManager<ModelT> {
 

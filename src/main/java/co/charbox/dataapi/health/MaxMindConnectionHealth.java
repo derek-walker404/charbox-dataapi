@@ -1,7 +1,8 @@
 package co.charbox.dataapi.health;
 
+import co.charbox.domain.mm.MaxMindService;
+
 import com.codahale.metrics.health.HealthCheck;
-import com.pofof.conmon.mm.MaxMindService;
 
 public class MaxMindConnectionHealth extends HealthCheck {
 

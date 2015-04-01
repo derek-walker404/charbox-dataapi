@@ -1,9 +1,11 @@
 package co.charbox.dataapi.data.mongo;
 
-import com.mongodb.DBCollection;
-import com.pofof.conmon.model.DeviceConfiguration;
+import co.charbox.core.data.mongo.AbstractMongoDAO;
+import co.charbox.domain.model.DeviceConfiguration;
 
-public class DeviceConfigDAO extends GenericMongoDAO<DeviceConfiguration> {
+import com.mongodb.DBCollection;
+
+public class DeviceConfigDAO extends AbstractMongoDAO<DeviceConfiguration> {
 
 	public DeviceConfigDAO(DBCollection collection) {
 		super(collection, DeviceConfiguration.class);

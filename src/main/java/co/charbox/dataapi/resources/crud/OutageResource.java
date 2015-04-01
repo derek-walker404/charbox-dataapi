@@ -9,20 +9,20 @@ import javax.ws.rs.core.MediaType;
 
 import org.joda.time.DateTime;
 
-import co.charbox.dataapi.data.SearchResults;
+import co.charbox.core.data.SearchResults;
 import co.charbox.dataapi.managers.OutageManager;
 import co.charbox.dataapi.resources.RequestUtils;
 import co.charbox.dataapi.resources.ResponseUtils;
+import co.charbox.domain.model.Outage;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
-import com.pofof.conmon.model.Outage;
 
 @Path("/outages")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class OutageResource extends GenericCrudResource<Outage, OutageManager> {
+public class OutageResource extends AbstractCrudResource<Outage, OutageManager> {
 
 	public OutageResource(OutageManager man) {
 		super(man, Outage.class);

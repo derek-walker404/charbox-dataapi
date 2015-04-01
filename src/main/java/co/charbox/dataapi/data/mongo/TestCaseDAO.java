@@ -1,9 +1,11 @@
 package co.charbox.dataapi.data.mongo;
 
-import com.mongodb.DBCollection;
-import com.pofof.conmon.model.TestCase;
+import co.charbox.core.data.mongo.AbstractMongoDAO;
+import co.charbox.domain.model.TestCase;
 
-public class TestCaseDAO extends GenericMongoDAO<TestCase> {
+import com.mongodb.DBCollection;
+
+public class TestCaseDAO extends AbstractMongoDAO<TestCase> {
 	
 	public TestCaseDAO(DBCollection testCaseCollection) {
 		super(testCaseCollection, TestCase.class);

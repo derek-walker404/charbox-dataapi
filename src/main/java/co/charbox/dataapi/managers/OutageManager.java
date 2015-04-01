@@ -2,10 +2,9 @@ package co.charbox.dataapi.managers;
 
 import org.joda.time.DateTime;
 
-import co.charbox.dataapi.data.SearchResults;
+import co.charbox.core.data.SearchResults;
 import co.charbox.dataapi.data.mongo.OutageDAO;
-
-import com.pofof.conmon.model.Outage;
+import co.charbox.domain.model.Outage;
 
 public class OutageManager extends AbstractModelManager<Outage, OutageDAO> {
 

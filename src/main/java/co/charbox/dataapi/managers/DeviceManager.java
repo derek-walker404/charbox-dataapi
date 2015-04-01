@@ -2,15 +2,15 @@ package co.charbox.dataapi.managers;
 
 import java.util.List;
 
-import co.charbox.dataapi.data.SearchResults;
+import co.charbox.core.data.SearchResults;
 import co.charbox.dataapi.data.mongo.DeviceDAO;
+import co.charbox.domain.model.Device;
+import co.charbox.domain.model.DeviceConfiguration;
+import co.charbox.domain.model.Heartbeat;
+import co.charbox.domain.model.TestCase;
+import co.charbox.domain.model.TimerResult;
 
 import com.google.common.collect.Lists;
-import com.pofof.conmon.model.Device;
-import com.pofof.conmon.model.DeviceConfiguration;
-import com.pofof.conmon.model.Heartbeat;
-import com.pofof.conmon.model.TestCase;
-import com.pofof.conmon.model.TimerResult;
 
 public class DeviceManager extends AbstractModelManager<Device, DeviceDAO> {
 

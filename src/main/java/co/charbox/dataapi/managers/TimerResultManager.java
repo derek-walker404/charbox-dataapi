@@ -1,9 +1,8 @@
 package co.charbox.dataapi.managers;
 
-import co.charbox.dataapi.data.SearchResults;
+import co.charbox.core.data.SearchResults;
 import co.charbox.dataapi.data.elasticsearch.TimerResultEsDAO;
-
-import com.pofof.conmon.model.TimerResult;
+import co.charbox.domain.model.TimerResult;
 
 public class TimerResultManager extends AbstractModelManager<TimerResult, TimerResultEsDAO> {
 

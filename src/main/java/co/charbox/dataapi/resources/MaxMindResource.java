@@ -7,10 +7,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import co.charbox.domain.mm.MaxMindService;
+import co.charbox.domain.model.mm.ConnectionInfoModel;
+
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.pofof.conmon.mm.MaxMindService;
-import com.pofof.conmon.model.mm.ConnectionInfoModel;
 
 @Path("/mm")
 @Produces(MediaType.APPLICATION_JSON)

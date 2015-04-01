@@ -3,10 +3,10 @@ package co.charbox.dataapi.managers;
 import java.util.List;
 
 import co.charbox.dataapi.data.mongo.DeviceConfigDAO;
+import co.charbox.domain.model.DeviceConfiguration;
+import co.charbox.domain.model.TestCase;
 
 import com.google.common.collect.Lists;
-import com.pofof.conmon.model.DeviceConfiguration;
-import com.pofof.conmon.model.TestCase;
 
 public class DeviceConfigurationManager extends AbstractModelManager<DeviceConfiguration, DeviceConfigDAO> {
 

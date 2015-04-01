@@ -15,6 +15,7 @@ import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
+import co.charbox.core.utils.Config;
 import co.charbox.dataapi.config.ConmonConfiguration;
 import co.charbox.dataapi.config.ElasticsearchConfiguration;
 import co.charbox.dataapi.config.MongoConfig;
@@ -40,13 +41,12 @@ import co.charbox.dataapi.resources.crud.HeartbeatResource;
 import co.charbox.dataapi.resources.crud.OutageResource;
 import co.charbox.dataapi.resources.crud.TestCaseResource;
 import co.charbox.dataapi.resources.crud.TimerResultResource;
+import co.charbox.domain.mm.MaxMindService;
 
 import com.codahale.metrics.MetricSet;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
-import com.pofof.conmon.mm.MaxMindService;
-import com.tpofof.utils.Config;
 
 public class ConmonApplication extends Application<ConmonConfiguration> {
 

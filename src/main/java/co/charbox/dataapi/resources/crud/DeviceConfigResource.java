@@ -6,13 +6,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import co.charbox.dataapi.managers.DeviceConfigurationManager;
-
-import com.pofof.conmon.model.DeviceConfiguration;
+import co.charbox.domain.model.DeviceConfiguration;
 
 @Path("/configs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DeviceConfigResource extends GenericCrudResource<DeviceConfiguration, DeviceConfigurationManager> {
+public class DeviceConfigResource extends AbstractCrudResource<DeviceConfiguration, DeviceConfigurationManager> {
 	
 	public DeviceConfigResource(DeviceConfigurationManager man) {
 		super(man, DeviceConfiguration.class);

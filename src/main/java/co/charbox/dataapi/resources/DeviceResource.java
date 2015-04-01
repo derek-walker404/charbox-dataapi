@@ -11,16 +11,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import co.charbox.dataapi.data.SearchResults;
+import co.charbox.core.data.SearchResults;
 import co.charbox.dataapi.managers.DeviceManager;
+import co.charbox.domain.model.Device;
+import co.charbox.domain.model.Heartbeat;
+import co.charbox.domain.model.TestCase;
+import co.charbox.domain.model.TimerResult;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
-import com.pofof.conmon.model.Device;
-import com.pofof.conmon.model.Heartbeat;
-import com.pofof.conmon.model.TestCase;
-import com.pofof.conmon.model.TimerResult;
 
 @Path("/devices")
 @Produces(MediaType.APPLICATION_JSON)

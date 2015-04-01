@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import co.charbox.core.utils.Config;
+import co.charbox.domain.model.MyLocation;
+
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.record.Location;
-import com.pofof.conmon.model.MyLocation;
-import com.tpofof.utils.Config;
 
 public final class LocationProvider {
 

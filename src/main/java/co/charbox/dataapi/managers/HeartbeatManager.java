@@ -1,9 +1,8 @@
 package co.charbox.dataapi.managers;
 
-import co.charbox.dataapi.data.SearchResults;
+import co.charbox.core.data.SearchResults;
 import co.charbox.dataapi.data.mongo.HeartbeatDAO;
-
-import com.pofof.conmon.model.Heartbeat;
+import co.charbox.domain.model.Heartbeat;
 
 public class HeartbeatManager extends AbstractModelManager<Heartbeat, HeartbeatDAO> {
 

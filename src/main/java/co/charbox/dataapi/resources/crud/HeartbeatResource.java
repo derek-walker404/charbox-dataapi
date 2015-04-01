@@ -6,13 +6,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import co.charbox.dataapi.managers.HeartbeatManager;
-
-import com.pofof.conmon.model.Heartbeat;
+import co.charbox.domain.model.Heartbeat;
 
 @Path("/hb")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class HeartbeatResource extends GenericCrudResource<Heartbeat, HeartbeatManager> {
+public class HeartbeatResource extends AbstractCrudResource<Heartbeat, HeartbeatManager> {
 
 	public HeartbeatResource(HeartbeatManager man) {
 		super(man, Heartbeat.class);

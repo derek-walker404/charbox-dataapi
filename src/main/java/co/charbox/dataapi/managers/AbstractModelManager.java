@@ -1,9 +1,8 @@
 package co.charbox.dataapi.managers;
 
-import co.charbox.dataapi.data.GenericDAO;
-import co.charbox.dataapi.data.SearchResults;
-
-import com.pofof.conmon.model.PersistentModel;
+import co.charbox.core.data.GenericDAO;
+import co.charbox.core.data.PersistentModel;
+import co.charbox.core.data.SearchResults;
 
 public abstract class AbstractModelManager<ModelT extends PersistentModel<ModelT>, ModelDaoT extends GenericDAO<ModelT>> implements GenericModelManager<ModelT> {
 

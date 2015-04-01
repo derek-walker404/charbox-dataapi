@@ -4,16 +4,17 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
-import co.charbox.dataapi.data.SearchResults;
+import co.charbox.core.data.SearchResults;
+import co.charbox.core.data.mongo.AbstractMongoDAO;
+import co.charbox.domain.model.Outage;
 
 import com.google.api.client.util.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.pofof.conmon.model.Outage;
 
-public class OutageDAO extends GenericMongoDAO<Outage> {
+public class OutageDAO extends AbstractMongoDAO<Outage> {
 
 	public OutageDAO(DBCollection collection) {
 		super(collection, Outage.class);

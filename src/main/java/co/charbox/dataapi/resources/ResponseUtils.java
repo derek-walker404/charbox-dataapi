@@ -2,13 +2,13 @@ package co.charbox.dataapi.resources;
 
 import java.util.List;
 
-import co.charbox.dataapi.data.SearchResults;
+import co.charbox.core.data.SearchResults;
+import co.charbox.core.utils.JsonUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.tpofof.utils.JsonUtils;
 
 public class ResponseUtils {
 

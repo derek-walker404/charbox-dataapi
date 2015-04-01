@@ -1,8 +1,7 @@
 package co.charbox.dataapi.managers;
 
 import co.charbox.dataapi.data.mongo.TestCaseDAO;
-
-import com.pofof.conmon.model.TestCase;
+import co.charbox.domain.model.TestCase;
 
 public class TestCaseManager extends AbstractModelManager<TestCase, TestCaseDAO> {
 

@@ -3,11 +3,11 @@ package co.charbox.dataapi.data.elasticsearch;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 
-import co.charbox.dataapi.data.SearchResults;
+import co.charbox.core.data.SearchResults;
+import co.charbox.core.data.es.AbstractElasticsearchDAO;
+import co.charbox.domain.model.TimerResult;
 
-import com.pofof.conmon.model.TimerResult;
-
-public class TimerResultEsDAO extends GenericElasticsearchDAO<TimerResult> {
+public class TimerResultEsDAO extends AbstractElasticsearchDAO<TimerResult> {
 
 	public TimerResultEsDAO(Client client) {
 		super(client, TimerResult.class);

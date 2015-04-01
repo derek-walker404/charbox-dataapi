@@ -10,15 +10,15 @@ import javax.ws.rs.core.MediaType;
 
 import co.charbox.dataapi.data.location.LocationProvider;
 import co.charbox.dataapi.managers.TimerResultManager;
+import co.charbox.domain.model.TimerResult;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.pofof.conmon.model.TimerResult;
 
 @Path("/results")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class TimerResultResource extends GenericCrudResource<TimerResult, TimerResultManager> {
+public class TimerResultResource extends AbstractCrudResource<TimerResult, TimerResultManager> {
 
 	public TimerResultResource(TimerResultManager man) {
 		super(man, TimerResult.class);
