@@ -16,7 +16,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
 import co.charbox.core.utils.Config;
-import co.charbox.dataapi.config.ConmonConfiguration;
+import co.charbox.dataapi.config.CharboxConfiguration;
 import co.charbox.dataapi.config.ElasticsearchConfiguration;
 import co.charbox.dataapi.config.MongoConfig;
 import co.charbox.dataapi.data.elasticsearch.TimerResultEsDAO;
@@ -48,24 +48,24 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 
-public class ConmonApplication extends Application<ConmonConfiguration> {
+public class CharboxDataApiApplication extends Application<CharboxConfiguration> {
 
 	public static void main(String[] args) throws Exception {
-		new ConmonApplication().run(args);
+		new CharboxDataApiApplication().run(args);
 	}
 	
 	@Override
 	public String getName() {
-		return "conmon";
+		return "charbox-dataapi";
 	}
 	
 	@Override
-	public void initialize(Bootstrap<ConmonConfiguration> bootstrap) {
+	public void initialize(Bootstrap<CharboxConfiguration> bootstrap) {
 		bootstrap.addBundle(new AssetsBundle("/assets", "/c/", "index.html"));
 	}
 
 	@Override
-	public void run(ConmonConfiguration config, Environment env) throws Exception {
+	public void run(CharboxConfiguration config, Environment env) throws Exception {
 		/* MONGO */
 		final MongoConfig mdbConfig = config.getMongo();
 		final MongoClient mongoClient = new MongoClient(mdbConfig.getHost(), mdbConfig.getPort());

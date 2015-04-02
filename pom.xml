@@ -101,7 +101,7 @@
 									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.tpofof.conmon.server.ConmonApplication</mainClass>
+									<mainClass>co.charbox.dataapi.CharboxDataApiApplication</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>

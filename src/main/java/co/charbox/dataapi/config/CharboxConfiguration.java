@@ -7,7 +7,7 @@ import io.dropwizard.Configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Lists;
 
-public class ConmonConfiguration extends Configuration {
+public class CharboxConfiguration extends Configuration {
 
 	private MongoConfig mongo = new MongoConfig();
 	private List<ElasticsearchConfiguration> esConfigs = Lists.newArrayList();
@@ -18,7 +18,7 @@ public class ConmonConfiguration extends Configuration {
 	}
 
 	@JsonProperty
-	public ConmonConfiguration setMongo(MongoConfig mongo) {
+	public CharboxConfiguration setMongo(MongoConfig mongo) {
 		this.mongo = mongo;
 		return this;
 	}
@@ -29,7 +29,7 @@ public class ConmonConfiguration extends Configuration {
 	}
 
 	@JsonProperty
-	public ConmonConfiguration setEsConfigs(List<ElasticsearchConfiguration> esConfigs) {
+	public CharboxConfiguration setEsConfigs(List<ElasticsearchConfiguration> esConfigs) {
 		this.esConfigs = esConfigs;
 		return this;
 	}
