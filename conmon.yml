@@ -1,7 +1,7 @@
-mongo:
-  host: localhost
-  port: 27017
-  dbname: charbox_alpha_local
-esConfigs:
-  - host: localhost
-    port: 9300
+server:
+  applicationConnectors:
+    - type: http
+      port: 8080
+  adminConnectors:
+    - type: http
+      port: 8081

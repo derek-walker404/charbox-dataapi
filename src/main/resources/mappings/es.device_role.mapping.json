@@ -1,0 +1,25 @@
+{
+    "auth": {
+        "properties": {
+            "deviceId": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "role": {
+                "properties": {
+                  "roleKey": {
+                      "type": "string",
+                      "index": "not_analyzed"
+                  },
+                  "roleType": {
+                      "type": "string",
+                      "index": "not_analyzed"
+                  },
+                  "admin": {
+                      "type": "boolean"
+                  }
+                }
+            }
+        }
+    }
+}

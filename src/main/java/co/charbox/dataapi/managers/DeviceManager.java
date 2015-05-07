@@ -2,8 +2,11 @@ package co.charbox.dataapi.managers;
 
 import java.util.List;
 
-import co.charbox.core.data.SearchResults;
-import co.charbox.dataapi.data.mongo.DeviceDAO;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import co.charbox.dataapi.data.elasticsearch.DeviceDAO;
 import co.charbox.domain.model.Device;
 import co.charbox.domain.model.DeviceConfiguration;
 import co.charbox.domain.model.Heartbeat;
@@ -11,39 +14,43 @@ import co.charbox.domain.model.TestCase;
 import co.charbox.domain.model.TimerResult;
 
 import com.google.common.collect.Lists;
+import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.managers.AbstractModelManager;
+import com.tpofof.core.utils.Config;
 
-public class DeviceManager extends AbstractModelManager<Device, DeviceDAO> {
+@Component
+public class DeviceManager extends AbstractModelManager<Device, String, DeviceDAO, QueryBuilder> {
 
-	private final DeviceConfigurationManager deviceConfigMan;
-	private final TestCaseManager testCaseManager;
-	private final TimerResultManager timerResultsManager;
-	private final HeartbeatManager hbManager;
+	private int defualtLimit;
 	
-	public DeviceManager(DeviceDAO deviceDao, DeviceConfigurationManager deviceConfigMan, 
-			TestCaseManager testCaseManager, TimerResultManager timerResultsManager,
-			HeartbeatManager heartBeatManager) {
+	@Autowired private DeviceConfigurationManager deviceConfigMan;
+	@Autowired private TestCaseManager testCaseManager;
+	@Autowired private TimerResultManager timerResultsManager;
+	@Autowired private HeartbeatManager hbManager;
+	
+	@Autowired
+	public DeviceManager(DeviceDAO deviceDao, Config config) {
 		super(deviceDao);
-		this.deviceConfigMan = deviceConfigMan;
-		this.testCaseManager = testCaseManager;
-		this.timerResultsManager = timerResultsManager;
-		this.hbManager = heartBeatManager;
+		this.defualtLimit = config.getInt("device.limit", 10);
 	}
 	
-	public Device findByDeviceId(int deviceId) {
-		Device device = getDao().findByDeviceId(deviceId);
+	public Device findByDeviceId(String deviceId) {
+		ResultsSet<Device> devices = getDao().findByDeviceId(deviceId);
+		Device device = devices.getResults().size() == 1 ? devices.getResults().get(0) : null;
 		return device != null 
 				? device
-				: new Device()
-						.setDeviceId(deviceId)
-						.setRegistered(false);
+				: Device.builder()
+					.deviceId(deviceId)
+					.registered(false)
+					.build();
 	}
 	
-	public Device register(int deviceId) {
+	public Device register(String deviceId) {
 		Device device = findByDeviceId(deviceId);
 		if (!device.isRegistered()) {
 			DeviceConfiguration config = deviceConfigMan.getNewConfig();
 			if (config != null) {
-				device.setConfigId(config.get_id());
+				device.setConfigId(config.getId());
 				device.setRegistered(true);
 				Device temp = getDao().insert(device);
 				if (temp == null) {
@@ -74,22 +81,27 @@ public class DeviceManager extends AbstractModelManager<Device, DeviceDAO> {
 
 	@Override
 	public int getDefualtLimit() {
-		return 10; // TODO: config or setting
+		return defualtLimit; // TODO: config or setting
 	}
 	
-	public SearchResults<TimerResult> getResults(long deviceId) {
+	public ResultsSet<TimerResult> getResults(String deviceId) {
 		return timerResultsManager.getByDevice(deviceId);
 	}
 	
-	public SearchResults<TimerResult> getResults(long deviceId, int limit, int offset) {
+	public ResultsSet<TimerResult> getResults(String deviceId, int limit, int offset) {
 		return timerResultsManager.getByDevice(deviceId, limit, offset);
 	}
 	
-	public Heartbeat heartbeat(int deviceId, long time) {
+	public Heartbeat heartbeat(String deviceId, long time) {
 		return hbManager.insert(deviceId, time);
 	}
 	
-	public SearchResults<Heartbeat> getHeartbeats(int deviceId) {
+	public Heartbeat getHeartbeats(String deviceId) {
 		return hbManager.findByDeviceId(deviceId);
+	}
+
+	@Override
+	public String getDefaultId() {
+		return "";
 	}
 }

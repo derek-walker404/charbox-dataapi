@@ -1,43 +1,42 @@
 package co.charbox.dataapi.managers;
 
-import co.charbox.core.data.SearchResults;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import co.charbox.dataapi.data.elasticsearch.TimerResultEsDAO;
 import co.charbox.domain.model.TimerResult;
 
-public class TimerResultManager extends AbstractModelManager<TimerResult, TimerResultEsDAO> {
+import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.managers.AbstractModelManager;
+import com.tpofof.core.utils.Config;
 
-	public TimerResultManager(TimerResultEsDAO esDao) {
+@Component
+public class TimerResultManager extends AbstractModelManager<TimerResult, String, TimerResultEsDAO, QueryBuilder> {
+
+	private int defaultLimit;
+	
+	@Autowired
+	public TimerResultManager(TimerResultEsDAO esDao, Config config) {
 		super(esDao);
-	}
-
-	/**
-	 * NOT SUPPORTED
-	 */
-	@Deprecated
-	@Override
-	public TimerResult update(TimerResult model) {
-		return null;
-	}
-
-	/**
-	 * NOT SUPPORTED
-	 */
-	@Deprecated
-	@Override
-	public boolean delete(String id) {
-		return false;
-	}
-
-	@Override
-	public int getDefualtLimit() {
-		return 20;
+		this.defaultLimit = config.getInt("timer_result.limit", 20);
 	}
 	
-	public SearchResults<TimerResult> getByDevice(long deviceId) {
+	@Override
+	public int getDefualtLimit() {
+		return defaultLimit;
+	}
+	
+	@Override
+	public String getDefaultId() {
+		return "";
+	}
+
+	public ResultsSet<TimerResult> getByDevice(String deviceId) {
 		return getByDevice(deviceId, getDefualtLimit(), 0);
 	}
 	
-	public SearchResults<TimerResult> getByDevice(long deviceId, int limit, int offset) {
+	public ResultsSet<TimerResult> getByDevice(String deviceId, int limit, int offset) {
 		return getDao().getByDevice(deviceId, limit, offset);
 	}
 }

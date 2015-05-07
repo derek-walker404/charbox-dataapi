@@ -1,27 +1,29 @@
 package co.charbox.dataapi.data.elasticsearch;
 
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.domain.model.TimerResult;
+import co.charbox.domain.model.Outage;
 
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class TimerResultEsDAO extends AbstractElasticsearchDAO<TimerResult> {
+public class OutageDAO extends AbstractElasticsearchDAO<Outage> {
 
 	private String index;
 	private String type;
 
 	@Autowired
-	public TimerResultEsDAO(Config config, Client client) {
+	public OutageDAO(Config config, Client client) {
 		super(config, client);
 		init();
 	}
@@ -29,7 +31,7 @@ public class TimerResultEsDAO extends AbstractElasticsearchDAO<TimerResult> {
 	@Override
 	protected String getIndex() {
 		if (index == null) {
-			index = getConfig().getString("es.timer_result.index", "charbot_v0.1_tr");
+			index = getConfig().getString("es.outage.index", "charbot_v0.1_outage");
 		}
 		return index;
 	}
@@ -37,14 +39,14 @@ public class TimerResultEsDAO extends AbstractElasticsearchDAO<TimerResult> {
 	@Override
 	protected String getType() {
 		if (type == null) {
-			type = getConfig().getString("es.timer_result.type", "tr");
+			type = getConfig().getString("es.outage.type", "outage");
 		}
 		return type;
 	}
-	
+
 	@Override
-	protected Class<TimerResult> getModelClass() {
-		return TimerResult.class;
+	protected Class<Outage> getModelClass() {
+		return Outage.class;
 	}
 	
 	@Override
@@ -53,13 +55,13 @@ public class TimerResultEsDAO extends AbstractElasticsearchDAO<TimerResult> {
 	}
 	
 	@Override
-	public boolean hasSort() {
+	protected boolean hasSort() {
 		return true;
 	}
 	
 	@Override
-	public SortBuilder getSort() {
-		return SortBuilders.fieldSort("startTime").order(SortOrder.DESC);
+	protected SortBuilder getSort() {
+		return SortBuilders.fieldSort("outageTime").order(SortOrder.DESC);
 	}
 	
 	@Override
@@ -67,7 +69,15 @@ public class TimerResultEsDAO extends AbstractElasticsearchDAO<TimerResult> {
 		return false;
 	}
 	
-	public ResultsSet<TimerResult> getByDevice(String deviceId, int limit, int offset) {
-		return find(QueryBuilders.termQuery("deviceId", deviceId), limit, offset);
+	public ResultsSet<Outage> getRecent(DateTime startTime, int limit) {
+		return getRecent(null, startTime, limit);
+	}
+	
+	public ResultsSet<Outage> getRecent(String deviceId, DateTime startTime, int limit) {
+		QueryBuilder q = QueryBuilders.termQuery("outageTime", startTime);
+		if (deviceId != null) {
+			q = QueryBuilders.boolQuery().must(q).must(QueryBuilders.termQuery("deviceId", deviceId));
+		}
+		return find(q, limit, 0);
 	}
 }

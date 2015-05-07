@@ -1,16 +1,33 @@
 package co.charbox.dataapi.managers;
 
-import co.charbox.dataapi.data.mongo.TestCaseDAO;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.tpofof.core.managers.AbstractModelManager;
+import com.tpofof.core.utils.Config;
+
+import co.charbox.dataapi.data.elasticsearch.TestCaseDAO;
 import co.charbox.domain.model.TestCase;
 
-public class TestCaseManager extends AbstractModelManager<TestCase, TestCaseDAO> {
+@Component
+public class TestCaseManager extends AbstractModelManager<TestCase, String, TestCaseDAO, QueryBuilder> {
 
-	public TestCaseManager(TestCaseDAO testCaseDao) {
+	private int defaultLimit;
+	
+	@Autowired
+	public TestCaseManager(TestCaseDAO testCaseDao, Config config) {
 		super(testCaseDao);
+		this.defaultLimit = config.getInt("test_case.limit", 20);
 	}
 
 	@Override
 	public int getDefualtLimit() {
-		return 20; // TODO: config or setting
+		return defaultLimit;
+	}
+
+	@Override
+	public String getDefaultId() {
+		return "";
 	}
 }

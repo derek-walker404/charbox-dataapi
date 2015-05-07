@@ -1,39 +1,37 @@
 package co.charbox.dataapi.managers;
 
-import java.util.List;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import co.charbox.dataapi.data.mongo.DeviceConfigDAO;
+import co.charbox.dataapi.data.elasticsearch.DeviceConfigDAO;
 import co.charbox.domain.model.DeviceConfiguration;
-import co.charbox.domain.model.TestCase;
 
-import com.google.common.collect.Lists;
+import com.tpofof.core.managers.AbstractModelManager;
+import com.tpofof.core.utils.Config;
 
-public class DeviceConfigurationManager extends AbstractModelManager<DeviceConfiguration, DeviceConfigDAO> {
+@Component
+public class DeviceConfigurationManager extends AbstractModelManager<DeviceConfiguration, String, DeviceConfigDAO, QueryBuilder> {
 
-	private final TestCaseManager testCaseMan;
-	
-	public DeviceConfigurationManager(DeviceConfigDAO deviceConfigDao,
-			TestCaseManager testCaseMan) {
+	private final Config config;
+
+	@Autowired
+	public DeviceConfigurationManager(DeviceConfigDAO deviceConfigDao, Config config) {
 		super(deviceConfigDao);
-		this.testCaseMan = testCaseMan;
+		this.config = config;
+	}
+
+	@Override
+	public String getDefaultId() {
+		return "";
 	}
 	
 	public DeviceConfiguration getNewConfig() {
-		List<TestCase> cases = testCaseMan.find(6, 0).getResults(); // TODO: convert to manager and get random set
-		List<String> tcIds = Lists.newArrayList();
-		for (TestCase tc : cases) {
-			tcIds.add(tc.get_id());
-		}
-		DeviceConfiguration newConfig = new DeviceConfiguration();
+		DeviceConfiguration newConfig = DeviceConfiguration.builder()
+				.testInterval(config.getInt("device_config.test_interval_mins.default", 30))
+				.trialsCount(config.getInt("device_config.trials_count.default", 3))
+				.build();
 		return getDao().insert(newConfig);
-	}
-	
-	public List<TestCase> getTestCases(List<String> ids) {
-		List<TestCase> cases = Lists.newArrayList();
-		for (String s : ids) {
-			cases.add(testCaseMan.find(s));
-		}
-		return cases;
 	}
 
 	@Override

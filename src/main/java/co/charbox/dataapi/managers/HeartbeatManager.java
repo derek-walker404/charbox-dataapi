@@ -1,26 +1,45 @@
 package co.charbox.dataapi.managers;
 
-import co.charbox.core.data.SearchResults;
-import co.charbox.dataapi.data.mongo.HeartbeatDAO;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import co.charbox.dataapi.data.elasticsearch.HeartbeatDAO;
 import co.charbox.domain.model.Heartbeat;
 
-public class HeartbeatManager extends AbstractModelManager<Heartbeat, HeartbeatDAO> {
+import com.tpofof.core.managers.AbstractModelManager;
+import com.tpofof.core.utils.Config;
 
-	public HeartbeatManager(HeartbeatDAO dao) {
+@Component
+public class HeartbeatManager extends AbstractModelManager<Heartbeat, String, HeartbeatDAO, QueryBuilder> {
+	
+	private int defaultLimit;
+	
+	@Autowired
+	public HeartbeatManager(HeartbeatDAO dao, Config config) {
 		super(dao);
+		this.defaultLimit = config.getInt("heartbeat.limit", 10);
+		
 	}
 
 	@Override
 	public int getDefualtLimit() {
-		return 100;
+		return defaultLimit;
+	}
+	
+	@Override
+	public String getDefaultId() {
+		return "";
 	}
 
-	public Heartbeat insert(int deviceId, long time) {
-		return insert(new Heartbeat().setDeviceId(deviceId).setTime(time));
-		
+	public Heartbeat insert(String deviceId, long time) {
+		return insert(Heartbeat.builder()
+				.deviceId(deviceId)
+				.time(time)
+				.build());
 	}
 
-	public SearchResults<Heartbeat> findByDeviceId(int deviceId) {
+	public Heartbeat findByDeviceId(String deviceId) {
 		return getDao().findByDeviceId(deviceId);
 	}
 }

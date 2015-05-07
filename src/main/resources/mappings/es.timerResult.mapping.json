@@ -1,0 +1,51 @@
+{
+    "timerResult": {
+        "properties": {
+            "clientLocation": {
+                "properties": {
+                    "ip": {
+                        "type": "ip"
+                    },
+                    "location": {
+                        "type": "geo_point"
+                    }
+                }
+            },
+            "deviceId": {
+                "type": "long"
+            },
+            "duration": {
+                "type": "long"
+            },
+            "outage": {
+                "type": "boolean"
+            },
+            "pingDuration": {
+                "type": "long"
+            },
+            "serverLocation": {
+                "properties": {
+                    "ip": {
+                        "type": "ip"
+                    },
+                    "location": {
+                        "type": "geo_point"
+                    }
+                }
+            },
+            "size": {
+                "type": "long"
+            },
+            "speed": {
+                "type": "double"
+            },
+            "startTime": {
+                "type": "date"
+            },
+            "testCaseId": {
+                "type": "string",
+                "index": "not_analyzed"
+            }
+        }
+    }
+}

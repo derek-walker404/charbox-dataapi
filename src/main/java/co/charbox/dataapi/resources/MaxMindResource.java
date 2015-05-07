@@ -12,47 +12,59 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import co.charbox.core.utils.Config;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import co.charbox.domain.mm.MaxMindService;
 import co.charbox.domain.model.mm.ConnectionInfoModel;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.tpofof.core.utils.Config;
+import com.tpofof.dwa.error.HttpInternalServerErrorException;
+import com.tpofof.dwa.utils.ResponseUtils;
 
 @Path("/mm")
+@Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class MaxMindResource {
 
 	private final MaxMindService mms;
+	private final ResponseUtils responseUtils;
+	private final String overrideIp;
 	
-	public MaxMindResource(MaxMindService mms) {
+	@Autowired
+	public MaxMindResource(MaxMindService mms, ResponseUtils responseUtils, Config config) {
 		this.mms = mms;
+		this.responseUtils = responseUtils;
+		this.overrideIp = config.getString("location.resource.overrideIp", "127.0.0.1");
 	}
 	
 	@Path("/{ip}")
 	@GET
 	@Timed
-	public JsonNode getIp(@PathParam("ip") String ip) {
+	public JsonNode getIp(@PathParam("ip") String ip) throws HttpInternalServerErrorException {
 		return getConnectionInfo(ip);
 	}
 	
-	private JsonNode getConnectionInfo(String ip) {
+	private JsonNode getConnectionInfo(String ip) throws HttpInternalServerErrorException {
 		ConnectionInfoModel conInfo = mms.get(ip);
-		return conInfo != null
-				? ResponseUtils.success(ResponseUtils.modelData(conInfo))
-						: ResponseUtils.failure("Could not retrieve info for " + ip, 500);
+		if (conInfo == null) {
+			throw new HttpInternalServerErrorException("Could not retrieve info for " + ip);
+		}
+		return responseUtils.success(responseUtils.modelData(conInfo));
 	}
 	
 	@Path("/self")
 	@GET
 	@Timed
-	public JsonNode getRequestersIp(@Context HttpServletRequest request) {
+	public JsonNode getRequestersIp(@Context HttpServletRequest request) throws HttpInternalServerErrorException {
 		String ip = request.getRemoteAddr();
 		try {
 			InetAddress addr = InetAddress.getByName(ip);
 			if (addr.isLoopbackAddress()) {
-				ip = Config.get().getString("client.ip.override");
+				ip = this.overrideIp;
 			} else {
 				ip = addr.getHostAddress();
 			}
@@ -60,6 +72,6 @@ public class MaxMindResource {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
-		return ResponseUtils.failure("Unexpected exception.", 500);
+		throw new HttpInternalServerErrorException("Unexpected exception.");
 	}
 }

@@ -1,0 +1,21 @@
+{
+    "auth": {
+        "properties": {
+            "apiKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "deviceId": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "id": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "activated": {
+                "type": "boolean"
+            }
+        }
+    }
+}

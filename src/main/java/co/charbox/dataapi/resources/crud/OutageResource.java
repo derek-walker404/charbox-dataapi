@@ -8,22 +8,30 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import co.charbox.core.data.SearchResults;
 import co.charbox.dataapi.managers.OutageManager;
-import co.charbox.dataapi.resources.RequestUtils;
-import co.charbox.dataapi.resources.ResponseUtils;
 import co.charbox.domain.model.Outage;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
+import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.dwa.resources.AbstractCrudResource;
+import com.tpofof.dwa.utils.RequestUtils;
+import com.tpofof.dwa.utils.ResponseUtils;
 
 @Path("/outages")
+@Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class OutageResource extends AbstractCrudResource<Outage, OutageManager> {
+public class OutageResource extends AbstractCrudResource<Outage, String, OutageManager> {
 
+	@Autowired private ResponseUtils responseUtils;
+	@Autowired private RequestUtils requestUtils;
+	
+	@Autowired
 	public OutageResource(OutageManager man) {
 		super(man, Outage.class);
 	}
@@ -60,7 +68,7 @@ public class OutageResource extends AbstractCrudResource<Outage, OutageManager> 
 				startTime = startTime.minusHours(1);
 			}
 		}
-		SearchResults<Outage> outages = getManager().getRecentOutages(startTime, RequestUtils.limit(limit), RequestUtils.offset(offset));
-		return ResponseUtils.success(ResponseUtils.listData(outages));
+		ResultsSet<Outage> outages = getManager().getRecentOutages(startTime, requestUtils.limit(limit), requestUtils.offset(offset));
+		return responseUtils.success(responseUtils.listData(outages));
 	}
 }

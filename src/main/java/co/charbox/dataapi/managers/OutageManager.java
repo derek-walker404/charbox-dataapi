@@ -1,35 +1,51 @@
 package co.charbox.dataapi.managers;
 
+import org.elasticsearch.index.query.QueryBuilder;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import co.charbox.core.data.SearchResults;
-import co.charbox.dataapi.data.mongo.OutageDAO;
+import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.managers.AbstractModelManager;
+import com.tpofof.core.utils.Config;
+
+import co.charbox.dataapi.data.elasticsearch.OutageDAO;
 import co.charbox.domain.model.Outage;
 
-public class OutageManager extends AbstractModelManager<Outage, OutageDAO> {
+@Component
+public class OutageManager extends AbstractModelManager<Outage, String, OutageDAO, QueryBuilder> {
 
-	public OutageManager(OutageDAO dao) {
+	private int defaultLimit;
+	
+	@Autowired
+	public OutageManager(OutageDAO dao, Config config) {
 		super(dao);
+		this.defaultLimit = config.getInt("outage.limit", 200);
 	}
 
 	@Override
 	public int getDefualtLimit() {
-		return 200;
+		return defaultLimit;
 	}
 	
-	public SearchResults<Outage> getRecentOutages() {
+	@Override
+	public String getDefaultId() {
+		return "";
+	}
+	
+	public ResultsSet<Outage> getRecentOutages() {
 		return getRecentOutages(new DateTime().minusDays(1));
 	}
 	
-	public SearchResults<Outage> getRecentOutages(DateTime startTime) {
+	public ResultsSet<Outage> getRecentOutages(DateTime startTime) {
 		return getDao().getRecent(startTime, getDefualtLimit());
 	}
 	
-	public SearchResults<Outage> getRecentOutages(String deviceId, DateTime startTime) {
+	public ResultsSet<Outage> getRecentOutages(String deviceId, DateTime startTime) {
 		return getDao().getRecent(deviceId, startTime, getDefualtLimit());
 	}
 	
-	public SearchResults<Outage> getRecentOutages(DateTime startTime, int limit, int offset) {
+	public ResultsSet<Outage> getRecentOutages(DateTime startTime, int limit, int offset) {
 		if (limit <= 0 || offset < 0) {
 			limit = getDefualtLimit();
 			offset = 0;
@@ -37,7 +53,7 @@ public class OutageManager extends AbstractModelManager<Outage, OutageDAO> {
 		return getDao().getRecent(startTime, getDefualtLimit());
 	}
 	
-	public SearchResults<Outage> getRecentOutages(String deviceId, DateTime startTime, int limit, int offset) {
+	public ResultsSet<Outage> getRecentOutages(String deviceId, DateTime startTime, int limit, int offset) {
 		if (limit <= 0 || offset < 0) {
 			limit = getDefualtLimit();
 			offset = 0;
