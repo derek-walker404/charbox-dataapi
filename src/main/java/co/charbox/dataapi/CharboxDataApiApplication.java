@@ -7,10 +7,10 @@ import io.dropwizard.auth.basic.BasicAuthFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
-import org.glassfish.hk2.utilities.Binder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.dataapi.auth.AdminAuthenticator;
 import co.charbox.dataapi.auth.DeviceAuthenticator;
 import co.charbox.dataapi.config.CharboxConfiguration;
 import co.charbox.dataapi.health.GuavaCacheMetrics;
@@ -25,7 +25,7 @@ import co.charbox.dataapi.resources.crud.OutageResource;
 import co.charbox.dataapi.resources.crud.TestCaseResource;
 import co.charbox.dataapi.resources.crud.TimerResultResource;
 import co.charbox.domain.mm.MaxMindService;
-import co.charbox.domain.model.DeviceAuthModel;
+import co.charbox.domain.model.auth.IAuthModel;
 
 import com.codahale.metrics.MetricSet;
 import com.tpofof.core.App;
@@ -65,6 +65,7 @@ public class CharboxDataApiApplication extends DwaApp<CharboxConfiguration> {
 	 * AUTH
 	 */
 	@Autowired private DeviceAuthenticator deviceAuthenticator;
+	@Autowired private AdminAuthenticator adminAuthenticator;
 	
 	@Override
 	public String getName() {
@@ -99,8 +100,11 @@ public class CharboxDataApiApplication extends DwaApp<CharboxConfiguration> {
 		env.metrics().registerAll(maxMindCacheMetrics);
 		
 		/* AUTH */
-		BasicAuthFactory<DeviceAuthModel> basicAuthFactory = new BasicAuthFactory<DeviceAuthModel>(deviceAuthenticator, "chatbot.co", DeviceAuthModel.class);
-		env.jersey().register(ChainedAuthFactory.binder(basicAuthFactory));
+		BasicAuthFactory<IAuthModel> deviceAuthFactory = new BasicAuthFactory<IAuthModel>(deviceAuthenticator, "chatbot.co", IAuthModel.class);
+		BasicAuthFactory<IAuthModel> adminAuthFactory = new BasicAuthFactory<IAuthModel>(adminAuthenticator, "chatbot.co", IAuthModel.class);
+		@SuppressWarnings("unchecked")
+		ChainedAuthFactory<IAuthModel> authChainFactory = new ChainedAuthFactory<IAuthModel>(deviceAuthFactory, adminAuthFactory);
+		env.jersey().register(AuthFactory.binder(authChainFactory));
 		
 		super.addCorsSupport(env); // TODO: change to config values.
 	}

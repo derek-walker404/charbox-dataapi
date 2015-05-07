@@ -11,14 +11,18 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.dataapi.auth.ManageAssetAuthValidator;
 import co.charbox.dataapi.managers.OutageManager;
 import co.charbox.domain.model.Outage;
+import co.charbox.domain.model.auth.IAuthModel;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.dwa.resources.AbstractCrudResource;
+import com.tpofof.dwa.auth.IAuthValidator;
+import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
+import com.tpofof.dwa.resources.AuthRequestPermisionType;
 import com.tpofof.dwa.utils.RequestUtils;
 import com.tpofof.dwa.utils.ResponseUtils;
 
@@ -26,14 +30,20 @@ import com.tpofof.dwa.utils.ResponseUtils;
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class OutageResource extends AbstractCrudResource<Outage, String, OutageManager> {
+public class OutageResource extends AbstractAuthProtectedCrudResource<Outage, String, OutageManager, IAuthModel> {
 
 	@Autowired private ResponseUtils responseUtils;
 	@Autowired private RequestUtils requestUtils;
+	@Autowired private ManageAssetAuthValidator authValidator;
 	
 	@Autowired
 	public OutageResource(OutageManager man) {
 		super(man, Outage.class);
+	}
+
+	@Override
+	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
+		return authValidator;
 	}
 	
 	@Path("/recent")

@@ -1,5 +1,7 @@
 package co.charbox.dataapi.resources.crud;
 
+import io.dropwizard.auth.Auth;
+
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,21 +18,25 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.dataapi.auth.DeviceViewAuthValidator;
 import co.charbox.dataapi.managers.DeviceManager;
 import co.charbox.domain.model.Device;
 import co.charbox.domain.model.Heartbeat;
 import co.charbox.domain.model.TestCase;
 import co.charbox.domain.model.TimerResult;
+import co.charbox.domain.model.auth.IAuthModel;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
 import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.error.HttpBadRequestException;
 import com.tpofof.dwa.error.HttpCodeException;
 import com.tpofof.dwa.error.HttpInternalServerErrorException;
 import com.tpofof.dwa.error.HttpNotFoundException;
-import com.tpofof.dwa.resources.AbstractCrudResource;
+import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
+import com.tpofof.dwa.resources.AuthRequestPermisionType;
 import com.tpofof.dwa.utils.RequestUtils;
 import com.tpofof.dwa.utils.ResponseUtils;
 
@@ -38,14 +44,20 @@ import com.tpofof.dwa.utils.ResponseUtils;
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DeviceResource extends AbstractCrudResource<Device, String, DeviceManager> {
+public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, String, DeviceManager, IAuthModel> {
 
 	@Autowired private ResponseUtils responseUtils;
 	@Autowired private RequestUtils requestUtils;
+	@Autowired private DeviceViewAuthValidator authValidator;
 	
 	@Autowired
 	public DeviceResource(DeviceManager man) {
 		super(man, Device.class);
+	}
+
+	@Override
+	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
+		return authValidator;
 	}
 	
 	@Path("/{_id}/testcases")
@@ -124,7 +136,8 @@ public class DeviceResource extends AbstractCrudResource<Device, String, DeviceM
 	}
 	
 	@Override
-	public JsonNode post(Device model, @Context HttpServletRequest request) throws HttpCodeException {
+	public JsonNode post(@Auth IAuthModel authModel, Device model, 
+			@Context HttpServletRequest request) throws HttpCodeException {
 		throw new HttpBadRequestException("POST not supported on Device collection. Use /device/register instead."); 
 	}
 }

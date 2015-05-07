@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.data.elasticsearch.DeviceAuthDAO;
-import co.charbox.domain.model.DeviceAuthModel;
+import co.charbox.domain.model.auth.DeviceAuthModel;
 
 import com.tpofof.core.managers.AbstractModelManager;
 
@@ -27,11 +27,17 @@ public class DeviceAuthManager extends AbstractModelManager<DeviceAuthModel, Str
 		return "";
 	}
 	
-	public boolean checkAuth(DeviceAuthModel auth) {
-		if (auth != null) {
-			DeviceAuthModel dbAuth = getDao().find(auth);
-			return dbAuth != null && dbAuth.isActivated();
-		}
-		return false;
+	public DeviceAuthModel isValid(String deviceId, String apiKey) {
+		DeviceAuthModel auth = DeviceAuthModel.builder()
+				.deviceId(deviceId)
+				.apiKey(apiKey)
+				.build();
+		DeviceAuthModel devAuth = find(auth);
+		boolean validAuth = devAuth != null && devAuth.isActivated();
+		return validAuth ? devAuth : null;
+	}
+	
+	public DeviceAuthModel find(DeviceAuthModel auth) {
+		return auth != null ? getDao().find(auth) : null;
 	}
 }
