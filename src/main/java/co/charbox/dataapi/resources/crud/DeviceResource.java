@@ -15,6 +15,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -117,7 +118,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 		if (getManager().findByDeviceId(deviceId) == null) {
 			throw new HttpNotFoundException("Could not find device with id " + deviceId);
 		}
-		Heartbeat heartBeat = getManager().heartbeat(deviceId, System.currentTimeMillis());;
+		Heartbeat heartBeat = getManager().heartbeat(deviceId, new DateTime());;
 		if (heartBeat == null) {
 			throw new HttpInternalServerErrorException("Could not register heartbeat for device with id " + deviceId);
 		}

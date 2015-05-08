@@ -3,6 +3,7 @@ package co.charbox.dataapi.managers;
 import java.util.List;
 
 import org.elasticsearch.index.query.QueryBuilder;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -92,7 +93,7 @@ public class DeviceManager extends AbstractModelManager<Device, String, DeviceDA
 		return timerResultsManager.getByDevice(deviceId, limit, offset);
 	}
 	
-	public Heartbeat heartbeat(String deviceId, long time) {
+	public Heartbeat heartbeat(String deviceId, DateTime time) {
 		return hbManager.insert(deviceId, time);
 	}
 	
