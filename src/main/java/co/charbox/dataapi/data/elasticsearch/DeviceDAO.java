@@ -9,6 +9,7 @@ import co.charbox.domain.model.Device;
 
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
+import com.tpofof.core.data.dao.es.EsQuery;
 import com.tpofof.core.utils.Config;
 
 @Component
@@ -45,17 +46,17 @@ public class DeviceDAO extends AbstractElasticsearchDAO<Device> {
 	}
 	
 	public ResultsSet<Device> findByDeviceId(String deviceId) {
-		return super.find(QueryBuilders.termQuery("deviceId", deviceId), 10, 0);
+		EsQuery q = EsQuery.builder()
+				.constraints(QueryBuilders.termQuery("deviceId", deviceId))
+				.limit(10)
+				.offset(0)
+				.build();
+		return super.find(q);
 	}
 
 	@Override
 	protected boolean isRequiredIndex() {
 		return true;
-	}
-
-	@Override
-	protected boolean hasSort() {
-		return false;
 	}
 
 	@Override

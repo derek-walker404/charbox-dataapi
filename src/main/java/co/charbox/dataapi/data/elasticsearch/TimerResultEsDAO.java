@@ -2,9 +2,6 @@ package co.charbox.dataapi.data.elasticsearch;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +9,7 @@ import co.charbox.domain.model.TimerResult;
 
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
+import com.tpofof.core.data.dao.es.EsQuery;
 import com.tpofof.core.utils.Config;
 
 @Component
@@ -53,21 +51,16 @@ public class TimerResultEsDAO extends AbstractElasticsearchDAO<TimerResult> {
 	}
 	
 	@Override
-	public boolean hasSort() {
-		return true;
-	}
-	
-	@Override
-	public SortBuilder getSort() {
-		return SortBuilders.fieldSort("startTime").order(SortOrder.DESC);
-	}
-	
-	@Override
 	protected boolean hasMapping() {
 		return false;
 	}
 	
 	public ResultsSet<TimerResult> getByDevice(String deviceId, int limit, int offset) {
-		return find(QueryBuilders.termQuery("deviceId", deviceId), limit, offset);
+		EsQuery q = EsQuery.builder()
+				.constraints(QueryBuilders.termQuery("deviceId", deviceId))
+				.limit(limit)
+				.offset(offset)
+				.build();
+		return find(q);
 	}
 }

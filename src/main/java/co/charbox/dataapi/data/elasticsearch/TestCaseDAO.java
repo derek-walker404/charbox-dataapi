@@ -48,11 +48,6 @@ public class TestCaseDAO extends AbstractElasticsearchDAO<TestCase> {
 	}
 
 	@Override
-	protected boolean hasSort() {
-		return false;
-	}
-
-	@Override
 	protected boolean hasMapping() {
 		return false;
 	}

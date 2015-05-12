@@ -11,6 +11,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,7 @@ import co.charbox.domain.model.TimerResult;
 import co.charbox.domain.model.auth.IAuthModel;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.tpofof.core.data.dao.es.EsQuery;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.error.HttpCodeException;
 import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
@@ -30,7 +33,7 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class TimerResultResource extends AbstractAuthProtectedCrudResource<TimerResult, String, TimerResultManager, IAuthModel> {
+public class TimerResultResource extends AbstractAuthProtectedCrudResource<TimerResult, String, TimerResultManager, EsQuery, QueryBuilder, SortBuilder, IAuthModel> {
 
 	@Autowired private LocationProvider locationProvider;
 	@Autowired private ManageAssetAuthValidator authValidator;
@@ -43,6 +46,14 @@ public class TimerResultResource extends AbstractAuthProtectedCrudResource<Timer
 	@Override
 	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
 		return authValidator;
+	}
+	
+	@Override
+	protected EsQuery getDefaultQuery(int limit, int offset) {
+		return EsQuery.builder()
+				.limit(limit)
+				.offset(offset)
+				.build();
 	}
 	
 	@POST

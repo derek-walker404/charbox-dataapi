@@ -7,6 +7,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
 import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.data.dao.es.EsQuery;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
@@ -30,7 +33,7 @@ import com.tpofof.dwa.utils.ResponseUtils;
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class OutageResource extends AbstractAuthProtectedCrudResource<Outage, String, OutageManager, IAuthModel> {
+public class OutageResource extends AbstractAuthProtectedCrudResource<Outage, String, OutageManager, EsQuery, QueryBuilder, SortBuilder, IAuthModel> {
 
 	@Autowired private ResponseUtils responseUtils;
 	@Autowired private RequestUtils requestUtils;
@@ -44,6 +47,14 @@ public class OutageResource extends AbstractAuthProtectedCrudResource<Outage, St
 	@Override
 	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
 		return authValidator;
+	}
+	
+	@Override
+	protected EsQuery getDefaultQuery(int limit, int offset) {
+		return EsQuery.builder()
+				.limit(limit)
+				.offset(offset)
+				.build();
 	}
 	
 	@Path("/recent")

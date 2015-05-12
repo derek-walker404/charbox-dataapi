@@ -8,6 +8,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,7 @@ import co.charbox.domain.model.auth.IAuthModel;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.tpofof.core.data.dao.es.EsQuery;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.error.HttpCodeException;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
@@ -31,7 +34,7 @@ import com.tpofof.dwa.utils.ResponseUtils;
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DeviceAuthResource extends AbstractAuthProtectedCrudResource<DeviceAuthModel, String, DeviceAuthManager, IAuthModel> {
+public class DeviceAuthResource extends AbstractAuthProtectedCrudResource<DeviceAuthModel, String, DeviceAuthManager, EsQuery, QueryBuilder, SortBuilder, IAuthModel> {
 
 	@Autowired private ResponseUtils responseUtils;
 	@Autowired private RequestUtils requestUtils;
@@ -45,6 +48,14 @@ public class DeviceAuthResource extends AbstractAuthProtectedCrudResource<Device
 	@Override
 	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
 		return authValidator;
+	}
+	
+	@Override
+	protected EsQuery getDefaultQuery(int limit, int offset) {
+		return EsQuery.builder()
+				.limit(limit)
+				.offset(offset)
+				.build();
 	}
 	
 	@Path("/validate/device")

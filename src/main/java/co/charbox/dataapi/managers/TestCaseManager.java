@@ -1,17 +1,16 @@
 package co.charbox.dataapi.managers;
 
-import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.tpofof.core.managers.AbstractModelManager;
-import com.tpofof.core.utils.Config;
 
 import co.charbox.dataapi.data.elasticsearch.TestCaseDAO;
 import co.charbox.domain.model.TestCase;
 
+import com.tpofof.core.managers.AbstractEsModelManager;
+import com.tpofof.core.utils.Config;
+
 @Component
-public class TestCaseManager extends AbstractModelManager<TestCase, String, TestCaseDAO, QueryBuilder> {
+public class TestCaseManager extends AbstractEsModelManager<TestCase, TestCaseDAO> {
 
 	private int defaultLimit;
 	
@@ -29,5 +28,10 @@ public class TestCaseManager extends AbstractModelManager<TestCase, String, Test
 	@Override
 	public String getDefaultId() {
 		return "";
+	}
+
+	@Override
+	protected boolean hasDefualtSort() {
+		return false;
 	}
 }

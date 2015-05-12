@@ -1,19 +1,21 @@
 package co.charbox.dataapi.managers;
 
-import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.managers.AbstractModelManager;
-import com.tpofof.core.utils.Config;
-
 import co.charbox.dataapi.data.elasticsearch.OutageDAO;
 import co.charbox.domain.model.Outage;
 
+import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.managers.AbstractEsModelManager;
+import com.tpofof.core.utils.Config;
+
 @Component
-public class OutageManager extends AbstractModelManager<Outage, String, OutageDAO, QueryBuilder> {
+public class OutageManager extends AbstractEsModelManager<Outage, OutageDAO> {
 
 	private int defaultLimit;
 	
@@ -59,5 +61,15 @@ public class OutageManager extends AbstractModelManager<Outage, String, OutageDA
 			offset = 0;
 		}
 		return getDao().getRecent(deviceId, startTime, getDefualtLimit());
+	}
+
+	@Override
+	protected boolean hasDefualtSort() {
+		return true;
+	}
+	
+	@Override
+	protected SortBuilder getSort() {
+		return SortBuilders.fieldSort("outageTime").order(SortOrder.DESC);
 	}
 }

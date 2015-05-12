@@ -1,16 +1,15 @@
 package co.charbox.dataapi.managers;
 
-import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.data.elasticsearch.DeviceAuthDAO;
 import co.charbox.domain.model.auth.DeviceAuthModel;
 
-import com.tpofof.core.managers.AbstractModelManager;
+import com.tpofof.core.managers.AbstractEsModelManager;
 
 @Component
-public class DeviceAuthManager extends AbstractModelManager<DeviceAuthModel, String, DeviceAuthDAO, QueryBuilder> {
+public class DeviceAuthManager extends AbstractEsModelManager<DeviceAuthModel, DeviceAuthDAO> {
 
 	@Autowired
 	public DeviceAuthManager(DeviceAuthDAO dao) {
@@ -39,5 +38,10 @@ public class DeviceAuthManager extends AbstractModelManager<DeviceAuthModel, Str
 	
 	public DeviceAuthModel find(DeviceAuthModel auth) {
 		return auth != null ? getDao().find(auth) : null;
+	}
+
+	@Override
+	protected boolean hasDefualtSort() {
+		return false;
 	}
 }

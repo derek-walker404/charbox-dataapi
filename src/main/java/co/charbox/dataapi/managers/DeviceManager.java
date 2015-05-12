@@ -2,7 +2,6 @@ package co.charbox.dataapi.managers;
 
 import java.util.List;
 
-import org.elasticsearch.index.query.QueryBuilder;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,11 +15,11 @@ import co.charbox.domain.model.TimerResult;
 
 import com.google.common.collect.Lists;
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.managers.AbstractModelManager;
+import com.tpofof.core.managers.AbstractEsModelManager;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class DeviceManager extends AbstractModelManager<Device, String, DeviceDAO, QueryBuilder> {
+public class DeviceManager extends AbstractEsModelManager<Device, DeviceDAO> {
 
 	private int defualtLimit;
 	
@@ -35,6 +34,11 @@ public class DeviceManager extends AbstractModelManager<Device, String, DeviceDA
 		this.defualtLimit = config.getInt("device.limit", 10);
 	}
 	
+	/**
+	 * 
+	 * @param deviceId
+	 * @return Never {@code null}. Only deviceId field is populated if device is not activated.
+	 */
 	public Device findByDeviceId(String deviceId) {
 		ResultsSet<Device> devices = getDao().findByDeviceId(deviceId);
 		Device device = devices.getResults().size() == 1 ? devices.getResults().get(0) : null;
@@ -104,5 +108,10 @@ public class DeviceManager extends AbstractModelManager<Device, String, DeviceDA
 	@Override
 	public String getDefaultId() {
 		return "";
+	}
+
+	@Override
+	protected boolean hasDefualtSort() {
+		return false;
 	}
 }

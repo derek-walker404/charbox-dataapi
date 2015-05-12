@@ -1,6 +1,5 @@
 package co.charbox.dataapi.managers;
 
-import org.elasticsearch.index.query.QueryBuilder;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,11 +10,11 @@ import co.charbox.dataapi.data.elasticsearch.HeartbeatDAO;
 import co.charbox.domain.model.Heartbeat;
 import co.charbox.domain.model.Outage;
 
-import com.tpofof.core.managers.AbstractModelManager;
+import com.tpofof.core.managers.AbstractEsModelManager;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class HeartbeatManager extends AbstractModelManager<Heartbeat, String, HeartbeatDAO, QueryBuilder> {
+public class HeartbeatManager extends AbstractEsModelManager<Heartbeat, HeartbeatDAO> {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(HeartbeatManager.class);
 	
@@ -70,5 +69,10 @@ public class HeartbeatManager extends AbstractModelManager<Heartbeat, String, He
 	
 	public Heartbeat findByDeviceId(String deviceId) {
 		return getDao().findByDeviceId(deviceId);
+	}
+
+	@Override
+	protected boolean hasDefualtSort() {
+		return false;
 	}
 }

@@ -10,6 +10,7 @@ import co.charbox.domain.model.auth.DeviceAuthModel;
 
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
+import com.tpofof.core.data.dao.es.EsQuery;
 import com.tpofof.core.io.IO;
 import com.tpofof.core.utils.Config;
 
@@ -49,11 +50,6 @@ public class DeviceAuthDAO extends AbstractElasticsearchDAO<DeviceAuthModel> {
 	}
 	
 	@Override
-	protected boolean hasSort() {
-		return false;
-	}
-	
-	@Override
 	protected boolean hasMapping() {
 		return true;
 	}
@@ -77,7 +73,12 @@ public class DeviceAuthDAO extends AbstractElasticsearchDAO<DeviceAuthModel> {
 		QueryBuilder q = QueryBuilders.boolQuery()
 				.must(QueryBuilders.termQuery("deviceId", auth.getDeviceId()))
 				.must(QueryBuilders.termQuery("apiKey", auth.getApiKey()));
-		ResultsSet<DeviceAuthModel> authResults = find(q, 1, 0);
+		EsQuery esQuery = EsQuery.builder()
+				.constraints(q)
+				.limit(1)
+				.offset(0)
+				.build();
+		ResultsSet<DeviceAuthModel> authResults = find(esQuery);
 		return authResults.getTotal() == 1 ? authResults.getResults().get(0) : null;
 	}
 }

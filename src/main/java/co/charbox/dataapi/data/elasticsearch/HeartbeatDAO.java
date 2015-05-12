@@ -9,6 +9,7 @@ import co.charbox.domain.model.Heartbeat;
 
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
+import com.tpofof.core.data.dao.es.EsQuery;
 import com.tpofof.core.utils.Config;
 
 @Component
@@ -50,17 +51,17 @@ public class HeartbeatDAO extends AbstractElasticsearchDAO<Heartbeat> {
 	}
 
 	@Override
-	protected boolean hasSort() {
-		return false;
-	}
-
-	@Override
 	protected boolean hasMapping() {
 		return false;
 	}
 	
 	public Heartbeat findByDeviceId(String deviceId) {
-		ResultsSet<Heartbeat> heartbeats = find(QueryBuilders.termQuery("deviceId", deviceId), 10, 0);
-		return heartbeats.getResults().size() == 1 ? heartbeats.getResults().get(0) : null;
+		EsQuery q = EsQuery.builder()
+				.constraints(QueryBuilders.termQuery("deviceId", deviceId))
+				.limit(10)
+				.offset(0)
+				.build();
+		ResultsSet<Heartbeat> heartbeats = find(q);
+		return heartbeats.getTotal() == 1 ? heartbeats.getResults().get(0) : null;
 	}
 }

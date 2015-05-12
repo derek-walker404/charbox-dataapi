@@ -1,17 +1,16 @@
 package co.charbox.dataapi.managers;
 
-import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.data.elasticsearch.DeviceConfigDAO;
 import co.charbox.domain.model.DeviceConfiguration;
 
-import com.tpofof.core.managers.AbstractModelManager;
+import com.tpofof.core.managers.AbstractEsModelManager;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class DeviceConfigurationManager extends AbstractModelManager<DeviceConfiguration, String, DeviceConfigDAO, QueryBuilder> {
+public class DeviceConfigurationManager extends AbstractEsModelManager<DeviceConfiguration, DeviceConfigDAO> {
 
 	private final Config config;
 
@@ -37,5 +36,10 @@ public class DeviceConfigurationManager extends AbstractModelManager<DeviceConfi
 	@Override
 	public int getDefualtLimit() {
 		return 10; // TODO: config or setting
+	}
+
+	@Override
+	protected boolean hasDefualtSort() {
+		return false;
 	}
 }
