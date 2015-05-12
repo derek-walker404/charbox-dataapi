@@ -3,7 +3,7 @@ package co.charbox.dataapi.managers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.dataapi.data.elasticsearch.DeviceAuthDAO;
+import co.charbox.dataapi.data.elasticsearch.auth.DeviceAuthDAO;
 import co.charbox.domain.model.auth.DeviceAuthModel;
 
 import com.tpofof.core.managers.AbstractEsModelManager;

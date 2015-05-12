@@ -10,17 +10,20 @@ import co.charbox.domain.model.Heartbeat;
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
 import com.tpofof.core.data.dao.es.EsQuery;
+import com.tpofof.core.io.IO;
 import com.tpofof.core.utils.Config;
 
 @Component
 public class HeartbeatDAO extends AbstractElasticsearchDAO<Heartbeat> {
 
+	private IO io;
 	private String index;
 	private String type;
 	
 	@Autowired
-	public HeartbeatDAO(Config config, Client client) {
+	public HeartbeatDAO(Config config, Client client, IO io) {
 		super(config, client);
+		this.io = io;
 		init();
 	}
 
@@ -52,7 +55,13 @@ public class HeartbeatDAO extends AbstractElasticsearchDAO<Heartbeat> {
 
 	@Override
 	protected boolean hasMapping() {
-		return false;
+		return true;
+	}
+	
+	@Override
+	protected String getMapping() {
+		String filename = getConfig().getString("es.heartbeat.mapping.name", "mappings/es.heartbeat.mapping.json");
+		return io.getContents(filename);
 	}
 	
 	public Heartbeat findByDeviceId(String deviceId) {

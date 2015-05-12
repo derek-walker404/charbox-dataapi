@@ -49,10 +49,10 @@ public class HeartbeatManager extends AbstractEsModelManager<Heartbeat, Heartbea
 	public Heartbeat insert(Heartbeat hb) {
 		Heartbeat lastHb = findByDeviceId(hb.getDeviceId());
 		if (lastHb != null) {
-			long currTime = hb.getTime().toDate().getTime();
-			long lastTime = lastHb.getTime().toDate().getTime();
-			long interval = currTime - lastTime;
-			if (interval > 3 * 60 * 1000) { // TODO: move to config
+			long currTime = hb.getTime().getMillis();
+			long lastTime = lastHb.getTime().getMillis();
+			long interval = (currTime - lastTime) / 1000 / 60; // to minutes
+			if (interval > 3) { // TODO: move to config
 				outageManager.insert(Outage.builder()
 						.deviceId(hb.getDeviceId())
 						.outageTime(new DateTime(hb.getTime()))
@@ -60,7 +60,7 @@ public class HeartbeatManager extends AbstractEsModelManager<Heartbeat, Heartbea
 						.build());
 			}
 			lastHb.setTime(hb.getTime());
-			return super.update(hb);
+			return super.update(lastHb);
 		} else {
 			LOGGER.info("Creating heartbeat for " + hb.getDeviceId());
 			return super.insert(hb);

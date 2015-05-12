@@ -136,7 +136,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 	@POST
 	@Timed
 	public JsonNode heartbeat(@Auth IAuthModel authModel, @PathParam("deviceId") String deviceId) throws HttpCodeException {
-		getValidator().validate(authModel, deviceId, READ);
+		getValidator().validate(authModel, deviceId, READ_ONE);
 		if (getManager().findByDeviceId(deviceId) == null) {
 			throw new HttpNotFoundException("Could not find device with id " + deviceId);
 		}

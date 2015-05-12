@@ -1,4 +1,4 @@
-package co.charbox.dataapi.data.elasticsearch;
+package co.charbox.dataapi.data.elasticsearch.auth;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -56,7 +56,7 @@ public class DeviceAuthDAO extends AbstractElasticsearchDAO<DeviceAuthModel> {
 	
 	@Override
 	protected String getMapping() {
-		String filename = getConfig().getString("es.device_config.mapping.name", "mappings/es.device_auth.mapping.json");
+		String filename = getConfig().getString("es.device_auth.mapping.name", "mappings/es.device_auth.mapping.json");
 		return io.getContents(filename);
 	}
 
