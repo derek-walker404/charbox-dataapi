@@ -12,18 +12,23 @@ import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.auth.AdminAuthenticator;
 import co.charbox.dataapi.auth.DeviceAuthenticator;
+import co.charbox.dataapi.auth.ServerAuthenticator;
+import co.charbox.dataapi.auth.TokenAuthenticator;
 import co.charbox.dataapi.config.CharboxConfiguration;
 import co.charbox.dataapi.health.GuavaCacheMetrics;
 import co.charbox.dataapi.health.MaxMindAccountHealth;
 import co.charbox.dataapi.health.MaxMindConnectionHealth;
 import co.charbox.dataapi.resources.MaxMindResource;
-import co.charbox.dataapi.resources.crud.DeviceAuthResource;
 import co.charbox.dataapi.resources.crud.DeviceConfigResource;
 import co.charbox.dataapi.resources.crud.DeviceResource;
 import co.charbox.dataapi.resources.crud.HeartbeatResource;
 import co.charbox.dataapi.resources.crud.OutageResource;
 import co.charbox.dataapi.resources.crud.TestCaseResource;
 import co.charbox.dataapi.resources.crud.TimerResultResource;
+import co.charbox.dataapi.resources.crud.auth.AuthResource;
+import co.charbox.dataapi.resources.crud.auth.DeviceAuthResource;
+import co.charbox.dataapi.resources.crud.auth.ServiceAuthResource;
+import co.charbox.dataapi.resources.crud.auth.TokenAuthResource;
 import co.charbox.domain.mm.MaxMindService;
 import co.charbox.domain.model.auth.IAuthModel;
 
@@ -53,7 +58,11 @@ public class CharboxDataApiApplication extends DwaApp<CharboxConfiguration> {
 	@Autowired private HeartbeatResource heartbeatResource;
 	@Autowired private OutageResource outageResource;
 	@Autowired private MaxMindResource maxMindResource;
-	@Autowired private DeviceAuthResource authResource;
+	
+	@Autowired private AuthResource authResource;
+	@Autowired private DeviceAuthResource deviceAuthResource;
+	@Autowired private ServiceAuthResource serverAuthResource;
+	@Autowired private TokenAuthResource tokenAuthResource;
 	
 	/*
 	 * HEALTH CHECKS
@@ -66,6 +75,8 @@ public class CharboxDataApiApplication extends DwaApp<CharboxConfiguration> {
 	 */
 	@Autowired private DeviceAuthenticator deviceAuthenticator;
 	@Autowired private AdminAuthenticator adminAuthenticator;
+	@Autowired private ServerAuthenticator serverAuthenticator;
+	@Autowired private TokenAuthenticator tokenAuthenticator;
 	
 	@Override
 	public String getName() {
@@ -89,7 +100,11 @@ public class CharboxDataApiApplication extends DwaApp<CharboxConfiguration> {
 		env.jersey().register(heartbeatResource);
 		env.jersey().register(outageResource);
 		env.jersey().register(maxMindResource);
+		
 		env.jersey().register(authResource);
+		env.jersey().register(deviceAuthResource);
+		env.jersey().register(serverAuthResource);
+		env.jersey().register(tokenAuthResource);
 		
 		/* HEALTH CHECKS */
 		env.healthChecks().register("mm.account", maxMindAccountHealth);
@@ -102,8 +117,11 @@ public class CharboxDataApiApplication extends DwaApp<CharboxConfiguration> {
 		/* AUTH */
 		BasicAuthFactory<IAuthModel> deviceAuthFactory = new BasicAuthFactory<IAuthModel>(deviceAuthenticator, "chatbot.co", IAuthModel.class);
 		BasicAuthFactory<IAuthModel> adminAuthFactory = new BasicAuthFactory<IAuthModel>(adminAuthenticator, "chatbot.co", IAuthModel.class);
+		BasicAuthFactory<IAuthModel> serverAuthFactory = new BasicAuthFactory<IAuthModel>(serverAuthenticator, "chatbot.co", IAuthModel.class);
+		BasicAuthFactory<IAuthModel> tokenAuthFactory = new BasicAuthFactory<IAuthModel>(tokenAuthenticator, "chatbot.co", IAuthModel.class);
 		@SuppressWarnings("unchecked")
-		ChainedAuthFactory<IAuthModel> authChainFactory = new ChainedAuthFactory<IAuthModel>(deviceAuthFactory, adminAuthFactory);
+		ChainedAuthFactory<IAuthModel> authChainFactory = new ChainedAuthFactory<IAuthModel>(deviceAuthFactory, adminAuthFactory,
+				serverAuthFactory, tokenAuthFactory);
 		env.jersey().register(AuthFactory.binder(authChainFactory));
 		
 		super.addCorsSupport(env); // TODO: change to config values.

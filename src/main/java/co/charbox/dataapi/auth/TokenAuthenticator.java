@@ -7,21 +7,20 @@ import io.dropwizard.auth.basic.BasicCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.dataapi.managers.auth.DeviceAuthManager;
+import co.charbox.dataapi.managers.auth.TokenAuthManager;
 import co.charbox.domain.model.auth.IAuthModel;
 
 import com.google.common.base.Optional;
 
 @Component
-public class DeviceAuthenticator implements Authenticator<BasicCredentials, IAuthModel> {
+public class TokenAuthenticator implements Authenticator<BasicCredentials, IAuthModel> {
 
-	@Autowired DeviceAuthManager deviceAuthManager;
+	@Autowired private TokenAuthManager tokenAuthManager;
 	
 	@Override
 	public Optional<IAuthModel> authenticate(BasicCredentials credentials)
 			throws AuthenticationException {
-		IAuthModel iAuth = deviceAuthManager.isValid(credentials.getUsername(), credentials.getPassword());
+		IAuthModel iAuth = tokenAuthManager.isValid(credentials.getUsername(), credentials.getPassword());
 		return iAuth != null ? Optional.of(iAuth) : Optional.<IAuthModel>absent();
 	}
-
 }

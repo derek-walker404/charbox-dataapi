@@ -1,0 +1,25 @@
+{
+    "auth": {
+        "properties": {
+            "serverKey": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "serverId": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "service": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "id": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "activated": {
+                "type": "boolean"
+            }
+        }
+    }
+}
