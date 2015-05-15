@@ -39,7 +39,7 @@ public class DeviceConfigurationManager extends AbstractEsModelManager<DeviceCon
 	}
 
 	@Override
-	protected boolean hasDefualtSort() {
+	protected boolean hasDefaultSort() {
 		return false;
 	}
 }

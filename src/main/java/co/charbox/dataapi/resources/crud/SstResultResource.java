@@ -15,29 +15,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.core.mm.LocationProvider;
+import co.charbox.core.mm.MaxMindService;
 import co.charbox.dataapi.auth.ManageAssetAuthValidator;
-import co.charbox.dataapi.managers.TimerResultManager;
-import co.charbox.domain.model.TimerResult;
+import co.charbox.dataapi.managers.SstResultManager;
+import co.charbox.domain.model.SstResults;
 import co.charbox.domain.model.auth.IAuthModel;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.tpofof.core.utils.Config;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.error.HttpCodeException;
 import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
-@Path("/results")
+@Path("/sst")
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class TimerResultResource extends AbstractAuthProtectedCrudResource<TimerResult, String, TimerResultManager, IAuthModel> {
+public class SstResultResource extends AbstractAuthProtectedCrudResource<SstResults, String, SstResultManager, IAuthModel> {
 
 	@Autowired private LocationProvider locationProvider;
+	@Autowired private MaxMindService mm;
 	@Autowired private ManageAssetAuthValidator authValidator;
+	@Autowired private Config config;
 	
 	@Autowired
-	public TimerResultResource(TimerResultManager man) {
-		super(man, TimerResult.class);
+	public SstResultResource(SstResultManager man) {
+		super(man, SstResults.class);
 	}
 	
 	@Override
@@ -47,14 +51,22 @@ public class TimerResultResource extends AbstractAuthProtectedCrudResource<Timer
 	
 	@POST
 	@Override
-	public JsonNode post(@Auth IAuthModel auth, TimerResult model, @Context HttpServletRequest request) throws HttpCodeException {
+	public JsonNode post(@Auth IAuthModel auth, SstResults model, @Context HttpServletRequest request) throws HttpCodeException {
 		validate(auth, null, CREATE);
-		if (model.getClientLocation().getIp() == null || model.getClientLocation().getIp().isEmpty()) {
+		String serviceIp = model.getServerLocation().getIp();
+		if (serviceIp == null || serviceIp.isEmpty()) {
 			// might be a proxy or local host, but something is better than nothing.
-			model.getClientLocation().setIp(request.getRemoteAddr());
+			String overrideIp = config.getString("location.ip.override");
+			serviceIp = overrideIp == null ? request.getRemoteAddr() : overrideIp;
 		}
-		model.setServerLocation(locationProvider.getLocation(model.getServerLocation().getIp()));
-		model.setClientLocation(locationProvider.getLocation(model.getClientLocation().getIp()));
+		String clientIp = model.getDeviceInfo().getConnection().getIp();
+		if (clientIp == null || clientIp.isEmpty()) {
+			// might be a proxy or local host, but something is better than nothing.
+			clientIp = config.getString("location.ip.override");
+		}
+		clientIp = config.getString("location.client.override", clientIp);
+		model.setServerLocation(locationProvider.getLocation(serviceIp));
+		model.setDeviceInfo(mm.get(clientIp));
 		return super.post(auth, model, request);
 	}
 }

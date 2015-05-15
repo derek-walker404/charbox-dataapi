@@ -3,7 +3,7 @@ package co.charbox.dataapi.health;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.domain.mm.MaxMindService;
+import co.charbox.core.mm.MaxMindService;
 
 import com.codahale.metrics.health.HealthCheck;
 import com.tpofof.core.utils.Config;

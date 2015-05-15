@@ -31,7 +31,7 @@ public class ServerAuthDAO extends AbstractElasticsearchDAO<ServerAuthModel> {
 	@Override
 	protected String getIndex() {
 		if (index == null) {
-			index = getConfig().getString("es.device_auth.index", "charbot_v0.1_devauth");
+			index = getConfig().getString("es.server_auth.index", "charbot_v0.1_serverauth");
 		}
 		return index;
 	}
@@ -39,7 +39,7 @@ public class ServerAuthDAO extends AbstractElasticsearchDAO<ServerAuthModel> {
 	@Override
 	protected String getType() {
 		if (type == null) {
-			type = getConfig().getString("es.device_auth.type", "auth");
+			type = getConfig().getString("es.server_auth.type", "serauth");
 		}
 		return type;
 	}
@@ -47,11 +47,6 @@ public class ServerAuthDAO extends AbstractElasticsearchDAO<ServerAuthModel> {
 	@Override
 	protected Class<ServerAuthModel> getModelClass() {
 		return ServerAuthModel.class;
-	}
-	
-	@Override
-	protected boolean hasMapping() {
-		return true;
 	}
 	
 	@Override
@@ -72,7 +67,8 @@ public class ServerAuthDAO extends AbstractElasticsearchDAO<ServerAuthModel> {
 	public ServerAuthModel find(ServerAuthModel auth) {
 		QueryBuilder q = QueryBuilders.boolQuery()
 				.must(QueryBuilders.termQuery("serverId", auth.getServerId()))
-				.must(QueryBuilders.termQuery("serverKey", auth.getServerKey()));
+				.must(QueryBuilders.termQuery("serverKey", auth.getServerKey()))
+				.must(QueryBuilders.termQuery("service", auth.getService()));
 		EsQuery esQuery = EsQuery.builder()
 				.constraints(q)
 				.limit(1)

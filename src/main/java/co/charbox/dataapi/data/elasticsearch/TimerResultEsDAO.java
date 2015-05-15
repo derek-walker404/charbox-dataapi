@@ -8,19 +8,24 @@ import org.springframework.stereotype.Component;
 import co.charbox.domain.model.TimerResult;
 
 import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.data.dao.SearchWindow;
+import com.tpofof.core.data.dao.SimpleSort;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
 import com.tpofof.core.data.dao.es.EsQuery;
+import com.tpofof.core.io.IO;
 import com.tpofof.core.utils.Config;
 
 @Component
 public class TimerResultEsDAO extends AbstractElasticsearchDAO<TimerResult> {
 
+	private IO io;
 	private String index;
 	private String type;
 
 	@Autowired
-	public TimerResultEsDAO(Config config, Client client) {
+	public TimerResultEsDAO(Config config, Client client, IO io) {
 		super(config, client);
+		this.io = io;
 		init();
 	}
 
@@ -51,15 +56,17 @@ public class TimerResultEsDAO extends AbstractElasticsearchDAO<TimerResult> {
 	}
 	
 	@Override
-	protected boolean hasMapping() {
-		return false;
+	protected String getMapping() {
+		String filename = getConfig().getString("es.timer_result.mapping.name", "mappings/es.timer_result.mapping.json");
+		return io.getContents(filename);
 	}
 	
-	public ResultsSet<TimerResult> getByDevice(String deviceId, int limit, int offset) {
+	public ResultsSet<TimerResult> getByDevice(String deviceId, SearchWindow window, SimpleSort sort) {
 		EsQuery q = EsQuery.builder()
 				.constraints(QueryBuilders.termQuery("deviceId", deviceId))
-				.limit(limit)
-				.offset(offset)
+				.limit(window.getLimit())
+				.offset(window.getOffset())
+				.sort(convertSort(sort))
 				.build();
 		return find(q);
 	}

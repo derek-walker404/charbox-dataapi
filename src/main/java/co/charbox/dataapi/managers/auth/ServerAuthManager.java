@@ -26,10 +26,11 @@ public class ServerAuthManager extends AbstractEsModelManager<ServerAuthModel, S
 		return "";
 	}
 	
-	public ServerAuthModel isValid(String serverId, String serverKey) {
+	public ServerAuthModel isValid(String serverId, String serverKey, String service) {
 		ServerAuthModel auth = ServerAuthModel.builder()
 				.serverId(serverId)
 				.serverKey(serverKey)
+				.service(service)
 				.build();
 		ServerAuthModel devAuth = find(auth);
 		boolean validAuth = devAuth != null && devAuth.isActivated();
@@ -41,7 +42,7 @@ public class ServerAuthManager extends AbstractEsModelManager<ServerAuthModel, S
 	}
 
 	@Override
-	protected boolean hasDefualtSort() {
+	protected boolean hasDefaultSort() {
 		return false;
 	}
 }

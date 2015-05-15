@@ -1,7 +1,11 @@
 {
     "device": {
         "properties": {
-            "configId": {
+            "id": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "version": {
                 "type": "string",
                 "index": "not_analyzed"
             },
@@ -9,7 +13,7 @@
                 "type": "string",
                 "index": "not_analyzed"
             },
-            "id": {
+            "configId": {
                 "type": "string",
                 "index": "not_analyzed"
             },

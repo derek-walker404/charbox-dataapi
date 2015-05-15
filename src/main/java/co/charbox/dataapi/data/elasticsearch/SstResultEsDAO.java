@@ -5,7 +5,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.domain.model.Heartbeat;
+import co.charbox.domain.model.SstResults;
 
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
@@ -14,14 +14,14 @@ import com.tpofof.core.io.IO;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class HeartbeatDAO extends AbstractElasticsearchDAO<Heartbeat> {
+public class SstResultEsDAO extends AbstractElasticsearchDAO<SstResults> {
 
 	private IO io;
 	private String index;
 	private String type;
-	
+
 	@Autowired
-	public HeartbeatDAO(Config config, Client client, IO io) {
+	public SstResultEsDAO(Config config, Client client, IO io) {
 		super(config, client);
 		this.io = io;
 		init();
@@ -30,7 +30,7 @@ public class HeartbeatDAO extends AbstractElasticsearchDAO<Heartbeat> {
 	@Override
 	protected String getIndex() {
 		if (index == null) {
-			index = getConfig().getString("es.heartbeat.index", "charbot_v0.1_hb");
+			index = getConfig().getString("es.sst_result.index", "charbot_v0.1_sst");
 		}
 		return index;
 	}
@@ -38,34 +38,33 @@ public class HeartbeatDAO extends AbstractElasticsearchDAO<Heartbeat> {
 	@Override
 	protected String getType() {
 		if (type == null) {
-			type = getConfig().getString("es.heartbeat.type", "hb");
+			type = getConfig().getString("es.sst_result.type", "sst");
 		}
 		return type;
 	}
-
+	
 	@Override
-	protected Class<Heartbeat> getModelClass() {
-		return Heartbeat.class;
+	protected Class<SstResults> getModelClass() {
+		return SstResults.class;
 	}
-
+	
 	@Override
 	protected boolean isRequiredIndex() {
 		return true;
 	}
-
+	
 	@Override
 	protected String getMapping() {
-		String filename = getConfig().getString("es.heartbeat.mapping.name", "mappings/es.heartbeat.mapping.json");
+		String filename = getConfig().getString("es.sst_result.mapping.name", "mappings/es.sst_result.mapping.json");
 		return io.getContents(filename);
 	}
 	
-	public Heartbeat findByDeviceId(String deviceId) {
+	public ResultsSet<SstResults> getByDevice(String deviceId, int limit, int offset) {
 		EsQuery q = EsQuery.builder()
 				.constraints(QueryBuilders.termQuery("deviceId", deviceId))
-				.limit(10)
-				.offset(0)
+				.limit(limit)
+				.offset(offset)
 				.build();
-		ResultsSet<Heartbeat> heartbeats = find(q);
-		return heartbeats.getTotal() == 1 ? heartbeats.getResults().get(0) : null;
+		return find(q);
 	}
 }

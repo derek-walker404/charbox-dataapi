@@ -1,5 +1,5 @@
 {
-    "timerResult": {
+    "tr": {
         "properties": {
             "clientLocation": {
                 "properties": {
@@ -12,7 +12,8 @@
                 }
             },
             "deviceId": {
-                "type": "long"
+                "type": "string",
+                "index": "not_analyzed"
             },
             "duration": {
                 "type": "long"
@@ -39,8 +40,9 @@
             "speed": {
                 "type": "double"
             },
-            "startTime": {
-                "type": "date"
+            "expiration": {
+                "type": "date",
+                "format": "dateOptionalTime"
             },
             "testCaseId": {
                 "type": "string",

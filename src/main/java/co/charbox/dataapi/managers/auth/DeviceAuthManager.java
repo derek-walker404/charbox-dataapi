@@ -41,7 +41,7 @@ public class DeviceAuthManager extends AbstractEsModelManager<DeviceAuthModel, D
 	}
 
 	@Override
-	protected boolean hasDefualtSort() {
+	protected boolean hasDefaultSort() {
 		return false;
 	}
 }

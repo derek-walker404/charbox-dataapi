@@ -39,7 +39,7 @@ public class DeviceAuthDAO extends AbstractElasticsearchDAO<DeviceAuthModel> {
 	@Override
 	protected String getType() {
 		if (type == null) {
-			type = getConfig().getString("es.device_auth.type", "auth");
+			type = getConfig().getString("es.device_auth.type", "devauth");
 		}
 		return type;
 	}
@@ -47,11 +47,6 @@ public class DeviceAuthDAO extends AbstractElasticsearchDAO<DeviceAuthModel> {
 	@Override
 	protected Class<DeviceAuthModel> getModelClass() {
 		return DeviceAuthModel.class;
-	}
-	
-	@Override
-	protected boolean hasMapping() {
-		return true;
 	}
 	
 	@Override

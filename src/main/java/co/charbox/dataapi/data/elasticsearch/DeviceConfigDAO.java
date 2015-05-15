@@ -7,17 +7,20 @@ import org.springframework.stereotype.Component;
 import co.charbox.domain.model.DeviceConfiguration;
 
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
+import com.tpofof.core.io.IO;
 import com.tpofof.core.utils.Config;
 
 @Component
 public class DeviceConfigDAO extends AbstractElasticsearchDAO<DeviceConfiguration> {
 
+	private IO io;
 	private String index;
 	private String type;
 
 	@Autowired
-	public DeviceConfigDAO(Config config, Client client) {
+	public DeviceConfigDAO(Config config, Client client, IO io) {
 		super(config, client);
+		this.io = io;
 		init();
 	}
 	
@@ -48,7 +51,8 @@ public class DeviceConfigDAO extends AbstractElasticsearchDAO<DeviceConfiguratio
 	}
 
 	@Override
-	protected boolean hasMapping() {
-		return false;
+	protected String getMapping() {
+		String filename = getConfig().getString("es.device_config.mapping.name", "mappings/es.device_config.mapping.json");
+		return io.getContents(filename);
 	}
 }

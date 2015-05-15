@@ -7,17 +7,20 @@ import org.springframework.stereotype.Component;
 import co.charbox.domain.model.TestCase;
 
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
+import com.tpofof.core.io.IO;
 import com.tpofof.core.utils.Config;
 
 @Component
 public class TestCaseDAO extends AbstractElasticsearchDAO<TestCase> {
 	
+	private IO io;
 	private String index;
 	private String type;
 	
 	@Autowired
-	public TestCaseDAO(Config config, Client client) {
+	public TestCaseDAO(Config config, Client client, IO io) {
 		super(config, client);
+		this.io = io;
 		init();
 	}
 
@@ -46,9 +49,10 @@ public class TestCaseDAO extends AbstractElasticsearchDAO<TestCase> {
 	protected boolean isRequiredIndex() {
 		return true;
 	}
-
+	
 	@Override
-	protected boolean hasMapping() {
-		return false;
+	protected String getMapping() {
+		String filename = getConfig().getString("es.testcase.mapping.name", "mappings/es.testcase.mapping.json");
+		return io.getContents(filename);
 	}
 }

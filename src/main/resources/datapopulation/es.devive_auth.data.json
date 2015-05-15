@@ -1,0 +1,2 @@
+{ "deviceId": "test-dev1", "apiKey": "asdf123", "activated": true }
+{ "deviceId": "test-dev2", "apiKey": "asdf321", "activated": false }

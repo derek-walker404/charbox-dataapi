@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.auth.AdminAuthValidator;
+import co.charbox.dataapi.managers.auth.TokenAuthManager;
 import co.charbox.domain.model.auth.AdminAuthModel;
 import co.charbox.domain.model.auth.DeviceAuthModel;
 import co.charbox.domain.model.auth.IAuthModel;
@@ -36,6 +37,7 @@ public class AuthResource {
 	@Autowired private ResponseUtils responseUtils;
 	@Autowired private RequestUtils requestUtils;
 	@Autowired private AdminAuthValidator authValidator;
+	@Autowired private TokenAuthManager tokenManager;
 	
 	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
 		return authValidator;

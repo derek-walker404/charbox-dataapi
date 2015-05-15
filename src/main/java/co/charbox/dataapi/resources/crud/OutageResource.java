@@ -7,8 +7,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,21 +20,16 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.es.EsQuery;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
-import com.tpofof.dwa.utils.RequestUtils;
-import com.tpofof.dwa.utils.ResponseUtils;
 
 @Path("/outages")
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class OutageResource extends AbstractAuthProtectedCrudResource<Outage, String, OutageManager, EsQuery, QueryBuilder, SortBuilder, IAuthModel> {
+public class OutageResource extends AbstractAuthProtectedCrudResource<Outage, String, OutageManager, IAuthModel> {
 
-	@Autowired private ResponseUtils responseUtils;
-	@Autowired private RequestUtils requestUtils;
 	@Autowired private ManageAssetAuthValidator authValidator;
 	
 	@Autowired
@@ -49,20 +42,13 @@ public class OutageResource extends AbstractAuthProtectedCrudResource<Outage, St
 		return authValidator;
 	}
 	
-	@Override
-	protected EsQuery getDefaultQuery(int limit, int offset) {
-		return EsQuery.builder()
-				.limit(limit)
-				.offset(offset)
-				.build();
-	}
-	
 	@Path("/recent")
 	@GET
 	@Timed
 	public JsonNode getRecentHour(@QueryParam("startTime") Optional<String> startTimeParam,
 			@QueryParam("limit") Optional<Integer> limit,
-			@QueryParam("offset") Optional<Integer> offset) {
+			@QueryParam("offset") Optional<Integer> offset,
+			@QueryParam("sort") Optional<String> sort) {
 		DateTime startTime = new DateTime();
 		if (startTimeParam.isPresent()) {
 			String startTimeString = startTimeParam.get().trim().toUpperCase();
@@ -89,7 +75,7 @@ public class OutageResource extends AbstractAuthProtectedCrudResource<Outage, St
 				startTime = startTime.minusHours(1);
 			}
 		}
-		ResultsSet<Outage> outages = getManager().getRecentOutages(startTime, requestUtils.limit(limit), requestUtils.offset(offset));
-		return responseUtils.success(responseUtils.listData(outages));
+		ResultsSet<Outage> outages = getManager().getRecentOutages(startTime, req().searchWindow(limit, offset));
+		return res().success(res().listData(outages));
 	}
 }

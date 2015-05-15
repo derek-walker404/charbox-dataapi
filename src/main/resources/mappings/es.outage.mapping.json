@@ -1,7 +1,7 @@
 {
-    "devauth": {
+    "outage": {
         "properties": {
-            "apiKey": {
+            "id": {
                 "type": "string",
                 "index": "not_analyzed"
             },
@@ -9,11 +9,14 @@
                 "type": "string",
                 "index": "not_analyzed"
             },
-            "id": {
-                "type": "string",
-                "index": "not_analyzed"
+            "outageTime": {
+                "type": "date",
+                "format": "dateOptionalTime"
             },
-            "activated": {
+            "duration": {
+                "type": "long"
+            },
+            "confirmed": {
                 "type": "boolean"
             }
         }

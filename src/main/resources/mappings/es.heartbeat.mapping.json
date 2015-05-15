@@ -1,11 +1,11 @@
 {
     "hb": {
         "properties": {
-            "deviceId": {
+            "id": {
                 "type": "string",
                 "index": "not_analyzed"
             },
-            "id": {
+            "deviceId": {
                 "type": "string",
                 "index": "not_analyzed"
             },

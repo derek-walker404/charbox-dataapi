@@ -31,7 +31,7 @@ public class TokenAuthDAO extends AbstractElasticsearchDAO<TokenAuthModel> {
 	@Override
 	protected String getIndex() {
 		if (index == null) {
-			index = getConfig().getString("es.device_auth.index", "charbot_v0.1_devauth");
+			index = getConfig().getString("es.token_auth.index", "charbot_v0.1_tokenauth");
 		}
 		return index;
 	}
@@ -39,7 +39,7 @@ public class TokenAuthDAO extends AbstractElasticsearchDAO<TokenAuthModel> {
 	@Override
 	protected String getType() {
 		if (type == null) {
-			type = getConfig().getString("es.device_auth.type", "auth");
+			type = getConfig().getString("es.token_auth.type", "tokauth");
 		}
 		return type;
 	}
@@ -50,13 +50,8 @@ public class TokenAuthDAO extends AbstractElasticsearchDAO<TokenAuthModel> {
 	}
 	
 	@Override
-	protected boolean hasMapping() {
-		return true;
-	}
-	
-	@Override
 	protected String getMapping() {
-		String filename = getConfig().getString("es.server_auth.mapping.name", "mappings/es.server_auth.mapping.json");
+		String filename = getConfig().getString("es.token_auth.mapping.name", "mappings/es.token_auth.mapping.json");
 		return io.getContents(filename);
 	}
 
@@ -72,7 +67,8 @@ public class TokenAuthDAO extends AbstractElasticsearchDAO<TokenAuthModel> {
 	public TokenAuthModel find(TokenAuthModel auth) {
 		BoolQueryBuilder q = QueryBuilders.boolQuery()
 				.must(QueryBuilders.termQuery("token", auth.getToken()))
-				.must(QueryBuilders.termQuery("authAssetId", auth.getAuthAssetId()));
+				.must(QueryBuilders.termQuery("authAssetId", auth.getAuthAssetId()))
+				.must(QueryBuilders.termQuery("serviceId", auth.getServiceId()));
 		EsQuery esQuery = EsQuery.builder()
 				.constraints(q)
 				.limit(1)

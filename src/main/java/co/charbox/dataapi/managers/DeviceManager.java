@@ -15,6 +15,8 @@ import co.charbox.domain.model.TimerResult;
 
 import com.google.common.collect.Lists;
 import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.data.dao.SearchWindow;
+import com.tpofof.core.data.dao.SimpleSort;
 import com.tpofof.core.managers.AbstractEsModelManager;
 import com.tpofof.core.utils.Config;
 
@@ -93,8 +95,8 @@ public class DeviceManager extends AbstractEsModelManager<Device, DeviceDAO> {
 		return timerResultsManager.getByDevice(deviceId);
 	}
 	
-	public ResultsSet<TimerResult> getResults(String deviceId, int limit, int offset) {
-		return timerResultsManager.getByDevice(deviceId, limit, offset);
+	public ResultsSet<TimerResult> getResults(String deviceId, SearchWindow window, SimpleSort sort) {
+		return timerResultsManager.getByDevice(deviceId, window, sort);
 	}
 	
 	public Heartbeat heartbeat(String deviceId, DateTime time) {
@@ -111,7 +113,7 @@ public class DeviceManager extends AbstractEsModelManager<Device, DeviceDAO> {
 	}
 
 	@Override
-	protected boolean hasDefualtSort() {
+	protected boolean hasDefaultSort() {
 		return false;
 	}
 }

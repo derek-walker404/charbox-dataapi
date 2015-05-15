@@ -20,7 +20,13 @@ public class TokenAuthenticator implements Authenticator<BasicCredentials, IAuth
 	@Override
 	public Optional<IAuthModel> authenticate(BasicCredentials credentials)
 			throws AuthenticationException {
-		IAuthModel iAuth = tokenAuthManager.isValid(credentials.getUsername(), credentials.getPassword());
+		String[] keys = credentials.getUsername().split("@");
+		if (keys.length != 2) {
+			return Optional.<IAuthModel>absent();
+		}
+		String deviceId = keys[0];
+		String service = keys[1];
+		IAuthModel iAuth = tokenAuthManager.isValid(service, deviceId, credentials.getPassword());
 		return iAuth != null ? Optional.of(iAuth) : Optional.<IAuthModel>absent();
 	}
 }

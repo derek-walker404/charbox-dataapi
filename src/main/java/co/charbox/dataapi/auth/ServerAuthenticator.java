@@ -20,7 +20,13 @@ public class ServerAuthenticator implements Authenticator<BasicCredentials, IAut
 	@Override
 	public Optional<IAuthModel> authenticate(BasicCredentials credentials)
 			throws AuthenticationException {
-		IAuthModel iAuth = serverAuthManager.isValid(credentials.getUsername(), credentials.getPassword());
+		String[] names = credentials.getUsername().split("@");
+		if (names.length != 2) {
+			return Optional.<IAuthModel>absent();
+		}
+		String serviceId = names[0];
+		String service = names[1];
+		IAuthModel iAuth = serverAuthManager.isValid(serviceId, credentials.getPassword(), service);
 		return iAuth != null ? Optional.of(iAuth) : Optional.<IAuthModel>absent();
 	}
 }

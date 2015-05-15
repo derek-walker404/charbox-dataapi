@@ -1,19 +1,19 @@
 {
-    "devauth": {
+    "tc": {
         "properties": {
-            "apiKey": {
-                "type": "string",
-                "index": "not_analyzed"
-            },
-            "deviceId": {
-                "type": "string",
-                "index": "not_analyzed"
-            },
             "id": {
                 "type": "string",
                 "index": "not_analyzed"
             },
-            "activated": {
+            "name": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "uri": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "active": {
                 "type": "boolean"
             }
         }

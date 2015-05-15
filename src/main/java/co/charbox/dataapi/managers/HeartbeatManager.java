@@ -72,7 +72,7 @@ public class HeartbeatManager extends AbstractEsModelManager<Heartbeat, Heartbea
 	}
 
 	@Override
-	protected boolean hasDefualtSort() {
+	protected boolean hasDefaultSort() {
 		return false;
 	}
 }

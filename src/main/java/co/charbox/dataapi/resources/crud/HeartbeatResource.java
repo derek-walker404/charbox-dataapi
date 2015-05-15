@@ -5,8 +5,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.sort.SortBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +13,6 @@ import co.charbox.dataapi.managers.HeartbeatManager;
 import co.charbox.domain.model.Heartbeat;
 import co.charbox.domain.model.auth.IAuthModel;
 
-import com.tpofof.core.data.dao.es.EsQuery;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
@@ -24,7 +21,7 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class HeartbeatResource extends AbstractAuthProtectedCrudResource<Heartbeat, String, HeartbeatManager, EsQuery, QueryBuilder, SortBuilder, IAuthModel> {
+public class HeartbeatResource extends AbstractAuthProtectedCrudResource<Heartbeat, String, HeartbeatManager, IAuthModel> {
 
 	@Autowired private ManageAssetAuthValidator authValidator;
 	
@@ -36,13 +33,5 @@ public class HeartbeatResource extends AbstractAuthProtectedCrudResource<Heartbe
 	@Override
 	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
 		return authValidator;
-	}
-	
-	@Override
-	protected EsQuery getDefaultQuery(int limit, int offset) {
-		return EsQuery.builder()
-				.limit(limit)
-				.offset(offset)
-				.build();
 	}
 }

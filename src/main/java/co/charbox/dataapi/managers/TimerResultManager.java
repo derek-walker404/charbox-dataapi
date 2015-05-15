@@ -1,8 +1,5 @@
 package co.charbox.dataapi.managers;
 
-import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +7,8 @@ import co.charbox.dataapi.data.elasticsearch.TimerResultEsDAO;
 import co.charbox.domain.model.TimerResult;
 
 import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.data.dao.SearchWindow;
+import com.tpofof.core.data.dao.SimpleSort;
 import com.tpofof.core.managers.AbstractEsModelManager;
 import com.tpofof.core.utils.Config;
 
@@ -35,20 +34,23 @@ public class TimerResultManager extends AbstractEsModelManager<TimerResult, Time
 	}
 
 	public ResultsSet<TimerResult> getByDevice(String deviceId) {
-		return getByDevice(deviceId, getDefualtLimit(), 0);
+		return getByDevice(deviceId, getDefualtWindow(), getDefaultSort());
 	}
 	
-	public ResultsSet<TimerResult> getByDevice(String deviceId, int limit, int offset) {
-		return getDao().getByDevice(deviceId, limit, offset);
+	public ResultsSet<TimerResult> getByDevice(String deviceId, SearchWindow window, SimpleSort sort) {
+		return getDao().getByDevice(deviceId, window, sort);
 	}
 
 	@Override
-	protected boolean hasDefualtSort() {
+	protected boolean hasDefaultSort() {
 		return true;
 	}
 	
 	@Override
-	public SortBuilder getSort() {
-		return SortBuilders.fieldSort("startTime").order(SortOrder.DESC);
+	public SimpleSort getDefaultSort() {
+		return SimpleSort.builder()
+				.field("startTime")
+				.direction(-1)
+				.build();
 	}
 }

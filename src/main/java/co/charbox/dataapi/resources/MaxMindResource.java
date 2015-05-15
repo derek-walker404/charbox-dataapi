@@ -15,7 +15,7 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.domain.mm.MaxMindService;
+import co.charbox.core.mm.MaxMindService;
 import co.charbox.domain.model.mm.ConnectionInfoModel;
 
 import com.codahale.metrics.annotation.Timed;

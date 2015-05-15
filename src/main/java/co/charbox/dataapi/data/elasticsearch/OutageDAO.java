@@ -10,19 +10,23 @@ import org.springframework.stereotype.Component;
 import co.charbox.domain.model.Outage;
 
 import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.data.dao.SearchWindow;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
 import com.tpofof.core.data.dao.es.EsQuery;
+import com.tpofof.core.io.IO;
 import com.tpofof.core.utils.Config;
 
 @Component
 public class OutageDAO extends AbstractElasticsearchDAO<Outage> {
 
+	private IO io;
 	private String index;
 	private String type;
 
 	@Autowired
-	public OutageDAO(Config config, Client client) {
+	public OutageDAO(Config config, Client client, IO io) {
 		super(config, client);
+		this.io = io;
 		init();
 	}
 
@@ -53,23 +57,24 @@ public class OutageDAO extends AbstractElasticsearchDAO<Outage> {
 	}
 	
 	@Override
-	protected boolean hasMapping() {
-		return false;
+	protected String getMapping() {
+		String filename = getConfig().getString("es.outage.mapping.name", "mappings/es.outage.mapping.json");
+		return io.getContents(filename);
 	}
 	
-	public ResultsSet<Outage> getRecent(DateTime startTime, int limit) {
-		return getRecent(null, startTime, limit);
+	public ResultsSet<Outage> getRecent(DateTime startTime, SearchWindow window) {
+		return getRecent(null, startTime, window);
 	}
 	
-	public ResultsSet<Outage> getRecent(String deviceId, DateTime startTime, int limit) {
+	public ResultsSet<Outage> getRecent(String deviceId, DateTime startTime, SearchWindow window) {
 		QueryBuilder constraints = QueryBuilders.termQuery("outageTime", startTime);
 		if (deviceId != null) {
 			constraints = QueryBuilders.boolQuery().must(constraints).must(QueryBuilders.termQuery("deviceId", deviceId));
 		}
 		EsQuery q = EsQuery.builder()
 				.constraints(constraints)
-				.limit(limit)
-				.offset(0)
+				.limit(window.getLimit())
+				.offset(window.getOffset())
 				.build();
 		return find(q);
 	}

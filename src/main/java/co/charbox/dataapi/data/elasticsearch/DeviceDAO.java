@@ -54,11 +54,6 @@ public class DeviceDAO extends AbstractElasticsearchDAO<Device> {
 	}
 	
 	@Override
-	protected boolean hasMapping() {
-		return true;
-	}
-	
-	@Override
 	protected String getMapping() {
 		String filename = getConfig().getString("es.device.mapping.name", "mappings/es.device.mapping.json");
 		return io.getContents(filename);
