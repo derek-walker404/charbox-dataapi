@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.domain.model.auth.AdminAuthModel;
-import co.charbox.domain.model.auth.IAuthModel;
 
 import com.google.common.base.Optional;
+import com.tpofof.core.security.IAuthModel;
 import com.tpofof.core.utils.Config;
 
 @Component

@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import co.charbox.dataapi.data.elasticsearch.auth.TokenAuthDAO;
 import co.charbox.domain.model.auth.TokenAuthModel;
 
+import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.data.dao.SearchWindow;
 import com.tpofof.core.managers.AbstractEsModelManager;
 
 @Component
@@ -27,6 +29,11 @@ public class TokenAuthManager extends AbstractEsModelManager<TokenAuthModel, Tok
 	@Override
 	public String getDefaultId() {
 		return "";
+	}
+	
+	@Override
+	protected boolean hasDefaultSort() {
+		return false;
 	}
 	
 	public TokenAuthModel getNewToken(String serviceId, String deviceId) {
@@ -54,9 +61,27 @@ public class TokenAuthManager extends AbstractEsModelManager<TokenAuthModel, Tok
 	public TokenAuthModel find(TokenAuthModel auth) {
 		return auth != null ? getDao().find(auth) : null;
 	}
-
-	@Override
-	protected boolean hasDefaultSort() {
-		return false;
+	
+	public boolean deleteByToken(String token) {
+		TokenAuthModel auth = getDao().findByToken(token);
+		return auth == null ? false : getDao().delete(auth.getId());
+	}
+	
+	public ResultsSet<TokenAuthModel> findExprired(SearchWindow window) {
+		return getDao().findExpired(window);
+	}
+	
+	public int deleteExpired() {
+		int count = 0;
+		ResultsSet<TokenAuthModel> expired = findExprired(getDefualtWindow());
+		while (expired.getResults().size() > 0) {
+			for (TokenAuthModel auth : expired.getResults()) {
+				if (delete(auth.getId())) {
+					count++;
+				}
+			}
+			expired = findExprired(getDefualtWindow());
+		} 
+		return count;
 	}
 }

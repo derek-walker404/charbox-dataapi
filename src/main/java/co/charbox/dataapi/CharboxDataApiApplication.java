@@ -31,10 +31,10 @@ import co.charbox.dataapi.resources.crud.auth.AuthResource;
 import co.charbox.dataapi.resources.crud.auth.DeviceAuthResource;
 import co.charbox.dataapi.resources.crud.auth.ServiceAuthResource;
 import co.charbox.dataapi.resources.crud.auth.TokenAuthResource;
-import co.charbox.domain.model.auth.IAuthModel;
 
 import com.codahale.metrics.MetricSet;
 import com.tpofof.core.App;
+import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.DwaApp;
 
 @Component

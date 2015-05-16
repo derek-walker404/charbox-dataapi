@@ -3,6 +3,8 @@ package co.charbox.dataapi.resources.crud;
 import static com.tpofof.dwa.resources.AuthRequestPermisionType.CREATE;
 import io.dropwizard.auth.Auth;
 
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -11,20 +13,22 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.elasticsearch.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.core.mm.LocationProvider;
 import co.charbox.core.mm.MaxMindService;
-import co.charbox.dataapi.auth.ManageAssetAuthValidator;
 import co.charbox.dataapi.managers.SstResultManager;
 import co.charbox.domain.model.SstResults;
-import co.charbox.domain.model.auth.IAuthModel;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.tpofof.core.security.IAuthModel;
 import com.tpofof.core.utils.Config;
 import com.tpofof.dwa.auth.IAuthValidator;
+import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpCodeException;
+import com.tpofof.dwa.error.HttpUnauthorizedException;
 import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
@@ -36,7 +40,7 @@ public class SstResultResource extends AbstractAuthProtectedCrudResource<SstResu
 
 	@Autowired private LocationProvider locationProvider;
 	@Autowired private MaxMindService mm;
-	@Autowired private ManageAssetAuthValidator authValidator;
+	@Autowired private RoleValidator authValidator;
 	@Autowired private Config config;
 	
 	@Autowired
@@ -46,7 +50,24 @@ public class SstResultResource extends AbstractAuthProtectedCrudResource<SstResu
 	
 	@Override
 	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
-		return authValidator;
+		return null;
+	}
+	
+	@Override
+	protected void validate(IAuthModel auth, String assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+		Set<String> requiredRoles = Sets.newHashSet();
+		switch (permType) {
+		case CREATE:
+			requiredRoles = Sets.newHashSet("ADMIN", "SST");
+			break;
+		case COUNT:
+		case DELETE:
+		case READ:
+		case READ_ONE:
+		case UPDATE:
+			requiredRoles = Sets.newHashSet("ADMIN");
+		}
+		authValidator.validate(auth, assetKey, requiredRoles);
 	}
 	
 	@POST

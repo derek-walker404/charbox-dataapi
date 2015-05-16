@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
-import co.charbox.domain.model.auth.IAuthModel;
 
 import com.google.common.base.Optional;
+import com.tpofof.core.security.IAuthModel;
 
 @Component
 public class TokenAuthenticator implements Authenticator<BasicCredentials, IAuthModel> {

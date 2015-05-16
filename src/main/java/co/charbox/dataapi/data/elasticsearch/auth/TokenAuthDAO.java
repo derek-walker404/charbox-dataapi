@@ -1,14 +1,17 @@
 package co.charbox.dataapi.data.elasticsearch.auth;
 
+import org.elasticsearch.action.deletebyquery.DeleteByQueryResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.domain.model.auth.TokenAuthModel;
 
 import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.data.dao.SearchWindow;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
 import com.tpofof.core.data.dao.es.EsQuery;
 import com.tpofof.core.io.IO;
@@ -76,5 +79,32 @@ public class TokenAuthDAO extends AbstractElasticsearchDAO<TokenAuthModel> {
 				.build();
 		ResultsSet<TokenAuthModel> authResults = find(esQuery);
 		return authResults.getTotal() == 1 ? authResults.getResults().get(0) : null;
+	}
+	
+	public TokenAuthModel findByToken(String token) {
+		EsQuery q = EsQuery.builder()
+				.constraints(QueryBuilders.termQuery("token", token))
+				.limit(1)
+				.offset(0)
+				.build();
+		ResultsSet<TokenAuthModel> authResults = find(q);
+		return authResults.getTotal() == 1 ? authResults.getResults().get(0) : null;
+	}
+
+	public ResultsSet<TokenAuthModel> findExpired(SearchWindow window) {
+		return find(EsQuery.builder()
+				.constraints(QueryBuilders.rangeQuery("expiration").lte(new DateTime()))
+				.limit(window.getLimit())
+				.offset(window.getOffset())
+				.build());
+	}
+	
+	public int deleteExpired(SearchWindow window) {
+		DeleteByQueryResponse response = getClient().prepareDeleteByQuery(getIndex())
+				.setTypes(getType())
+				.setQuery(QueryBuilders.rangeQuery("expiration").lte(new DateTime()))
+				.execute()
+				.actionGet();
+		return response.contextSize();
 	}
 }

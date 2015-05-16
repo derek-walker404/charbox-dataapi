@@ -11,20 +11,14 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.dataapi.auth.AdminAuthValidator;
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
-import co.charbox.domain.model.auth.AdminAuthModel;
-import co.charbox.domain.model.auth.DeviceAuthModel;
-import co.charbox.domain.model.auth.IAuthModel;
-import co.charbox.domain.model.auth.ServerAuthModel;
-import co.charbox.domain.model.auth.TokenAuthModel;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.tpofof.dwa.auth.IAuthValidator;
+import com.google.common.collect.Sets;
+import com.tpofof.core.security.IAuthModel;
+import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpCodeException;
-import com.tpofof.dwa.error.HttpUnauthorizedException;
-import com.tpofof.dwa.resources.AuthRequestPermisionType;
 import com.tpofof.dwa.utils.RequestUtils;
 import com.tpofof.dwa.utils.ResponseUtils;
 
@@ -36,23 +30,14 @@ public class AuthResource {
 
 	@Autowired private ResponseUtils responseUtils;
 	@Autowired private RequestUtils requestUtils;
-	@Autowired private AdminAuthValidator authValidator;
+	@Autowired private RoleValidator authValidator;
 	@Autowired private TokenAuthManager tokenManager;
-	
-	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
-		return authValidator;
-	}
 	
 	@Path("/validate/device")
 	@GET
 	@Timed
 	public JsonNode validateDevice(@Auth IAuthModel auth) throws HttpCodeException {
-		if (!auth.isActivated()) {
-			throw new HttpUnauthorizedException("Credentials are not activated");
-		}
-		if (!auth.is(DeviceAuthModel.class)) {
-			throw new HttpUnauthorizedException("Not authorized as device");
-		}
+		authValidator.validate(auth, null, Sets.newHashSet("DEVICE"));
 		return responseUtils.success(responseUtils.rawData("valid", true));
 	}
 	
@@ -60,12 +45,7 @@ public class AuthResource {
 	@GET
 	@Timed
 	public JsonNode validateAdmin(@Auth IAuthModel auth) throws HttpCodeException {
-		if (!auth.isActivated()) {
-			throw new HttpUnauthorizedException("Credentials are not activated");
-		}
-		if (!auth.is(AdminAuthModel.class)) {
-			throw new HttpUnauthorizedException("Not authorized as admin");
-		}
+		authValidator.validate(auth, null, Sets.newHashSet("ADMIN"));
 		return responseUtils.success(responseUtils.rawData("valid", true));
 	}
 	
@@ -73,12 +53,7 @@ public class AuthResource {
 	@GET
 	@Timed
 	public JsonNode validateServer(@Auth IAuthModel auth) throws HttpCodeException {
-		if (!auth.isActivated()) {
-			throw new HttpUnauthorizedException("Credentials are not activated");
-		}
-		if (!auth.is(ServerAuthModel.class)) {
-			throw new HttpUnauthorizedException("Not authorized as server");
-		}
+		authValidator.validate(auth, null, Sets.newHashSet("SERVER"));
 		return responseUtils.success(responseUtils.rawData("valid", true));
 	}
 	
@@ -86,12 +61,7 @@ public class AuthResource {
 	@GET
 	@Timed
 	public JsonNode validateToken(@Auth IAuthModel auth) throws HttpCodeException {
-		if (!auth.isActivated()) {
-			throw new HttpUnauthorizedException("Credentials are not activated");
-		}
-		if (!auth.is(TokenAuthModel.class)) {
-			throw new HttpUnauthorizedException("Not authorized as token");
-		}
+		authValidator.validate(auth, null, Sets.newHashSet("TOKEN"));
 		return responseUtils.success(responseUtils.rawData("valid", true));
 	}
 }

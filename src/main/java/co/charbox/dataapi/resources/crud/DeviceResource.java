@@ -1,10 +1,10 @@
 package co.charbox.dataapi.resources.crud;
 
-import static com.tpofof.dwa.resources.AuthRequestPermisionType.READ;
 import static com.tpofof.dwa.resources.AuthRequestPermisionType.READ_ONE;
 import io.dropwizard.auth.Auth;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -17,29 +17,31 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.elasticsearch.common.collect.Sets;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.dataapi.auth.DeviceViewAuthValidator;
 import co.charbox.dataapi.managers.DeviceManager;
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
 import co.charbox.domain.model.Device;
 import co.charbox.domain.model.Heartbeat;
 import co.charbox.domain.model.TestCase;
 import co.charbox.domain.model.TimerResult;
-import co.charbox.domain.model.auth.IAuthModel;
 import co.charbox.domain.model.auth.TokenAuthModel;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
 import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
+import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpBadRequestException;
 import com.tpofof.dwa.error.HttpCodeException;
 import com.tpofof.dwa.error.HttpInternalServerErrorException;
 import com.tpofof.dwa.error.HttpNotFoundException;
+import com.tpofof.dwa.error.HttpUnauthorizedException;
 import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
@@ -49,7 +51,7 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 @Consumes(MediaType.APPLICATION_JSON)
 public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, String, DeviceManager, IAuthModel> {
 
-	@Autowired private DeviceViewAuthValidator authValidator;
+	@Autowired private RoleValidator authValidator;
 	@Autowired private TokenAuthManager tokenAuthManager;
 	
 	@Autowired
@@ -59,14 +61,29 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 
 	@Override
 	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
-		return authValidator;
+		return null;
+	}
+	
+	@Override
+	protected void validate(IAuthModel auth, String assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+		Set<String> requiredRoles = Sets.newHashSet();
+		switch (permType) {
+		case CREATE:
+		case COUNT:
+		case DELETE:
+		case READ:
+		case READ_ONE:
+		case UPDATE:
+			requiredRoles = Sets.newHashSet("ADMIN");
+		}
+		authValidator.validate(auth, assetKey, requiredRoles);
 	}
 	
 	@Path("/{deviceId}/testcases")
 	@GET
 	@Timed
 	public JsonNode getTestCases(@Auth IAuthModel authModel, @PathParam("deviceId") String deviceId) throws HttpCodeException {
-		getValidator().validate(authModel, deviceId, READ_ONE);
+		authValidator.validate(authModel, deviceId, Sets.newHashSet("ADMIN", deviceId));
 		Device model = getManager().find(deviceId);
 		if (model == null) {
 			throw new HttpNotFoundException("Could not find Device with id " + deviceId);
@@ -88,7 +105,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 	@GET
 	@Timed
 	public JsonNode getTestCasesByDeviceId(@Auth IAuthModel authModel, @PathParam("deviceId") String deviceId) throws HttpCodeException {
-		getValidator().validate(authModel, deviceId, READ_ONE);
+		authValidator.validate(authModel, deviceId, Sets.newHashSet("ADMIN", deviceId));
 		Device model = getManager().findByDeviceId(deviceId);
 		if (model == null) {
 			throw new HttpNotFoundException("Could not find Device with device id " + deviceId);
@@ -101,7 +118,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 	@POST
 	@Timed
 	public JsonNode register(@Auth IAuthModel authModel, @PathParam("deviceId") String deviceId) throws HttpCodeException {
-		getValidator().validate(authModel, deviceId, READ_ONE);
+		authValidator.validate(authModel, deviceId, Sets.newHashSet("ADMIN", deviceId));
 		Device device = getManager().findByDeviceId(deviceId);
 		if (!device.isRegistered()) {
 			device = getManager().register(deviceId);
@@ -116,7 +133,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 			@QueryParam("limit") Optional<Integer> limit,
 			@QueryParam("offset") Optional<Integer> offset,
 			@QueryParam("sort") Optional<String> sort) throws HttpCodeException {
-		getValidator().validate(authModel, deviceId, READ);
+		getValidator().validate(authModel, deviceId, READ_ONE);
 		ResultsSet<TimerResult> results = getManager().getResults(deviceId, req().searchWindow(limit, offset), req().simpleSort(sort));
 		return res().success(res().listData(results));
 	}
@@ -125,7 +142,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 	@POST
 	@Timed
 	public JsonNode heartbeat(@Auth IAuthModel authModel, @PathParam("deviceId") String deviceId) throws HttpCodeException {
-		getValidator().validate(authModel, deviceId, READ_ONE);
+		authValidator.validate(authModel, deviceId, Sets.newHashSet("ADMIN", deviceId));
 		if (getManager().findByDeviceId(deviceId) == null) {
 			throw new HttpNotFoundException("Could not find device with id " + deviceId);
 		}
@@ -160,7 +177,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 	public JsonNode getServiceToken(@Auth IAuthModel auth, 
 			@PathParam(value="deviceId") String deviceId,
 			@PathParam(value="serviceId") String serviceId) {
-		getValidator().validate(auth, deviceId, READ_ONE);
+		authValidator.validate(auth, deviceId, Sets.newHashSet("ADMIN", deviceId));
 		TokenAuthModel token = tokenAuthManager.getNewToken(serviceId, deviceId);
 		if (token == null) {
 			throw new HttpInternalServerErrorException("Error creating token for service:" + serviceId + "\tdevice:" + deviceId);

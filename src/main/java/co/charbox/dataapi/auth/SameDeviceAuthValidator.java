@@ -3,8 +3,8 @@ package co.charbox.dataapi.auth;
 import org.springframework.stereotype.Component;
 
 import co.charbox.domain.model.auth.DeviceAuthModel;
-import co.charbox.domain.model.auth.IAuthModel;
 
+import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;

@@ -1,5 +1,9 @@
 package co.charbox.dataapi.resources.crud;
 
+import io.dropwizard.auth.Auth;
+
+import java.util.Set;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -7,20 +11,22 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.elasticsearch.common.collect.Sets;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.dataapi.auth.ManageAssetAuthValidator;
 import co.charbox.dataapi.managers.OutageManager;
 import co.charbox.domain.model.Outage;
-import co.charbox.domain.model.auth.IAuthModel;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
 import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
+import com.tpofof.dwa.auth.RoleValidator;
+import com.tpofof.dwa.error.HttpUnauthorizedException;
 import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
@@ -30,7 +36,7 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 @Consumes(MediaType.APPLICATION_JSON)
 public class OutageResource extends AbstractAuthProtectedCrudResource<Outage, String, OutageManager, IAuthModel> {
 
-	@Autowired private ManageAssetAuthValidator authValidator;
+	@Autowired private RoleValidator authValidator;
 	
 	@Autowired
 	public OutageResource(OutageManager man) {
@@ -39,16 +45,33 @@ public class OutageResource extends AbstractAuthProtectedCrudResource<Outage, St
 
 	@Override
 	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
-		return authValidator;
+		return null;
+	}
+	
+	@Override
+	protected void validate(IAuthModel auth, String assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+		Set<String> requiredRoles = Sets.newHashSet();
+		switch (permType) {
+		case CREATE:
+		case COUNT:
+		case DELETE:
+		case READ:
+		case READ_ONE:
+		case UPDATE:
+			requiredRoles = Sets.newHashSet("ADMIN");
+		}
+		authValidator.validate(auth, assetKey, requiredRoles);
 	}
 	
 	@Path("/recent")
 	@GET
 	@Timed
-	public JsonNode getRecentHour(@QueryParam("startTime") Optional<String> startTimeParam,
+	public JsonNode getRecentHour(@Auth IAuthModel auth,
+			@QueryParam("startTime") Optional<String> startTimeParam,
 			@QueryParam("limit") Optional<Integer> limit,
 			@QueryParam("offset") Optional<Integer> offset,
 			@QueryParam("sort") Optional<String> sort) {
+		validate(auth, null, AuthRequestPermisionType.READ);
 		DateTime startTime = new DateTime();
 		if (startTimeParam.isPresent()) {
 			String startTimeString = startTimeParam.get().trim().toUpperCase();
