@@ -64,7 +64,7 @@ public class OutageManager extends AbstractEsModelManager<Outage, OutageDAO> {
 	@Override
 	protected SimpleSort getDefaultSort() {
 		return SimpleSort.builder()
-				.field("outageTime")
+				.field("startTime")
 				.direction(-1)
 				.build();
 	}

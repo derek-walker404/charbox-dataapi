@@ -3,6 +3,8 @@ package co.charbox.dataapi.managers.auth;
 import java.util.UUID;
 
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,8 @@ import com.tpofof.core.managers.AbstractEsModelManager;
 
 @Component
 public class TokenAuthManager extends AbstractEsModelManager<TokenAuthModel, TokenAuthDAO> {
+	
+	private static final Logger log = LoggerFactory.getLogger(TokenAuthManager.class);
 
 	@Autowired
 	public TokenAuthManager(TokenAuthDAO dao) {
@@ -54,7 +58,16 @@ public class TokenAuthManager extends AbstractEsModelManager<TokenAuthModel, Tok
 				.serviceId(serviceId)
 				.build();
 		TokenAuthModel tokenAuth = find(auth);
-		boolean validAuth = tokenAuth != null && tokenAuth.isValid(authAssetId, serviceId);
+		boolean tokenFound = tokenAuth != null;
+		boolean validAuth = false;
+		if (!tokenFound) {
+			log.debug("token not found: " + authAssetId + "@" + serviceId + ":" + token);
+		} else {
+			validAuth = tokenAuth.isValid(authAssetId, serviceId);
+			if (!validAuth) {
+				log.debug("invalid auth: " + authAssetId + "@" + serviceId + ":" + token);
+			}
+		}
 		return validAuth ? tokenAuth : null;
 	}
 	

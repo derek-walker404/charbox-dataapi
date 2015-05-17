@@ -4,6 +4,8 @@ import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,8 @@ import com.tpofof.core.security.IAuthModel;
 
 @Component
 public class TokenAuthenticator implements Authenticator<BasicCredentials, IAuthModel> {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(TokenAuthenticator.class);
 
 	@Autowired private TokenAuthManager tokenAuthManager;
 	
@@ -22,11 +26,16 @@ public class TokenAuthenticator implements Authenticator<BasicCredentials, IAuth
 			throws AuthenticationException {
 		String[] keys = credentials.getUsername().split("@");
 		if (keys.length != 2) {
+			LOGGER.debug("invalid token credentials: " + credentials.getUsername() + ":" + credentials.getPassword());
 			return Optional.<IAuthModel>absent();
 		}
 		String deviceId = keys[0];
 		String service = keys[1];
 		IAuthModel iAuth = tokenAuthManager.isValid(service, deviceId, credentials.getPassword());
-		return iAuth != null ? Optional.of(iAuth) : Optional.<IAuthModel>absent();
+		if (iAuth == null) {
+			LOGGER.debug("token not valid: " + credentials.getUsername() + ":" + credentials.getPassword());
+			return Optional.<IAuthModel>absent();
+		}
+		return Optional.of(iAuth);
 	}
 }

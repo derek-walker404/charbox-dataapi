@@ -9,7 +9,11 @@
                 "type": "string",
                 "index": "not_analyzed"
             },
-            "outageTime": {
+            "startTime": {
+                "type": "date",
+                "format": "dateOptionalTime"
+            },
+            "endTime": {
                 "type": "date",
                 "format": "dateOptionalTime"
             },

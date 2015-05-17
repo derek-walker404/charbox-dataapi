@@ -18,19 +18,17 @@ public class HeartbeatManager extends AbstractEsModelManager<Heartbeat, Heartbea
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(HeartbeatManager.class);
 	
-	private int defaultLimit;
+	@Autowired private Config config;
 	@Autowired private OutageManager outageManager;
 	
 	@Autowired
 	public HeartbeatManager(HeartbeatDAO dao, Config config) {
 		super(dao);
-		this.defaultLimit = config.getInt("heartbeat.limit", 10);
-		
 	}
 
 	@Override
 	public int getDefualtLimit() {
-		return defaultLimit;
+		return config.getInt("heartbeat.limit", 10);
 	}
 	
 	@Override
@@ -52,10 +50,11 @@ public class HeartbeatManager extends AbstractEsModelManager<Heartbeat, Heartbea
 			long currTime = hb.getTime().getMillis();
 			long lastTime = lastHb.getTime().getMillis();
 			long interval = (currTime - lastTime) / 1000 / 60; // to minutes
-			if (interval > 3) { // TODO: move to config
+			if (interval > config.getInt("outage.threshold.minutes", 3)) {
 				outageManager.insert(Outage.builder()
 						.deviceId(hb.getDeviceId())
-						.outageTime(new DateTime(hb.getTime()))
+						.startTime(hb.getTime())
+						.endTime(new DateTime())
 						.duration(interval)
 						.build());
 			}

@@ -96,7 +96,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 	@GET
 	@Timed
 	public JsonNode findByDeviceId(@Auth IAuthModel authModel, @PathParam("deviceId") String deviceId) throws HttpCodeException {
-		getValidator().validate(authModel, deviceId, READ_ONE);
+		validate(authModel, deviceId, READ_ONE);
 		Device device = getManager().findByDeviceId(deviceId);
 		return res().success(res().modelData(device));
 	}
@@ -118,7 +118,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 	@POST
 	@Timed
 	public JsonNode register(@Auth IAuthModel authModel, @PathParam("deviceId") String deviceId) throws HttpCodeException {
-		authValidator.validate(authModel, deviceId, Sets.newHashSet("ADMIN", deviceId));
+		authValidator.validate(authModel, deviceId, Sets.newHashSet("ADMIN", deviceId.toUpperCase()));
 		Device device = getManager().findByDeviceId(deviceId);
 		if (!device.isRegistered()) {
 			device = getManager().register(deviceId);
@@ -133,7 +133,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 			@QueryParam("limit") Optional<Integer> limit,
 			@QueryParam("offset") Optional<Integer> offset,
 			@QueryParam("sort") Optional<String> sort) throws HttpCodeException {
-		getValidator().validate(authModel, deviceId, READ_ONE);
+		validate(authModel, deviceId, READ_ONE);
 		ResultsSet<TimerResult> results = getManager().getResults(deviceId, req().searchWindow(limit, offset), req().simpleSort(sort));
 		return res().success(res().listData(results));
 	}
@@ -142,7 +142,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 	@POST
 	@Timed
 	public JsonNode heartbeat(@Auth IAuthModel authModel, @PathParam("deviceId") String deviceId) throws HttpCodeException {
-		authValidator.validate(authModel, deviceId, Sets.newHashSet("ADMIN", deviceId));
+		authValidator.validate(authModel, deviceId, Sets.newHashSet("ADMIN", deviceId.toUpperCase()));
 		if (getManager().findByDeviceId(deviceId) == null) {
 			throw new HttpNotFoundException("Could not find device with id " + deviceId);
 		}
@@ -157,7 +157,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 	@GET
 	@Timed
 	public JsonNode getDeviceHeartbeats(@Auth IAuthModel authModel, @PathParam("deviceId") String deviceId) throws HttpCodeException {
-		getValidator().validate(authModel, deviceId, READ_ONE);
+		validate(authModel, deviceId, READ_ONE);
 		Heartbeat hb = getManager().getHeartbeats(deviceId);
 		if (hb == null) {
 			throw new HttpNotFoundException("Cannot find heartbeat for device with id " + deviceId);
