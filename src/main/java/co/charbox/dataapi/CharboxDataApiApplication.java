@@ -24,6 +24,7 @@ import co.charbox.dataapi.resources.crud.DeviceConfigResource;
 import co.charbox.dataapi.resources.crud.DeviceResource;
 import co.charbox.dataapi.resources.crud.HeartbeatResource;
 import co.charbox.dataapi.resources.crud.OutageResource;
+import co.charbox.dataapi.resources.crud.PingResultsResource;
 import co.charbox.dataapi.resources.crud.SstResultResource;
 import co.charbox.dataapi.resources.crud.TestCaseResource;
 import co.charbox.dataapi.resources.crud.TimerResultResource;
@@ -59,6 +60,7 @@ public class CharboxDataApiApplication extends DwaApp<CharboxConfiguration> {
 	@Autowired private HeartbeatResource heartbeatResource;
 	@Autowired private OutageResource outageResource;
 	@Autowired private SstResultResource sstResource;
+	@Autowired private PingResultsResource pingResultsResource;
 	@Autowired private MaxMindResource maxMindResource;
 	
 	@Autowired private AuthResource authResource;
@@ -102,6 +104,7 @@ public class CharboxDataApiApplication extends DwaApp<CharboxConfiguration> {
 		env.jersey().register(heartbeatResource);
 		env.jersey().register(outageResource);
 		env.jersey().register(sstResource);
+		env.jersey().register(pingResultsResource);
 		env.jersey().register(maxMindResource);
 		
 		env.jersey().register(authResource);
