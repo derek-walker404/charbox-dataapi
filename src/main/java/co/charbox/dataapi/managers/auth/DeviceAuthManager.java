@@ -1,5 +1,7 @@
 package co.charbox.dataapi.managers.auth;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,5 +45,22 @@ public class DeviceAuthManager extends AbstractEsModelManager<DeviceAuthModel, D
 	@Override
 	protected boolean hasDefaultSort() {
 		return false;
+	}
+
+	public DeviceAuthModel newInstall() {
+		String deviceId = null;
+		while (deviceId == null || deviceIdExists(deviceId)) {
+			deviceId = UUID.randomUUID().toString().substring(4, 13);
+		}
+		DeviceAuthModel model = getDao().insert(DeviceAuthModel.builder()
+				.deviceId(deviceId)
+				.apiKey(UUID.randomUUID().toString().substring(0, 13))
+				.activated(true)
+				.build());
+		return model;
+	}
+	
+	protected boolean deviceIdExists(String deviceId) {
+		return getDao().findByDeviceId(deviceId) != null;
 	}
 }

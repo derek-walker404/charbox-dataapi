@@ -76,4 +76,16 @@ public class DeviceAuthDAO extends AbstractElasticsearchDAO<DeviceAuthModel> {
 		ResultsSet<DeviceAuthModel> authResults = find(esQuery);
 		return authResults.getTotal() == 1 ? authResults.getResults().get(0) : null;
 	}
+
+	public DeviceAuthModel findByDeviceId(String deviceId) {
+		QueryBuilder q = QueryBuilders.boolQuery()
+				.must(QueryBuilders.termQuery("deviceId", deviceId));
+		EsQuery esQuery = EsQuery.builder()
+				.constraints(q)
+				.limit(1)
+				.offset(0)
+				.build();
+		ResultsSet<DeviceAuthModel> authResults = find(esQuery);
+		return authResults.getTotal() >= 1 ? authResults.getResults().get(0) : null;
+	}
 }
