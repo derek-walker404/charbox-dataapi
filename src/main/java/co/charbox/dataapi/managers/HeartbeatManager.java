@@ -53,7 +53,7 @@ public class HeartbeatManager extends AbstractEsModelManager<Heartbeat, Heartbea
 			if (interval > config.getInt("outage.threshold.minutes", 3)) {
 				outageManager.insert(Outage.builder()
 						.deviceId(hb.getDeviceId())
-						.startTime(hb.getTime())
+						.startTime(lastHb.getTime()) // TODO: wft is happening?!
 						.endTime(new DateTime())
 						.duration(interval)
 						.build());
