@@ -1,8 +1,8 @@
 package co.charbox.dataapi.managers;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,10 +13,9 @@ import co.charbox.domain.model.Outage;
 import com.tpofof.core.managers.AbstractEsModelManager;
 import com.tpofof.core.utils.Config;
 
+@Slf4j
 @Component
 public class HeartbeatManager extends AbstractEsModelManager<Heartbeat, HeartbeatDAO> {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(HeartbeatManager.class);
 	
 	@Autowired private Config config;
 	@Autowired private OutageManager outageManager;
@@ -61,7 +60,7 @@ public class HeartbeatManager extends AbstractEsModelManager<Heartbeat, Heartbea
 			lastHb.setTime(hb.getTime());
 			return super.update(lastHb);
 		} else {
-			LOGGER.info("Creating heartbeat for " + hb.getDeviceId());
+			log.info("Creating heartbeat for " + hb.getDeviceId());
 			return super.insert(hb);
 		}
 	}

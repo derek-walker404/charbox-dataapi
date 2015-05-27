@@ -2,9 +2,9 @@ package co.charbox.dataapi.managers.auth;
 
 import java.util.UUID;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +15,10 @@ import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.SearchWindow;
 import com.tpofof.core.managers.AbstractEsModelManager;
 
+@Slf4j
 @Component
 public class TokenAuthManager extends AbstractEsModelManager<TokenAuthModel, TokenAuthDAO> {
 	
-	private static final Logger log = LoggerFactory.getLogger(TokenAuthManager.class);
-
 	@Autowired
 	public TokenAuthManager(TokenAuthDAO dao) {
 		super(dao);

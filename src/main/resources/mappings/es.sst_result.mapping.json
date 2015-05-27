@@ -18,7 +18,7 @@
                 "format": "dateOptionalTime"
             },
             "downloadSize": {
-                "type": "integer"
+                "type": "long"
             },
             "downloadDuration": {
                 "type": "integer"
@@ -27,7 +27,7 @@
                 "type": "double"
             },
             "uploadSize": {
-                "type": "integer"
+                "type": "long"
             },
             "uploadDuration": {
                 "type": "integer"
