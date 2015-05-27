@@ -1,0 +1,21 @@
+{
+    "version": {
+        "properties": {
+            "id": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "version": {
+                "type": "string",
+                "index": "not_analyzed"
+            },
+            "versionSort": {
+                "type": "integer"
+            },
+            "installScriptUrl": {
+                "type": "string",
+                "index": "not_analyzed"
+            }
+        }
+    }
+}
