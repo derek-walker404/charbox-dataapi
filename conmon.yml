@@ -5,6 +5,15 @@ server:
   adminConnectors:
     - type: http
       port: 8081
+  requestLog:
+    timeZone: UTC
+    appenders:
+      - type: file
+        currentLogFilename: logs/access.log
+        threshold: ALL
+        archive: true
+        archivedLogFilenamePattern: logs/access.%d.log.gz
+        archivedFileCount: 14
 # Logging settings.
 logging:
   # The default level of all loggers. Can be OFF, ERROR, WARN, INFO, DEBUG, TRACE, or ALL.
