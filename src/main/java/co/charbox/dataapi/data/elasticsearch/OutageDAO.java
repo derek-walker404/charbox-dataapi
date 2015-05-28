@@ -27,7 +27,7 @@ public class OutageDAO extends AbstractElasticsearchDAO<Outage> {
 	public OutageDAO(Config config, Client client, IO io) {
 		super(config, client);
 		this.io = io;
-		init();
+		init(config.getBoolean("es.deleteAll", false));
 	}
 
 	@Override
