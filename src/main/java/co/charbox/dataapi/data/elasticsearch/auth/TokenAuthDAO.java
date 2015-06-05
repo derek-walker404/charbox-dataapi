@@ -28,7 +28,7 @@ public class TokenAuthDAO extends AbstractElasticsearchDAO<TokenAuthModel> {
 	public TokenAuthDAO(Config config, Client client, IO io) {
 		super(config, client);
 		this.io = io;
-		init();
+		init(true);
 	}
 	
 	@Override

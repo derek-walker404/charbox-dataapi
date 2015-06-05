@@ -21,7 +21,7 @@ public class DeviceVersionDAO extends AbstractElasticsearchDAO<DeviceVersionMode
 	public DeviceVersionDAO(Config config, Client client, IO io) {
 		super(config, client);
 		this.io = io;
-		init();
+		init(config.getBoolean("es.deleteAll", false));
 	}
 	
 	@Override

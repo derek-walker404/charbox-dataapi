@@ -25,7 +25,7 @@ public class ServerAuthDAO extends AbstractElasticsearchDAO<ServerAuthModel> {
 	public ServerAuthDAO(Config config, Client client, IO io) {
 		super(config, client);
 		this.io = io;
-		init();
+		init(config.getBoolean("es.deleteAll", false));
 	}
 	
 	@Override
@@ -61,8 +61,6 @@ public class ServerAuthDAO extends AbstractElasticsearchDAO<ServerAuthModel> {
 	}
 
 	// TODO: shouldCreate() boolean call
-	
-	// TODO: populate on create
 	
 	public ServerAuthModel find(ServerAuthModel auth) {
 		QueryBuilder q = QueryBuilders.boolQuery()

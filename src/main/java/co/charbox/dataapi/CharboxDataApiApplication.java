@@ -20,6 +20,7 @@ import co.charbox.dataapi.health.GuavaCacheMetrics;
 import co.charbox.dataapi.health.MaxMindAccountHealth;
 import co.charbox.dataapi.health.MaxMindConnectionHealth;
 import co.charbox.dataapi.resources.InstallResource;
+import co.charbox.dataapi.resources.JobScheduleResource;
 import co.charbox.dataapi.resources.MaxMindResource;
 import co.charbox.dataapi.resources.crud.DeviceConfigResource;
 import co.charbox.dataapi.resources.crud.DeviceResource;
@@ -67,6 +68,7 @@ public class CharboxDataApiApplication extends DwaApp<CharboxConfiguration> {
 	
 	@Autowired private MaxMindResource maxMindResource;
 	@Autowired private InstallResource installResource;
+	@Autowired private JobScheduleResource jobScheduleResource;
 	
 	@Autowired private AuthResource authResource;
 	@Autowired private DeviceAuthResource deviceAuthResource;
@@ -114,6 +116,7 @@ public class CharboxDataApiApplication extends DwaApp<CharboxConfiguration> {
 	
 		env.jersey().register(maxMindResource);
 		env.jersey().register(installResource);
+		env.jersey().register(jobScheduleResource);
 		
 		env.jersey().register(authResource);
 		env.jersey().register(deviceAuthResource);

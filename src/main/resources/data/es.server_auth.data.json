@@ -1,0 +1,2 @@
+{ "serverId": "test-sst-0", "serverKey": "asdf123", "service": "sst", "activated": true }
+{ "serverId": "client-installer-charbot", "serverKey": "4wt589jhergfh3", "service": "install", "activated": true }
