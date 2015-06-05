@@ -1,19 +1,14 @@
 package co.charbox.dataapi.data.elasticsearch;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.elasticsearch.client.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.domain.model.DeviceVersionModel;
 
-import com.google.common.collect.Lists;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
 import com.tpofof.core.io.IO;
 import com.tpofof.core.utils.Config;
-import com.tpofof.core.utils.json.JsonUtils;
 
 @Component
 public class DeviceVersionDAO extends AbstractElasticsearchDAO<DeviceVersionModel> {
@@ -21,13 +16,11 @@ public class DeviceVersionDAO extends AbstractElasticsearchDAO<DeviceVersionMode
 	private IO io;
 	private String index;
 	private String type;
-	private JsonUtils json;
 
 	@Autowired
-	public DeviceVersionDAO(Config config, Client client, IO io, JsonUtils json) {
+	public DeviceVersionDAO(Config config, Client client, IO io) {
 		super(config, client);
 		this.io = io;
-		this.json = json;
 		init(config.getBoolean("es.deleteAll", false));
 	}
 	
@@ -55,17 +48,6 @@ public class DeviceVersionDAO extends AbstractElasticsearchDAO<DeviceVersionMode
 	@Override
 	protected boolean isRequiredIndex() {
 		return true;
-	}
-	
-	@Override
-	protected List<DeviceVersionModel> getInitModels() {
-		ArrayList<DeviceVersionModel> models = Lists.newArrayList();
-		String filename = getConfig().getString("es.device_version.data.name", "data/es.device_version.data.json");
-		String[] content = io.getContents(filename).split("\n");
-		for (String s : content) {
-			models.add(json.fromJson(s, getModelClass()));
-		}
-		return models;
 	}
 
 	@Override

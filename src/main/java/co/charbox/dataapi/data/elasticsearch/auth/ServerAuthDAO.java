@@ -1,8 +1,5 @@
 package co.charbox.dataapi.data.elasticsearch.auth;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -11,13 +8,11 @@ import org.springframework.stereotype.Component;
 
 import co.charbox.domain.model.auth.ServerAuthModel;
 
-import com.google.common.collect.Lists;
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
 import com.tpofof.core.data.dao.es.EsQuery;
 import com.tpofof.core.io.IO;
 import com.tpofof.core.utils.Config;
-import com.tpofof.core.utils.json.JsonUtils;
 
 @Component
 public class ServerAuthDAO extends AbstractElasticsearchDAO<ServerAuthModel> {
@@ -25,13 +20,11 @@ public class ServerAuthDAO extends AbstractElasticsearchDAO<ServerAuthModel> {
 	private IO io;
 	private String index;
 	private String type;
-	private JsonUtils json;
 	
 	@Autowired
-	public ServerAuthDAO(Config config, Client client, IO io, JsonUtils json) {
+	public ServerAuthDAO(Config config, Client client, IO io) {
 		super(config, client);
 		this.io = io;
-		this.json = json;
 		init(config.getBoolean("es.deleteAll", false));
 	}
 	
@@ -65,17 +58,6 @@ public class ServerAuthDAO extends AbstractElasticsearchDAO<ServerAuthModel> {
 	@Override
 	protected boolean isRequiredIndex() {
 		return true;
-	}
-	
-	@Override
-	protected List<ServerAuthModel> getInitModels() {
-		ArrayList<ServerAuthModel> auths = Lists.newArrayList();
-		String filename = getConfig().getString("es.server_auth.data.name", "data/es.server_auth.data.json");
-		String[] content = io.getContents(filename).split("\n");
-		for (String s : content) {
-			auths.add(json.fromJson(s, getModelClass()));
-		}
-		return auths;
 	}
 
 	// TODO: shouldCreate() boolean call
