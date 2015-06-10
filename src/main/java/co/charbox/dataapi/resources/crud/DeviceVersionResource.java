@@ -19,7 +19,6 @@ import co.charbox.dataapi.managers.DeviceVersionManager;
 import co.charbox.domain.model.DeviceVersionModel;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.tpofof.core.data.dao.SearchWindow;
 import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
@@ -64,12 +63,10 @@ public class DeviceVersionResource extends AbstractAuthProtectedCrudResource<Dev
 	@GET
 	public JsonNode upgrade(@Auth IAuthModel auth, @PathParam("version") String version) {
 		authValidator.validate(auth, null, Sets.newHashSet("ADMIN", "DEVICE"));
+		DeviceVersionModel upgradeVersion = getManager().canUpgrade(version);
 		return res().success(
-				getManager().canUpgrade(version)
-				? res().modelData(getManager().find(SearchWindow.builder()
-						.limit(1)
-						.build(), getManager().getDefaultSort())
-						.getResults().get(0))
+				upgradeVersion != null
+				? res().modelData(upgradeVersion)
 				: res().rawData("canUpgrade", false)
 				); 
 	}

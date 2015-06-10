@@ -20,3 +20,4 @@ src/main/resources/assets/.idea/workspace.xml
 
 *.DS_Store
 temp
+logs
