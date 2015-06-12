@@ -3,6 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>charbox-server</artifactId>
 	<name>Charbox - Data Api</name>
+	<groupId>co.charbox</groupId>
 	<description>Connection Monitor</description>
 	<properties>
 		<dropwizard.version>0.7.1</dropwizard.version>
@@ -71,5 +72,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<groupId>co.charbox</groupId>
 </project>
