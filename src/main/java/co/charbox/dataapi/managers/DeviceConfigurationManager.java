@@ -6,11 +6,10 @@ import org.springframework.stereotype.Component;
 import co.charbox.dataapi.data.elasticsearch.DeviceConfigDAO;
 import co.charbox.domain.model.DeviceConfiguration;
 
-import com.tpofof.core.managers.AbstractEsModelManager;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class DeviceConfigurationManager extends AbstractEsModelManager<DeviceConfiguration, DeviceConfigDAO> {
+public class DeviceConfigurationManager extends CharbotModelManager<DeviceConfiguration, DeviceConfigDAO> {
 
 	private final Config config;
 

@@ -6,12 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.data.elasticsearch.auth.DeviceAuthDAO;
+import co.charbox.dataapi.managers.CharbotModelManager;
 import co.charbox.domain.model.auth.DeviceAuthModel;
 
-import com.tpofof.core.managers.AbstractEsModelManager;
-
 @Component
-public class DeviceAuthManager extends AbstractEsModelManager<DeviceAuthModel, DeviceAuthDAO> {
+public class DeviceAuthManager extends CharbotModelManager<DeviceAuthModel, DeviceAuthDAO> {
 
 	@Autowired
 	public DeviceAuthManager(DeviceAuthDAO dao) {

@@ -23,14 +23,13 @@ import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
-import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
 @Path("/versions")
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DeviceVersionResource extends AbstractAuthProtectedCrudResource<DeviceVersionModel, String, DeviceVersionManager, IAuthModel> {
+public class DeviceVersionResource extends CharbotAuthProtectedCrudResource<DeviceVersionModel, DeviceVersionManager> {
 	
 	@Autowired private RoleValidator authValidator;
 	

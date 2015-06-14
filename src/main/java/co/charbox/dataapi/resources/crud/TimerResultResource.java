@@ -26,14 +26,13 @@ import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpCodeException;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
-import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
 @Path("/results")
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class TimerResultResource extends AbstractAuthProtectedCrudResource<TimerResult, String, TimerResultManager, IAuthModel> {
+public class TimerResultResource extends CharbotAuthProtectedCrudResource<TimerResult, TimerResultManager> {
 
 	@Autowired private LocationProvider locationProvider;
 	@Autowired private RoleValidator authValidator;

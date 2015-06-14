@@ -18,14 +18,13 @@ import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
-import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
 @Path("/hb")
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class HeartbeatResource extends AbstractAuthProtectedCrudResource<Heartbeat, String, HeartbeatManager, IAuthModel> {
+public class HeartbeatResource extends CharbotAuthProtectedCrudResource<Heartbeat, HeartbeatManager> {
 
 	@Autowired private RoleValidator authValidator;
 	

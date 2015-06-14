@@ -6,11 +6,10 @@ import org.springframework.stereotype.Component;
 import co.charbox.dataapi.data.elasticsearch.TestCaseDAO;
 import co.charbox.domain.model.TestCase;
 
-import com.tpofof.core.managers.AbstractEsModelManager;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class TestCaseManager extends AbstractEsModelManager<TestCase, TestCaseDAO> {
+public class TestCaseManager extends CharbotModelManager<TestCase, TestCaseDAO> {
 
 	private int defaultLimit;
 	

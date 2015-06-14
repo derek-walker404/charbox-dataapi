@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 import co.charbox.dataapi.data.elasticsearch.DeviceVersionDAO;
 import co.charbox.domain.model.DeviceVersionModel;
 
-import com.tpofof.core.data.dao.SearchWindow;
-import com.tpofof.core.data.dao.SimpleSort;
-import com.tpofof.core.managers.AbstractEsModelManager;
+import com.tpofof.core.data.dao.context.SearchWindow;
+import com.tpofof.core.data.dao.context.SimpleSearchContext;
+import com.tpofof.core.data.dao.context.SimpleSort;
 
 @Component
-public class DeviceVersionManager extends AbstractEsModelManager<DeviceVersionModel, DeviceVersionDAO> {
+public class DeviceVersionManager extends CharbotModelManager<DeviceVersionModel, DeviceVersionDAO> {
 
 	@Autowired
 	public DeviceVersionManager(DeviceVersionDAO deviceVersionDao) {
@@ -52,10 +52,13 @@ public class DeviceVersionManager extends AbstractEsModelManager<DeviceVersionMo
 	}
 
 	public DeviceVersionModel canUpgrade(String version) {
-		DeviceVersionModel latestVersion = getDao().find(SearchWindow.builder()
-				.limit(1)
-				.offset(0)
-				.build(), getDefaultSort())
+		DeviceVersionModel latestVersion = getDao().find(SimpleSearchContext.builder()
+				.window(SearchWindow.builder() // TODO: pass in context
+						.limit(1)
+						.offset(0)
+						.build())
+				.sort(getDefaultSort())
+				.build())
 				.getResults()
 				.get(0);
 		DeviceVersionModel queryVersion = DeviceVersionModel.builder().version(version).build();

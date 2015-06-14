@@ -15,13 +15,13 @@ import co.charbox.domain.model.TimerResult;
 
 import com.google.common.collect.Lists;
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.SearchWindow;
-import com.tpofof.core.data.dao.SimpleSort;
-import com.tpofof.core.managers.AbstractEsModelManager;
+import com.tpofof.core.data.dao.context.SearchWindow;
+import com.tpofof.core.data.dao.context.SimpleSearchContext;
+import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class DeviceManager extends AbstractEsModelManager<Device, DeviceDAO> {
+public class DeviceManager extends CharbotModelManager<Device, DeviceDAO> {
 
 	private int defualtLimit;
 	
@@ -81,7 +81,10 @@ public class DeviceManager extends AbstractEsModelManager<Device, DeviceDAO> {
 	public List<TestCase> getTestCases(Device model) {
 		List<TestCase> cases = Lists.newArrayList();
 		if (model != null) {
-			cases = testCaseManager.find().getResults();
+			cases = testCaseManager.find(SimpleSearchContext.builder()
+					.window(SearchWindow.builder().limit(10).offset(0).build())
+					.build())
+					.getResults(); // TODO: do this better
 		}
 		return cases;
 	}
@@ -99,8 +102,8 @@ public class DeviceManager extends AbstractEsModelManager<Device, DeviceDAO> {
 		return timerResultsManager.getByDevice(deviceId, window, sort);
 	}
 	
-	public Heartbeat heartbeat(String deviceId, DateTime time) {
-		return hbManager.insert(deviceId, time);
+	public Heartbeat heartbeat(SimpleSearchContext context, String deviceId, DateTime time) {
+		return hbManager.insert(context, deviceId, time);
 	}
 	
 	public Heartbeat getHeartbeats(String deviceId) {

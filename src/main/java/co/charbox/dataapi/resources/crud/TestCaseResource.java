@@ -18,14 +18,13 @@ import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
-import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
 @Path("/testcases")
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class TestCaseResource extends AbstractAuthProtectedCrudResource<TestCase, String, TestCaseManager, IAuthModel> {
+public class TestCaseResource extends CharbotAuthProtectedCrudResource<TestCase, TestCaseManager> {
 
 	@Autowired private RoleValidator authValidator;
 	

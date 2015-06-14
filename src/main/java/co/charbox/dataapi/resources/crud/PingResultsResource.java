@@ -27,14 +27,13 @@ import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpCodeException;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
-import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
 @Path("/pingres")
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class PingResultsResource extends AbstractAuthProtectedCrudResource<PingResults, String, PingResultsManager, IAuthModel> {
+public class PingResultsResource extends CharbotAuthProtectedCrudResource<PingResults, PingResultsManager> {
 
 	@Autowired private RoleValidator authValidator;
 	@Autowired private MaxMindService mm;

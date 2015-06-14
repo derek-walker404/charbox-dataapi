@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import co.charbox.domain.model.TimerResult;
 
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.SearchWindow;
-import com.tpofof.core.data.dao.SimpleSort;
+import com.tpofof.core.data.dao.context.SearchWindow;
+import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
 import com.tpofof.core.data.dao.es.EsQuery;
 import com.tpofof.core.io.IO;

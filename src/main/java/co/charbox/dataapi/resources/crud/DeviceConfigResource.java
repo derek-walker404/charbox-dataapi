@@ -18,14 +18,13 @@ import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
-import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
 @Path("/configs")
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DeviceConfigResource extends AbstractAuthProtectedCrudResource<DeviceConfiguration, String, DeviceConfigurationManager, IAuthModel> {
+public class DeviceConfigResource extends CharbotAuthProtectedCrudResource<DeviceConfiguration, DeviceConfigurationManager> {
 	
 	@Autowired private RoleValidator authValidator;
 	

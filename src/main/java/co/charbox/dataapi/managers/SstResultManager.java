@@ -7,11 +7,11 @@ import co.charbox.dataapi.data.elasticsearch.SstResultEsDAO;
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
 import co.charbox.domain.model.SstResults;
 
-import com.tpofof.core.managers.AbstractEsModelManager;
+import com.tpofof.core.data.dao.context.SimpleSearchContext;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class SstResultManager extends AbstractEsModelManager<SstResults, SstResultEsDAO> {
+public class SstResultManager extends CharbotModelManager<SstResults, SstResultEsDAO> {
 
 	private int defaultLimit;
 	@Autowired private TokenAuthManager tokenManager;
@@ -38,8 +38,8 @@ public class SstResultManager extends AbstractEsModelManager<SstResults, SstResu
 	}
 	
 	@Override
-	public SstResults insert(SstResults model) {
-		model = super.insert(model);
+	public SstResults insert(SimpleSearchContext context, SstResults model) {
+		model = super.insert(context, model);
 		if (model != null) {
 			tokenManager.deleteByToken(model.getDeviceToken());
 		}

@@ -4,12 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.data.elasticsearch.auth.ServerAuthDAO;
+import co.charbox.dataapi.managers.CharbotModelManager;
 import co.charbox.domain.model.auth.ServerAuthModel;
 
-import com.tpofof.core.managers.AbstractEsModelManager;
-
 @Component
-public class ServerAuthManager extends AbstractEsModelManager<ServerAuthModel, ServerAuthDAO> {
+public class ServerAuthManager extends CharbotModelManager<ServerAuthModel, ServerAuthDAO> {
 
 	@Autowired
 	public ServerAuthManager(ServerAuthDAO dao) {

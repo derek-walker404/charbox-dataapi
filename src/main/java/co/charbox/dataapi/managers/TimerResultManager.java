@@ -7,13 +7,12 @@ import co.charbox.dataapi.data.elasticsearch.TimerResultEsDAO;
 import co.charbox.domain.model.TimerResult;
 
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.SearchWindow;
-import com.tpofof.core.data.dao.SimpleSort;
-import com.tpofof.core.managers.AbstractEsModelManager;
+import com.tpofof.core.data.dao.context.SearchWindow;
+import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class TimerResultManager extends AbstractEsModelManager<TimerResult, TimerResultEsDAO> {
+public class TimerResultManager extends CharbotModelManager<TimerResult, TimerResultEsDAO> {
 
 	private int defaultLimit;
 	

@@ -8,13 +8,12 @@ import co.charbox.dataapi.data.elasticsearch.OutageDAO;
 import co.charbox.domain.model.Outage;
 
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.SearchWindow;
-import com.tpofof.core.data.dao.SimpleSort;
-import com.tpofof.core.managers.AbstractEsModelManager;
+import com.tpofof.core.data.dao.context.SearchWindow;
+import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class OutageManager extends AbstractEsModelManager<Outage, OutageDAO> {
+public class OutageManager extends CharbotModelManager<Outage, OutageDAO> {
 
 	private int defaultLimit;
 	

@@ -9,15 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.data.elasticsearch.auth.TokenAuthDAO;
+import co.charbox.dataapi.managers.CharbotModelManager;
 import co.charbox.domain.model.auth.TokenAuthModel;
 
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.SearchWindow;
-import com.tpofof.core.managers.AbstractEsModelManager;
+import com.tpofof.core.data.dao.context.SearchWindow;
 
 @Slf4j
 @Component
-public class TokenAuthManager extends AbstractEsModelManager<TokenAuthModel, TokenAuthDAO> {
+public class TokenAuthManager extends CharbotModelManager<TokenAuthModel, TokenAuthDAO> {
 	
 	@Autowired
 	public TokenAuthManager(TokenAuthDAO dao) {
@@ -88,7 +88,7 @@ public class TokenAuthManager extends AbstractEsModelManager<TokenAuthModel, Tok
 		ResultsSet<TokenAuthModel> expired = findExprired(getDefualtWindow());
 		while (expired.getResults().size() > 0) {
 			for (TokenAuthModel auth : expired.getResults()) {
-				if (delete(auth.getId())) {
+				if (delete(null, auth.getId())) { // TODO: pass in context or call internal method
 					count++;
 				}
 			}

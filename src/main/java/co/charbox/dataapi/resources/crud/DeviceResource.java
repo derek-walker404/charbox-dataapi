@@ -42,14 +42,13 @@ import com.tpofof.dwa.error.HttpCodeException;
 import com.tpofof.dwa.error.HttpInternalServerErrorException;
 import com.tpofof.dwa.error.HttpNotFoundException;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
-import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
 @Path("/devices")
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, String, DeviceManager, IAuthModel> {
+public class DeviceResource extends CharbotAuthProtectedCrudResource<Device, DeviceManager> {
 
 	@Autowired private RoleValidator authValidator;
 	@Autowired private TokenAuthManager tokenAuthManager;
@@ -84,7 +83,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 	@Timed
 	public JsonNode getTestCases(@Auth IAuthModel authModel, @PathParam("deviceId") String deviceId) throws HttpCodeException {
 		authValidator.validate(authModel, deviceId, Sets.newHashSet("ADMIN", deviceId));
-		Device model = getManager().find(deviceId);
+		Device model = getManager().find(getContext(authModel), deviceId);
 		if (model == null) {
 			throw new HttpNotFoundException("Could not find Device with id " + deviceId);
 		}
@@ -146,7 +145,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 		if (getManager().findByDeviceId(deviceId) == null) {
 			throw new HttpNotFoundException("Could not find device with id " + deviceId);
 		}
-		Heartbeat heartBeat = getManager().heartbeat(deviceId, new DateTime());;
+		Heartbeat heartBeat = getManager().heartbeat(getContext(authModel), deviceId, new DateTime());;
 		if (heartBeat == null) {
 			throw new HttpInternalServerErrorException("Could not register heartbeat for device with id " + deviceId);
 		}

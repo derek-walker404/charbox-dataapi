@@ -5,12 +5,17 @@ import org.springframework.stereotype.Component;
 
 import co.charbox.core.mm.MaxMindService;
 
-import com.codahale.metrics.health.HealthCheck;
+import com.tpofof.dwa.resources.IDwaHealthCheck;
 
 @Component
-public class MaxMindConnectionHealth extends HealthCheck {
+public class MaxMindConnectionHealth extends IDwaHealthCheck {
 
 	@Autowired private MaxMindService mms;
+	
+	@Override
+	public String getName() {
+		return "MaxMind-connectionHealth";
+	}
 	
 	@Override
 	protected Result check() throws Exception {
