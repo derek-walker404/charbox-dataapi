@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
+import co.charbox.dataapi.resources.crud.CharbotAuthProtectedCrudResource;
 import co.charbox.domain.model.auth.DeviceAuthModel;
 import co.charbox.domain.model.auth.TokenAuthModel;
 
@@ -26,7 +27,6 @@ import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
-import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 import com.tpofof.dwa.utils.RequestUtils;
 import com.tpofof.dwa.utils.ResponseUtils;
@@ -35,7 +35,7 @@ import com.tpofof.dwa.utils.ResponseUtils;
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class TokenAuthResource extends AbstractAuthProtectedCrudResource<TokenAuthModel, String, TokenAuthManager, IAuthModel> {
+public class TokenAuthResource extends CharbotAuthProtectedCrudResource<TokenAuthModel, TokenAuthManager> {
 
 	@Autowired private ResponseUtils responseUtils;
 	@Autowired private RequestUtils requestUtils;

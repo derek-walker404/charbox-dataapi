@@ -12,13 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.managers.auth.DeviceAuthManager;
+import co.charbox.dataapi.resources.crud.CharbotAuthProtectedCrudResource;
 import co.charbox.domain.model.auth.DeviceAuthModel;
 
 import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
-import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 import com.tpofof.dwa.utils.RequestUtils;
 import com.tpofof.dwa.utils.ResponseUtils;
@@ -27,7 +27,7 @@ import com.tpofof.dwa.utils.ResponseUtils;
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DeviceAuthResource extends AbstractAuthProtectedCrudResource<DeviceAuthModel, String, DeviceAuthManager, IAuthModel> {
+public class DeviceAuthResource extends CharbotAuthProtectedCrudResource<DeviceAuthModel, DeviceAuthManager> {
 
 	@Autowired private ResponseUtils responseUtils;
 	@Autowired private RequestUtils requestUtils;

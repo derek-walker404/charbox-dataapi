@@ -16,15 +16,13 @@ import com.tpofof.core.utils.Config;
 @Component
 public class HeartbeatDAO extends AbstractElasticsearchDAO<Heartbeat> {
 
-	private IO io;
+	@Autowired private IO io;
 	private String index;
 	private String type;
 	
 	@Autowired
-	public HeartbeatDAO(Config config, Client client, IO io) {
+	public HeartbeatDAO(Config config, Client client) {
 		super(config, client);
-		this.io = io;
-		init(config.getBoolean("es.deleteAll", false));
 	}
 
 	@Override

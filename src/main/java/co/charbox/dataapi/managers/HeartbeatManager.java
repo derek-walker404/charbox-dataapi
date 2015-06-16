@@ -10,12 +10,12 @@ import co.charbox.dataapi.data.elasticsearch.HeartbeatDAO;
 import co.charbox.domain.model.Heartbeat;
 import co.charbox.domain.model.Outage;
 
-import com.tpofof.core.managers.AbstractEsModelManager;
+import com.tpofof.core.data.dao.context.SimpleSearchContext;
 import com.tpofof.core.utils.Config;
 
 @Slf4j
 @Component
-public class HeartbeatManager extends AbstractEsModelManager<Heartbeat, HeartbeatDAO> {
+public class HeartbeatManager extends CharbotModelManager<Heartbeat, HeartbeatDAO> {
 	
 	@Autowired private Config config;
 	@Autowired private OutageManager outageManager;
@@ -35,22 +35,22 @@ public class HeartbeatManager extends AbstractEsModelManager<Heartbeat, Heartbea
 		return "";
 	}
 	
-	public Heartbeat insert(String deviceId, DateTime time) {
-		return insert(Heartbeat.builder()
+	public Heartbeat insert(SimpleSearchContext context, String deviceId, DateTime time) {
+		return insert(context, Heartbeat.builder()
 				.deviceId(deviceId)
 				.time(time)
 				.build());
 	}
 
 	@Override
-	public Heartbeat insert(Heartbeat hb) {
+	public Heartbeat insert(SimpleSearchContext context, Heartbeat hb) {
 		Heartbeat lastHb = findByDeviceId(hb.getDeviceId());
 		if (lastHb != null) {
 			long currTime = hb.getTime().getMillis();
 			long lastTime = lastHb.getTime().getMillis();
 			long interval = (currTime - lastTime) / 1000 / 60; // to minutes
 			if (interval > config.getInt("outage.threshold.minutes", 3)) {
-				outageManager.insert(Outage.builder()
+				outageManager.insert(context, Outage.builder()
 						.deviceId(hb.getDeviceId())
 						.startTime(lastHb.getTime()) // TODO: wft is happening?!
 						.endTime(new DateTime())
@@ -58,10 +58,10 @@ public class HeartbeatManager extends AbstractEsModelManager<Heartbeat, Heartbea
 						.build());
 			}
 			lastHb.setTime(hb.getTime());
-			return super.update(lastHb);
+			return super.update(context, lastHb);
 		} else {
 			log.info("Creating heartbeat for " + hb.getDeviceId());
-			return super.insert(hb);
+			return super.insert(context, hb);
 		}
 	}
 	

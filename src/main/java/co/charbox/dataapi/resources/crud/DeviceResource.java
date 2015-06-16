@@ -26,6 +26,9 @@ import co.charbox.dataapi.managers.DeviceManager;
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
 import co.charbox.domain.model.Device;
 import co.charbox.domain.model.Heartbeat;
+import co.charbox.domain.model.Outage;
+import co.charbox.domain.model.PingResults;
+import co.charbox.domain.model.SstResults;
 import co.charbox.domain.model.TestCase;
 import co.charbox.domain.model.TimerResult;
 import co.charbox.domain.model.auth.TokenAuthModel;
@@ -42,14 +45,13 @@ import com.tpofof.dwa.error.HttpCodeException;
 import com.tpofof.dwa.error.HttpInternalServerErrorException;
 import com.tpofof.dwa.error.HttpNotFoundException;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
-import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
 @Path("/devices")
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, String, DeviceManager, IAuthModel> {
+public class DeviceResource extends CharbotAuthProtectedCrudResource<Device, DeviceManager> {
 
 	@Autowired private RoleValidator authValidator;
 	@Autowired private TokenAuthManager tokenAuthManager;
@@ -84,7 +86,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 	@Timed
 	public JsonNode getTestCases(@Auth IAuthModel authModel, @PathParam("deviceId") String deviceId) throws HttpCodeException {
 		authValidator.validate(authModel, deviceId, Sets.newHashSet("ADMIN", deviceId));
-		Device model = getManager().find(deviceId);
+		Device model = getManager().find(getContext(authModel), deviceId);
 		if (model == null) {
 			throw new HttpNotFoundException("Could not find Device with id " + deviceId);
 		}
@@ -146,7 +148,7 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 		if (getManager().findByDeviceId(deviceId) == null) {
 			throw new HttpNotFoundException("Could not find device with id " + deviceId);
 		}
-		Heartbeat heartBeat = getManager().heartbeat(deviceId, new DateTime());;
+		Heartbeat heartBeat = getManager().heartbeat(getContext(authModel), deviceId, new DateTime());;
 		if (heartBeat == null) {
 			throw new HttpInternalServerErrorException("Could not register heartbeat for device with id " + deviceId);
 		}
@@ -163,6 +165,54 @@ public class DeviceResource extends AbstractAuthProtectedCrudResource<Device, St
 			throw new HttpNotFoundException("Cannot find heartbeat for device with id " + deviceId);
 		}
 		return res().success(res().modelData(hb));
+	}
+	
+	@Path("/id/{deviceId}/pingres")
+	@GET
+	@Timed
+	public JsonNode getDevicePingResults(@Auth IAuthModel authModel, 
+			@PathParam("deviceId") String deviceId,
+			@QueryParam("limit") Optional<Integer> limit,
+			@QueryParam("offset") Optional<Integer> offset,
+			@QueryParam("sort") Optional<String> sort) throws HttpCodeException {
+		validate(authModel, deviceId, READ_ONE);
+		ResultsSet<PingResults> pings = getManager().getPingResults(getContext(authModel, limit, offset, sort), deviceId);
+		if (pings == null) {
+			throw new HttpNotFoundException("Cannot find ping results for device with id " + deviceId);
+		}
+		return res().success(res().listData(pings));
+	}
+	
+	@Path("/id/{deviceId}/outages")
+	@GET
+	@Timed
+	public JsonNode getDeviceOutages(@Auth IAuthModel authModel, 
+			@PathParam("deviceId") String deviceId,
+			@QueryParam("limit") Optional<Integer> limit,
+			@QueryParam("offset") Optional<Integer> offset,
+			@QueryParam("sort") Optional<String> sort) throws HttpCodeException {
+		validate(authModel, deviceId, READ_ONE);
+		ResultsSet<Outage> outage = getManager().getOutages(getContext(authModel, limit, offset, sort), deviceId);
+		if (outage == null) {
+			throw new HttpNotFoundException("Cannot find outages for device with id " + deviceId);
+		}
+		return res().success(res().listData(outage));
+	}
+	
+	@Path("/id/{deviceId}/sst")
+	@GET
+	@Timed
+	public JsonNode getDeviceSstResults(@Auth IAuthModel authModel, 
+			@PathParam("deviceId") String deviceId,
+			@QueryParam("limit") Optional<Integer> limit,
+			@QueryParam("offset") Optional<Integer> offset,
+			@QueryParam("sort") Optional<String> sort) throws HttpCodeException {
+		validate(authModel, deviceId, READ_ONE);
+		ResultsSet<SstResults> outage = getManager().getSstResults(getContext(authModel, limit, offset, sort), deviceId);
+		if (outage == null) {
+			throw new HttpNotFoundException("Cannot find outages for device with id " + deviceId);
+		}
+		return res().success(res().listData(outage));
 	}
 	
 	@Override

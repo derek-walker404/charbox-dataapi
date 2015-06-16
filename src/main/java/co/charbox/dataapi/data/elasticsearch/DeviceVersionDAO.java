@@ -13,15 +13,13 @@ import com.tpofof.core.utils.Config;
 @Component
 public class DeviceVersionDAO extends AbstractElasticsearchDAO<DeviceVersionModel> {
 
-	private IO io;
+	@Autowired private IO io;
 	private String index;
 	private String type;
 
 	@Autowired
-	public DeviceVersionDAO(Config config, Client client, IO io) {
+	public DeviceVersionDAO(Config config, Client client) {
 		super(config, client);
-		this.io = io;
-		init(config.getBoolean("es.deleteAll", false));
 	}
 	
 	@Override

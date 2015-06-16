@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component;
 
 import co.charbox.core.mm.MaxMindService;
 
-import com.codahale.metrics.health.HealthCheck;
 import com.tpofof.core.utils.Config;
+import com.tpofof.dwa.resources.IDwaHealthCheck;
 
 @Component
-public class MaxMindAccountHealth extends HealthCheck {
+public class MaxMindAccountHealth extends IDwaHealthCheck {
 
 	private final MaxMindService mms;
 	private final int minRequestThreshold;
@@ -18,6 +18,11 @@ public class MaxMindAccountHealth extends HealthCheck {
 	public MaxMindAccountHealth(MaxMindService mms, Config config) {
 		this.mms = mms;
 		this.minRequestThreshold = config.getInt("location.api.requests.minThreshold", 500);
+	}
+	
+	@Override
+	public String getName() {
+		return "MaxMind-requestThreshold";
 	}
 
 	@Override

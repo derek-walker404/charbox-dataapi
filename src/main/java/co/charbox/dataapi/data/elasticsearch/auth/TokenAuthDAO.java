@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import co.charbox.domain.model.auth.TokenAuthModel;
 
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.SearchWindow;
+import com.tpofof.core.data.dao.context.SearchWindow;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
 import com.tpofof.core.data.dao.es.EsQuery;
 import com.tpofof.core.io.IO;
@@ -20,15 +20,13 @@ import com.tpofof.core.utils.Config;
 @Component
 public class TokenAuthDAO extends AbstractElasticsearchDAO<TokenAuthModel> {
 
-	private IO io;
+	@Autowired private IO io;
 	private String index;
 	private String type;
 	
 	@Autowired
-	public TokenAuthDAO(Config config, Client client, IO io) {
+	public TokenAuthDAO(Config config, Client client) {
 		super(config, client);
-		this.io = io;
-		init(true);
 	}
 	
 	@Override

@@ -6,14 +6,16 @@
 	<groupId>co.charbox</groupId>
 	<description>Connection Monitor</description>
 	<properties>
-		<dropwizard.version>0.7.1</dropwizard.version>
+		<tpofof-dwa.version>0.1.1-SNAPSHOT</tpofof-dwa.version>
+		<charbox-core.version>0.1.0-SNAPSHOT</charbox-core.version>
+		<charbox-domain.version>0.1.0-SNAPSHOT</charbox-domain.version>
 	</properties>
 	<version>0.1.1-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
 			<groupId>co.charbox</groupId>
 			<artifactId>domain</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
+			<version>${charbox-domain.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>
@@ -24,12 +26,12 @@
 		<dependency>
 			<groupId>co.charbox</groupId>
 			<artifactId>core</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
+			<version>${charbox-core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.tpofof.dwa</groupId>
 			<artifactId>tpofof-dwa</artifactId>
-			<version>0.1.0-SNAPSHOT</version>
+			<version>${tpofof-dwa.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

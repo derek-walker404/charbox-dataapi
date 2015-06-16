@@ -2,29 +2,31 @@ package co.charbox.dataapi.data.elasticsearch;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.domain.model.SstResults;
 
 import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.data.dao.context.SimpleSearchContext;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
 import com.tpofof.core.data.dao.es.EsQuery;
+import com.tpofof.core.data.dao.es.EsQuery.EsQueryBuilder;
 import com.tpofof.core.io.IO;
 import com.tpofof.core.utils.Config;
 
 @Component
 public class SstResultEsDAO extends AbstractElasticsearchDAO<SstResults> {
 
-	private IO io;
+	@Autowired private IO io;
 	private String index;
 	private String type;
 
 	@Autowired
-	public SstResultEsDAO(Config config, Client client, IO io) {
+	public SstResultEsDAO(Config config, Client client) {
 		super(config, client);
-		this.io = io;
-		init(config.getBoolean("es.deleteAll", false));
 	}
 
 	@Override
@@ -66,5 +68,16 @@ public class SstResultEsDAO extends AbstractElasticsearchDAO<SstResults> {
 				.offset(offset)
 				.build();
 		return find(q);
+	}
+
+	public ResultsSet<SstResults> getByDeviceId(SimpleSearchContext context, String deviceId) {
+		EsQueryBuilder q = EsQuery.builder()
+				.limit(context.getWindow().getLimit())
+				.offset(context.getWindow().getOffset())
+				.constraints(QueryBuilders.termQuery("deviceId", deviceId));
+		if (context.getSort() != null) {
+			q.sort(SortBuilders.fieldSort(context.getSort().getField()).order(context.getSort().getDirection() > 0 ? SortOrder.ASC : SortOrder.DESC));
+		}
+		return find(q.build());
 	}
 }

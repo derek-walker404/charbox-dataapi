@@ -13,6 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.elasticsearch.common.collect.Sets;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,14 +28,13 @@ import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpCodeException;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
-import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
 @Path("/pingres")
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class PingResultsResource extends AbstractAuthProtectedCrudResource<PingResults, String, PingResultsManager, IAuthModel> {
+public class PingResultsResource extends CharbotAuthProtectedCrudResource<PingResults, PingResultsManager> {
 
 	@Autowired private RoleValidator authValidator;
 	@Autowired private MaxMindService mm;
@@ -77,6 +77,9 @@ public class PingResultsResource extends AbstractAuthProtectedCrudResource<PingR
 		ip = config.getString("location.ip.override", ip);
 		ip = config.getString("location.client.override", ip);
 		model.setConnectionInfo(mm.get(ip));
+		if (model.getTestStartTime() == null) {
+			model.setTestStartTime(new DateTime());
+		}
 		return super.post(authModel, model, request);
 	}
 }

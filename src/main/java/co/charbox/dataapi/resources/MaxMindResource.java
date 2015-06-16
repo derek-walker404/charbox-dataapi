@@ -22,13 +22,14 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.tpofof.core.utils.Config;
 import com.tpofof.dwa.error.HttpInternalServerErrorException;
+import com.tpofof.dwa.resources.IDwaResource;
 import com.tpofof.dwa.utils.ResponseUtils;
 
 @Path("/mm")
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class MaxMindResource {
+public class MaxMindResource implements IDwaResource {
 
 	private final MaxMindService mms;
 	private final ResponseUtils responseUtils;

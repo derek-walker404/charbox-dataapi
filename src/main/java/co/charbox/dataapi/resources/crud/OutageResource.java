@@ -27,14 +27,13 @@ import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
-import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
 @Path("/outages")
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class OutageResource extends AbstractAuthProtectedCrudResource<Outage, String, OutageManager, IAuthModel> {
+public class OutageResource extends CharbotAuthProtectedCrudResource<Outage, OutageManager> {
 
 	@Autowired private RoleValidator authValidator;
 	

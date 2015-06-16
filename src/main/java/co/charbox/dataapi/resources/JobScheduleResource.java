@@ -17,13 +17,14 @@ import co.charbox.domain.model.JobSchedule;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.api.client.util.Maps;
 import com.tpofof.dwa.auth.RoleValidator;
+import com.tpofof.dwa.resources.IDwaResource;
 import com.tpofof.dwa.utils.ResponseUtils;
 
 @Component
 @Path("/schedules")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class JobScheduleResource {
+public class JobScheduleResource implements IDwaResource {
 
 	@Autowired private ResponseUtils responseUtils;
 	@Autowired private RoleValidator authValidator;

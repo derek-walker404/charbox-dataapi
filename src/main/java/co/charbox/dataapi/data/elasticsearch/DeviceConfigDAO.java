@@ -13,15 +13,13 @@ import com.tpofof.core.utils.Config;
 @Component
 public class DeviceConfigDAO extends AbstractElasticsearchDAO<DeviceConfiguration> {
 
-	private IO io;
+	@Autowired private IO io;
 	private String index;
 	private String type;
 
 	@Autowired
-	public DeviceConfigDAO(Config config, Client client, IO io) {
+	public DeviceConfigDAO(Config config, Client client) {
 		super(config, client);
-		this.io = io;
-		init(config.getBoolean("es.deleteAll", false));
 	}
 	
 	@Override
