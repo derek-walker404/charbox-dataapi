@@ -26,6 +26,9 @@ import co.charbox.dataapi.managers.DeviceManager;
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
 import co.charbox.domain.model.Device;
 import co.charbox.domain.model.Heartbeat;
+import co.charbox.domain.model.Outage;
+import co.charbox.domain.model.PingResults;
+import co.charbox.domain.model.SstResults;
 import co.charbox.domain.model.TestCase;
 import co.charbox.domain.model.TimerResult;
 import co.charbox.domain.model.auth.TokenAuthModel;
@@ -162,6 +165,54 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<Device, Dev
 			throw new HttpNotFoundException("Cannot find heartbeat for device with id " + deviceId);
 		}
 		return res().success(res().modelData(hb));
+	}
+	
+	@Path("/id/{deviceId}/pingres")
+	@GET
+	@Timed
+	public JsonNode getDevicePingResults(@Auth IAuthModel authModel, 
+			@PathParam("deviceId") String deviceId,
+			@QueryParam("limit") Optional<Integer> limit,
+			@QueryParam("offset") Optional<Integer> offset,
+			@QueryParam("sort") Optional<String> sort) throws HttpCodeException {
+		validate(authModel, deviceId, READ_ONE);
+		ResultsSet<PingResults> pings = getManager().getPingResults(getContext(authModel, limit, offset, sort), deviceId);
+		if (pings == null) {
+			throw new HttpNotFoundException("Cannot find ping results for device with id " + deviceId);
+		}
+		return res().success(res().listData(pings));
+	}
+	
+	@Path("/id/{deviceId}/outages")
+	@GET
+	@Timed
+	public JsonNode getDeviceOutages(@Auth IAuthModel authModel, 
+			@PathParam("deviceId") String deviceId,
+			@QueryParam("limit") Optional<Integer> limit,
+			@QueryParam("offset") Optional<Integer> offset,
+			@QueryParam("sort") Optional<String> sort) throws HttpCodeException {
+		validate(authModel, deviceId, READ_ONE);
+		ResultsSet<Outage> outage = getManager().getOutages(getContext(authModel, limit, offset, sort), deviceId);
+		if (outage == null) {
+			throw new HttpNotFoundException("Cannot find outages for device with id " + deviceId);
+		}
+		return res().success(res().listData(outage));
+	}
+	
+	@Path("/id/{deviceId}/sst")
+	@GET
+	@Timed
+	public JsonNode getDeviceSstResults(@Auth IAuthModel authModel, 
+			@PathParam("deviceId") String deviceId,
+			@QueryParam("limit") Optional<Integer> limit,
+			@QueryParam("offset") Optional<Integer> offset,
+			@QueryParam("sort") Optional<String> sort) throws HttpCodeException {
+		validate(authModel, deviceId, READ_ONE);
+		ResultsSet<SstResults> outage = getManager().getSstResults(getContext(authModel, limit, offset, sort), deviceId);
+		if (outage == null) {
+			throw new HttpNotFoundException("Cannot find outages for device with id " + deviceId);
+		}
+		return res().success(res().listData(outage));
 	}
 	
 	@Override

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import co.charbox.dataapi.data.elasticsearch.PingResultDAO;
 import co.charbox.domain.model.PingResults;
 
+import com.tpofof.core.data.dao.ResultsSet;
+import com.tpofof.core.data.dao.context.SimpleSearchContext;
 import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.utils.Config;
 
@@ -41,5 +43,9 @@ public class PingResultsManager extends CharbotModelManager<PingResults, PingRes
 				.field("testStartTime")
 				.direction(-1)
 				.build();
+	}
+
+	public ResultsSet<PingResults> getByDeviceId(SimpleSearchContext context, String deviceId) {
+		return getDao().getByDeviceId(context, deviceId);
 	}
 }

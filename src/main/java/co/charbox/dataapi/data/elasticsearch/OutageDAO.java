@@ -3,6 +3,8 @@ package co.charbox.dataapi.data.elasticsearch;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,8 +13,10 @@ import co.charbox.domain.model.Outage;
 
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.context.SearchWindow;
+import com.tpofof.core.data.dao.context.SimpleSearchContext;
 import com.tpofof.core.data.dao.es.AbstractElasticsearchDAO;
 import com.tpofof.core.data.dao.es.EsQuery;
+import com.tpofof.core.data.dao.es.EsQuery.EsQueryBuilder;
 import com.tpofof.core.io.IO;
 import com.tpofof.core.utils.Config;
 
@@ -75,5 +79,16 @@ public class OutageDAO extends AbstractElasticsearchDAO<Outage> {
 				.offset(window.getOffset())
 				.build();
 		return find(q);
+	}
+
+	public ResultsSet<Outage> getOutagesByDeviceId(SimpleSearchContext context, String deviceId) {
+		EsQueryBuilder q = EsQuery.builder()
+				.limit(context.getWindow().getLimit())
+				.offset(context.getWindow().getOffset())
+				.constraints(QueryBuilders.termQuery("deviceId", deviceId));
+		if (context.getSort() != null) {
+			q.sort(SortBuilders.fieldSort(context.getSort().getField()).order(context.getSort().getDirection() > 0 ? SortOrder.ASC : SortOrder.DESC));
+		}
+		return find(q.build());
 	}
 }

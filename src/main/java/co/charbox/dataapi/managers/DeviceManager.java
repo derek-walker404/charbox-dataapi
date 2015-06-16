@@ -10,6 +10,9 @@ import co.charbox.dataapi.data.elasticsearch.DeviceDAO;
 import co.charbox.domain.model.Device;
 import co.charbox.domain.model.DeviceConfiguration;
 import co.charbox.domain.model.Heartbeat;
+import co.charbox.domain.model.Outage;
+import co.charbox.domain.model.PingResults;
+import co.charbox.domain.model.SstResults;
 import co.charbox.domain.model.TestCase;
 import co.charbox.domain.model.TimerResult;
 
@@ -29,6 +32,9 @@ public class DeviceManager extends CharbotModelManager<Device, DeviceDAO> {
 	@Autowired private TestCaseManager testCaseManager;
 	@Autowired private TimerResultManager timerResultsManager;
 	@Autowired private HeartbeatManager hbManager;
+	@Autowired private PingResultsManager pingManager;
+	@Autowired private OutageManager outageManager;
+	@Autowired private SstResultManager sstManager;
 	
 	@Autowired
 	public DeviceManager(DeviceDAO deviceDao, Config config) {
@@ -118,5 +124,17 @@ public class DeviceManager extends CharbotModelManager<Device, DeviceDAO> {
 	@Override
 	protected boolean hasDefaultSort() {
 		return false;
+	}
+
+	public ResultsSet<PingResults> getPingResults(SimpleSearchContext context, String deviceId) {
+		return pingManager.getByDeviceId(context, deviceId);
+	}
+
+	public ResultsSet<Outage> getOutages(SimpleSearchContext context, String deviceId) {
+		return outageManager.getOutagesByDeviceId(context, deviceId);
+	}
+
+	public ResultsSet<SstResults> getSstResults(SimpleSearchContext context, String deviceId) {
+		return sstManager.getByDeviceId(context, deviceId);
 	}
 }

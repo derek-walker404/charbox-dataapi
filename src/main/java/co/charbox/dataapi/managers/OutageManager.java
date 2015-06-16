@@ -9,6 +9,7 @@ import co.charbox.domain.model.Outage;
 
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.context.SearchWindow;
+import com.tpofof.core.data.dao.context.SimpleSearchContext;
 import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.utils.Config;
 
@@ -66,5 +67,10 @@ public class OutageManager extends CharbotModelManager<Outage, OutageDAO> {
 				.field("startTime")
 				.direction(-1)
 				.build();
+	}
+
+	public ResultsSet<Outage> getOutagesByDeviceId(SimpleSearchContext context,
+			String deviceId) {
+		return getDao().getOutagesByDeviceId(context, deviceId);
 	}
 }

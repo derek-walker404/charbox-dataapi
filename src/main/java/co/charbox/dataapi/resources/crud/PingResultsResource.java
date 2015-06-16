@@ -13,6 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.elasticsearch.common.collect.Sets;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -76,6 +77,9 @@ public class PingResultsResource extends CharbotAuthProtectedCrudResource<PingRe
 		ip = config.getString("location.ip.override", ip);
 		ip = config.getString("location.client.override", ip);
 		model.setConnectionInfo(mm.get(ip));
+		if (model.getTestStartTime() == null) {
+			model.setTestStartTime(new DateTime());
+		}
 		return super.post(authModel, model, request);
 	}
 }
