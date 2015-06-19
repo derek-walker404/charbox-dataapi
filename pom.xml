@@ -8,21 +8,9 @@
 	<properties>
 		<tpofof-dwa.version>0.1.1-SNAPSHOT</tpofof-dwa.version>
 		<charbox-core.version>0.1.0-SNAPSHOT</charbox-core.version>
-		<charbox-domain.version>0.1.0-SNAPSHOT</charbox-domain.version>
 	</properties>
 	<version>0.1.1-SNAPSHOT</version>
 	<dependencies>
-		<dependency>
-			<groupId>co.charbox</groupId>
-			<artifactId>domain</artifactId>
-			<version>${charbox-domain.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 		<dependency>
 			<groupId>co.charbox</groupId>
 			<artifactId>core</artifactId>
