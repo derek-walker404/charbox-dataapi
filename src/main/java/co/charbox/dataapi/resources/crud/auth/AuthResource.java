@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpCodeException;
+import com.tpofof.dwa.resources.IDwaResource;
 import com.tpofof.dwa.utils.RequestUtils;
 import com.tpofof.dwa.utils.ResponseUtils;
 
@@ -26,7 +27,7 @@ import com.tpofof.dwa.utils.ResponseUtils;
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class AuthResource {
+public class AuthResource implements IDwaResource {
 
 	@Autowired private ResponseUtils responseUtils;
 	@Autowired private RequestUtils requestUtils;
