@@ -1,5 +1,9 @@
 package co.charbox.dataapi.managers;
 
+import java.util.Set;
+
+import jersey.repackaged.com.google.common.collect.Sets;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +47,11 @@ public class PingResultsManager extends CharbotModelManager<PingResults, PingRes
 				.field("testStartTime")
 				.direction(-1)
 				.build();
+	}
+	
+	@Override
+	protected Set<String> getDefaultValidSorts() {
+		return Sets.newHashSet("testStartTime", "packetLoss", "avgLatency");
 	}
 
 	public ResultsSet<PingResults> getByDeviceId(SimpleSearchContext context, String deviceId) {

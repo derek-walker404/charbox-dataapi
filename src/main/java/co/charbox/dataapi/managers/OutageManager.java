@@ -1,5 +1,9 @@
 package co.charbox.dataapi.managers;
 
+import java.util.Set;
+
+import jersey.repackaged.com.google.common.collect.Sets;
+
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -72,5 +76,10 @@ public class OutageManager extends CharbotModelManager<Outage, OutageDAO> {
 	public ResultsSet<Outage> getOutagesByDeviceId(SimpleSearchContext context,
 			String deviceId) {
 		return getDao().getOutagesByDeviceId(context, deviceId);
+	}
+	
+	@Override
+	protected Set<String> getDefaultValidSorts() {
+		return Sets.newHashSet("startTime", "duration");
 	}
 }
