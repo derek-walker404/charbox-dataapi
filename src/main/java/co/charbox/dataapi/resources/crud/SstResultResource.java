@@ -20,7 +20,8 @@ import org.springframework.stereotype.Component;
 import co.charbox.core.mm.LocationProvider;
 import co.charbox.core.mm.MaxMindService;
 import co.charbox.dataapi.managers.SstResultManager;
-import co.charbox.domain.model.SstResults;
+import co.charbox.domain.model.SstResultsModel;
+import co.charbox.domain.model.mm.ConnectionInfoModel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.tpofof.core.security.IAuthModel;
@@ -35,7 +36,7 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class SstResultResource extends CharbotAuthProtectedCrudResource<SstResults, SstResultManager> {
+public class SstResultResource extends CharbotAuthProtectedCrudResource<SstResultsModel, SstResultManager> {
 
 	@Autowired private LocationProvider locationProvider;
 	@Autowired private MaxMindService mm;
@@ -44,16 +45,16 @@ public class SstResultResource extends CharbotAuthProtectedCrudResource<SstResul
 	
 	@Autowired
 	public SstResultResource(SstResultManager man) {
-		super(man, SstResults.class);
+		super(man, SstResultsModel.class);
 	}
 	
 	@Override
-	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
+	protected IAuthValidator<IAuthModel, Integer, AuthRequestPermisionType> getValidator() {
 		return null;
 	}
 	
 	@Override
-	protected void validate(IAuthModel auth, String assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+	protected void validate(IAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
 		Set<String> requiredRoles = Sets.newHashSet();
 		switch (permType) {
 		case CREATE:
@@ -71,7 +72,7 @@ public class SstResultResource extends CharbotAuthProtectedCrudResource<SstResul
 	
 	@POST
 	@Override
-	public JsonNode post(@Auth IAuthModel auth, SstResults model, @Context HttpServletRequest request) throws HttpCodeException {
+	public JsonNode post(@Auth IAuthModel auth, SstResultsModel model, @Context HttpServletRequest request) throws HttpCodeException {
 		validate(auth, null, CREATE);
 		String serviceIp = model.getServerLocation().getIp();
 		if (serviceIp == null || serviceIp.isEmpty()) {
@@ -86,7 +87,10 @@ public class SstResultResource extends CharbotAuthProtectedCrudResource<SstResul
 		}
 		clientIp = config.getString("location.client.override", clientIp);
 		model.setServerLocation(locationProvider.getLocation(serviceIp));
-		model.setDeviceInfo(mm.get(clientIp));
+		ConnectionInfoModel connInfo = mm.get(clientIp);
+		if (connInfo != null) {
+			model.setDeviceInfo(connInfo);
+		}
 		return super.post(auth, model, request);
 	}
 }

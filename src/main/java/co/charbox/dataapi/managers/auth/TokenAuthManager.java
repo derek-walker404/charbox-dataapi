@@ -8,12 +8,12 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.dataapi.data.elasticsearch.auth.TokenAuthDAO;
 import co.charbox.dataapi.managers.CharbotModelManager;
+import co.charbox.domain.data.mysql.auth.TokenAuthDAO;
 import co.charbox.domain.model.auth.TokenAuthModel;
 
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.context.SearchWindow;
+import com.tpofof.core.data.dao.context.SimpleSearchContext;
 
 @Slf4j
 @Component
@@ -30,41 +30,36 @@ public class TokenAuthManager extends CharbotModelManager<TokenAuthModel, TokenA
 	}
 
 	@Override
-	public String getDefaultId() {
-		return "";
-	}
-	
-	@Override
 	protected boolean hasDefaultSort() {
 		return false;
 	}
 	
-	public TokenAuthModel getNewToken(String serviceId, String deviceId) {
+	public TokenAuthModel getNewToken(String serviceName, Integer assetId) {
 		// TODO: validate service Id. e.g. sst
 		DateTime expiration = new DateTime().plusMillis(10 * 60 * 1000); // TODO move to config
 		return getDao().insert(TokenAuthModel.builder()
 				.token(UUID.randomUUID().toString())
-				.authAssetId(deviceId)
-				.serviceId(serviceId)
+				.authAssetId(assetId)
+				.serviceName(serviceName)
 				.expiration(expiration)
 				.build());
 	}
 	
-	public TokenAuthModel isValid(String serviceId, String authAssetId, String token) {
+	public TokenAuthModel isValid(String serviceName, Integer authAssetId, String token) {
 		TokenAuthModel auth = TokenAuthModel.builder()
 				.token(token)
 				.authAssetId(authAssetId)
-				.serviceId(serviceId)
+				.serviceName(serviceName)
 				.build();
 		TokenAuthModel tokenAuth = find(auth);
 		boolean tokenFound = tokenAuth != null;
 		boolean validAuth = false;
 		if (!tokenFound) {
-			log.debug("token not found: " + authAssetId + "@" + serviceId + ":" + token);
+			log.debug("token not found: " + authAssetId + "@" + serviceName + ":" + token);
 		} else {
-			validAuth = tokenAuth.isValid(authAssetId, serviceId);
+			validAuth = tokenAuth.isValid(authAssetId, serviceName);
 			if (!validAuth) {
-				log.debug("invalid auth: " + authAssetId + "@" + serviceId + ":" + token);
+				log.debug("invalid auth: " + authAssetId + "@" + serviceName + ":" + token);
 			}
 		}
 		return validAuth ? tokenAuth : null;
@@ -79,20 +74,23 @@ public class TokenAuthManager extends CharbotModelManager<TokenAuthModel, TokenA
 		return auth == null ? false : getDao().delete(auth.getId());
 	}
 	
-	public ResultsSet<TokenAuthModel> findExprired(SearchWindow window) {
-		return getDao().findExpired(window);
+	public ResultsSet<TokenAuthModel> findExprired(SimpleSearchContext context) {
+		return getDao().findExpired(context);
 	}
 	
 	public int deleteExpired() {
 		int count = 0;
-		ResultsSet<TokenAuthModel> expired = findExprired(getDefualtWindow());
+		SimpleSearchContext defaultContext = SimpleSearchContext.builder()
+				.window(getDefualtWindow())
+				.build();
+		ResultsSet<TokenAuthModel> expired = findExprired(defaultContext);
 		while (expired.getResults().size() > 0) {
 			for (TokenAuthModel auth : expired.getResults()) {
 				if (delete(null, auth.getId())) { // TODO: pass in context or call internal method
 					count++;
 				}
 			}
-			expired = findExprired(getDefualtWindow());
+			expired = findExprired(defaultContext);
 		} 
 		return count;
 	}

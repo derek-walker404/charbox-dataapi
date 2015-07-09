@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.managers.HeartbeatManager;
-import co.charbox.domain.model.Heartbeat;
+import co.charbox.domain.model.HeartbeatModel;
 
 import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
@@ -24,22 +24,22 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class HeartbeatResource extends CharbotAuthProtectedCrudResource<Heartbeat, HeartbeatManager> {
+public class HeartbeatResource extends CharbotAuthProtectedCrudResource<HeartbeatModel, HeartbeatManager> {
 
 	@Autowired private RoleValidator authValidator;
 	
 	@Autowired
 	public HeartbeatResource(HeartbeatManager man) {
-		super(man, Heartbeat.class);
+		super(man, HeartbeatModel.class);
 	}
 
 	@Override
-	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
+	protected IAuthValidator<IAuthModel, Integer, AuthRequestPermisionType> getValidator() {
 		return null;
 	}
 	
 	@Override
-	protected void validate(IAuthModel auth, String assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+	protected void validate(IAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
 		Set<String> requiredRoles = Sets.newHashSet();
 		switch (permType) {
 		case CREATE:

@@ -20,7 +20,13 @@ public class DeviceAuthenticator implements Authenticator<BasicCredentials, IAut
 	@Override
 	public Optional<IAuthModel> authenticate(BasicCredentials credentials)
 			throws AuthenticationException {
-		IAuthModel iAuth = deviceAuthManager.isValid(credentials.getUsername(), credentials.getPassword());
+		int deviceId = -1;
+		try {
+			deviceId = Integer.parseInt(credentials.getUsername());
+		} catch (NumberFormatException e) {
+			return Optional.<IAuthModel>absent();
+		}
+		IAuthModel iAuth = deviceAuthManager.isValid(deviceId, credentials.getPassword());
 		return iAuth != null ? Optional.of(iAuth) : Optional.<IAuthModel>absent();
 	}
 

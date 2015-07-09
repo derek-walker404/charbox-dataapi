@@ -19,7 +19,8 @@ import org.springframework.stereotype.Component;
 
 import co.charbox.core.mm.MaxMindService;
 import co.charbox.dataapi.managers.PingResultsManager;
-import co.charbox.domain.model.PingResults;
+import co.charbox.domain.model.PingResultModel;
+import co.charbox.domain.model.mm.ConnectionInfoModel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.tpofof.core.security.IAuthModel;
@@ -34,7 +35,7 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class PingResultsResource extends CharbotAuthProtectedCrudResource<PingResults, PingResultsManager> {
+public class PingResultsResource extends CharbotAuthProtectedCrudResource<PingResultModel, PingResultsManager> {
 
 	@Autowired private RoleValidator authValidator;
 	@Autowired private MaxMindService mm;
@@ -42,16 +43,16 @@ public class PingResultsResource extends CharbotAuthProtectedCrudResource<PingRe
 	
 	@Autowired
 	public PingResultsResource(PingResultsManager man) {
-		super(man, PingResults.class);
+		super(man, PingResultModel.class);
 	}
 
 	@Override
-	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
+	protected IAuthValidator<IAuthModel, Integer, AuthRequestPermisionType> getValidator() {
 		return null;
 	}
 	
 	@Override
-	protected void validate(IAuthModel auth, String assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+	protected void validate(IAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
 		Set<String> requiredRoles = Sets.newHashSet();
 		switch (permType) {
 		case CREATE:
@@ -69,16 +70,19 @@ public class PingResultsResource extends CharbotAuthProtectedCrudResource<PingRe
 	
 	@Override
 	@POST
-	public JsonNode post(@Auth IAuthModel authModel, PingResults model, 
+	public JsonNode post(@Auth IAuthModel authModel, PingResultModel model, 
 			@Context HttpServletRequest request) throws HttpCodeException {
 		String ip = model.getConnectionInfo() != null && model.getConnectionInfo().getConnection() != null && model.getConnectionInfo().getConnection().getIp() != null
 				? model.getConnectionInfo().getConnection().getIp()
 				: request.getRemoteAddr(); // TODO: do I let the device choose its own ip?
 		ip = config.getString("location.ip.override", ip);
 		ip = config.getString("location.client.override", ip);
-		model.setConnectionInfo(mm.get(ip));
-		if (model.getTestStartTime() == null) {
-			model.setTestStartTime(new DateTime());
+		ConnectionInfoModel connInfo = mm.get(ip);
+		if (connInfo != null) {
+			model.setConnectionInfo(connInfo);
+		}
+		if (model.getStartTime() == null) {
+			model.setStartTime(new DateTime());
 		}
 		return super.post(authModel, model, request);
 	}

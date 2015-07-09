@@ -7,9 +7,9 @@ import jersey.repackaged.com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.dataapi.data.elasticsearch.SstResultEsDAO;
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
-import co.charbox.domain.model.SstResults;
+import co.charbox.domain.data.mysql.SstResultsDAO;
+import co.charbox.domain.model.SstResultsModel;
 
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.context.SimpleSearchContext;
@@ -17,13 +17,13 @@ import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class SstResultManager extends CharbotModelManager<SstResults, SstResultEsDAO> {
+public class SstResultManager extends CharbotModelManager<SstResultsModel, SstResultsDAO> {
 
 	private int defaultLimit;
 	@Autowired private TokenAuthManager tokenManager;
 	
 	@Autowired
-	public SstResultManager(SstResultEsDAO esDao, Config config) {
+	public SstResultManager(SstResultsDAO esDao, Config config) {
 		super(esDao);
 		this.defaultLimit = config.getInt("sst_result.limit", 20);
 	}
@@ -33,11 +33,6 @@ public class SstResultManager extends CharbotModelManager<SstResults, SstResultE
 		return defaultLimit;
 	}
 	
-	@Override
-	public String getDefaultId() {
-		return "";
-	}
-
 	@Override
 	protected boolean hasDefaultSort() {
 		return true;
@@ -57,7 +52,7 @@ public class SstResultManager extends CharbotModelManager<SstResults, SstResultE
 	}
 	
 	@Override
-	public SstResults insert(SimpleSearchContext context, SstResults model) {
+	public SstResultsModel insert(SimpleSearchContext context, SstResultsModel model) {
 		model = super.insert(context, model);
 		if (model != null) {
 			tokenManager.deleteByToken(model.getDeviceToken());
@@ -65,8 +60,8 @@ public class SstResultManager extends CharbotModelManager<SstResults, SstResultE
 		return model;
 	}
 
-	public ResultsSet<SstResults> getByDeviceId(SimpleSearchContext context, String deviceId) {
+	public ResultsSet<SstResultsModel> getByDeviceId(SimpleSearchContext context, Integer deviceId) {
 		validateSearchContext(context);
-		return getDao().getByDeviceId(context, deviceId);
+		return getDao().findByDeviceId(context, deviceId);
 	}
 }

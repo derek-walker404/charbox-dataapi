@@ -8,8 +8,8 @@ import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.resources.AbstractAuthProtectedCrudResource;
 import com.tpofof.dwa.resources.IDwaResource;
 
-public abstract class CharbotAuthProtectedCrudResource<ModelT extends IPersistentModel<ModelT, String>, ManagerT extends IModelManager<ModelT, String, SimpleSearchContext, SimpleSearchContext>> 
-		extends AbstractAuthProtectedCrudResource<ModelT, String, ManagerT, IAuthModel, SimpleSearchContext, SimpleSearchContext>
+public abstract class CharbotAuthProtectedCrudResource<ModelT extends IPersistentModel<ModelT, Integer>, ManagerT extends IModelManager<ModelT, Integer, SimpleSearchContext, SimpleSearchContext>> 
+		extends AbstractAuthProtectedCrudResource<ModelT, Integer, ManagerT, IAuthModel, SimpleSearchContext, SimpleSearchContext>
 		implements IDwaResource {
 
 	public CharbotAuthProtectedCrudResource(ManagerT man, Class<ModelT> modelClass) {

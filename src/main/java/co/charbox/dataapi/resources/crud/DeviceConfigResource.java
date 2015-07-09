@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.managers.DeviceConfigurationManager;
-import co.charbox.domain.model.DeviceConfiguration;
+import co.charbox.domain.model.DeviceConfigurationModel;
 
 import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
@@ -24,22 +24,23 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 @Component
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class DeviceConfigResource extends CharbotAuthProtectedCrudResource<DeviceConfiguration, DeviceConfigurationManager> {
+public class DeviceConfigResource extends CharbotAuthProtectedCrudResource<DeviceConfigurationModel, DeviceConfigurationManager> {
 	
-	@Autowired private RoleValidator authValidator;
+	private final RoleValidator authValidator;
 	
 	@Autowired
-	public DeviceConfigResource(DeviceConfigurationManager man) {
-		super(man, DeviceConfiguration.class);
+	public DeviceConfigResource(DeviceConfigurationManager man, RoleValidator authValidator) {
+		super(man, DeviceConfigurationModel.class);
+		this.authValidator = authValidator;
 	}
 	
 	@Override
-	protected IAuthValidator<IAuthModel, String, AuthRequestPermisionType> getValidator() {
+	protected IAuthValidator<IAuthModel, Integer, AuthRequestPermisionType> getValidator() {
 		return null;
 	}
 	
 	@Override
-	protected void validate(IAuthModel auth, String assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+	protected void validate(IAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
 		Set<String> requiredRoles = Sets.newHashSet();
 		switch (permType) {
 		case CREATE:

@@ -7,8 +7,8 @@ import jersey.repackaged.com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.dataapi.data.elasticsearch.PingResultDAO;
-import co.charbox.domain.model.PingResults;
+import co.charbox.domain.data.mysql.PingResultsDAO;
+import co.charbox.domain.model.PingResultModel;
 
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.context.SimpleSearchContext;
@@ -16,12 +16,12 @@ import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class PingResultsManager extends CharbotModelManager<PingResults, PingResultDAO> {
+public class PingResultsManager extends CharbotModelManager<PingResultModel, PingResultsDAO> {
 
 	private int defaultLimit;
 	
 	@Autowired
-	public PingResultsManager(PingResultDAO dao, Config config) {
+	public PingResultsManager(PingResultsDAO dao, Config config) {
 		super(dao);
 		this.defaultLimit = config.getInt("ping_result.limit", 10);
 	}
@@ -29,11 +29,6 @@ public class PingResultsManager extends CharbotModelManager<PingResults, PingRes
 	@Override
 	public int getDefualtLimit() {
 		return defaultLimit;
-	}
-	
-	@Override
-	public String getDefaultId() {
-		return "";
 	}
 	
 	@Override
@@ -54,7 +49,7 @@ public class PingResultsManager extends CharbotModelManager<PingResults, PingRes
 		return Sets.newHashSet("testStartTime", "packetLoss", "avgLatency");
 	}
 
-	public ResultsSet<PingResults> getByDeviceId(SimpleSearchContext context, String deviceId) {
-		return getDao().getByDeviceId(context, deviceId);
+	public ResultsSet<PingResultModel> getByDeviceId(SimpleSearchContext context, Integer deviceId) {
+		return getDao().findByDeviceId(context, deviceId);
 	}
 }

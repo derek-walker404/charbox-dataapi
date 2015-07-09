@@ -3,31 +3,24 @@ package co.charbox.dataapi.managers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.dataapi.data.elasticsearch.DeviceConfigDAO;
-import co.charbox.domain.model.DeviceConfiguration;
-
-import com.tpofof.core.utils.Config;
+import co.charbox.domain.data.mysql.DeviceConfigurationDAO;
+import co.charbox.domain.model.DeviceConfigurationModel;
+import co.charbox.domain.model.DeviceModel;
 
 @Component
-public class DeviceConfigurationManager extends CharbotModelManager<DeviceConfiguration, DeviceConfigDAO> {
-
-	private final Config config;
+public class DeviceConfigurationManager extends CharbotModelManager<DeviceConfigurationModel, DeviceConfigurationDAO> {
 
 	@Autowired
-	public DeviceConfigurationManager(DeviceConfigDAO deviceConfigDao, Config config) {
+	public DeviceConfigurationManager(DeviceConfigurationDAO deviceConfigDao) {
 		super(deviceConfigDao);
-		this.config = config;
 	}
 
-	@Override
-	public String getDefaultId() {
-		return "";
-	}
-	
-	public DeviceConfiguration getNewConfig() {
-		DeviceConfiguration newConfig = DeviceConfiguration.builder()
-				.testInterval(config.getInt("device_config.test_interval_mins.default", 30))
-				.trialsCount(config.getInt("device_config.trials_count.default", 3))
+	public DeviceConfigurationModel getNewConfig(DeviceModel device) {
+		DeviceConfigurationModel newConfig = DeviceConfigurationModel.builder()
+				.device(device)
+				.registered(false)
+				.schedules(null)
+				.version(null)
 				.build();
 		return getDao().insert(newConfig);
 	}
@@ -40,5 +33,13 @@ public class DeviceConfigurationManager extends CharbotModelManager<DeviceConfig
 	@Override
 	protected boolean hasDefaultSort() {
 		return false;
+	}
+	
+	public DeviceConfigurationModel findByDeviceId(Integer deviceId) {
+		return getDao().findByDeviceId(deviceId);
+	}
+	
+	public DeviceConfigurationModel updateRegistered(DeviceConfigurationModel model) {
+		return getDao().updateRegistered(model);
 	}
 }

@@ -27,7 +27,12 @@ public class TokenAuthenticator implements Authenticator<BasicCredentials, IAuth
 			log.debug("invalid token credentials: " + credentials.getUsername() + ":" + credentials.getPassword());
 			return Optional.<IAuthModel>absent();
 		}
-		String deviceId = keys[0];
+		Integer deviceId = -1;
+		try {
+			deviceId = Integer.parseInt(keys[0]);
+		} catch (NumberFormatException e) {
+			return Optional.<IAuthModel>absent();
+		}
 		String service = keys[1];
 		IAuthModel iAuth = tokenAuthManager.isValid(service, deviceId, credentials.getPassword());
 		if (iAuth == null) {

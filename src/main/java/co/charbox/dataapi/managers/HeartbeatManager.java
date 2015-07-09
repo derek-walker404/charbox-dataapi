@@ -6,19 +6,19 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.dataapi.data.elasticsearch.HeartbeatDAO;
-import co.charbox.domain.model.Heartbeat;
-import co.charbox.domain.model.Outage;
+import co.charbox.domain.data.mysql.HeartbeatDAO;
+import co.charbox.domain.model.DeviceModel;
+import co.charbox.domain.model.HeartbeatModel;
+import co.charbox.domain.model.OutageModel;
 
 import com.tpofof.core.data.dao.context.SimpleSearchContext;
 import com.tpofof.core.utils.Config;
 
 @Slf4j
 @Component
-public class HeartbeatManager extends CharbotModelManager<Heartbeat, HeartbeatDAO> {
+public class HeartbeatManager extends CharbotModelManager<HeartbeatModel, HeartbeatDAO> {
 	
 	@Autowired private Config config;
-	@Autowired private OutageManager outageManager;
 	
 	@Autowired
 	public HeartbeatManager(HeartbeatDAO dao, Config config) {
@@ -30,42 +30,46 @@ public class HeartbeatManager extends CharbotModelManager<Heartbeat, HeartbeatDA
 		return config.getInt("heartbeat.limit", 10);
 	}
 	
-	@Override
-	public String getDefaultId() {
-		return "";
+	public HeartbeatModel insert(SimpleSearchContext context, Integer deviceId, DateTime time) {
+		return insert(context, getManProvider().getDeviceManager().find(context, deviceId), time);
 	}
 	
-	public Heartbeat insert(SimpleSearchContext context, String deviceId, DateTime time) {
-		return insert(context, Heartbeat.builder()
-				.deviceId(deviceId)
+	public HeartbeatModel insert(SimpleSearchContext context, DeviceModel device, DateTime time) {
+		return insert(context, HeartbeatModel.builder()
+				.device(device)
 				.time(time)
 				.build());
 	}
 
 	@Override
-	public Heartbeat insert(SimpleSearchContext context, Heartbeat hb) {
-		Heartbeat lastHb = findByDeviceId(hb.getDeviceId());
+	public HeartbeatModel insert(SimpleSearchContext context, HeartbeatModel hb) {
+		HeartbeatModel lastHb = findByDeviceId(hb.getDevice().getId());
 		if (lastHb != null) {
 			long currTime = hb.getTime().getMillis();
 			long lastTime = lastHb.getTime().getMillis();
 			long interval = (currTime - lastTime) / 1000 / 60; // to minutes
 			if (interval > config.getInt("outage.threshold.minutes", 3)) {
-				outageManager.insert(context, Outage.builder()
-						.deviceId(hb.getDeviceId())
+				getManProvider().getOutageManager()
+					.insert(context, OutageModel.builder()
+						.device(hb.getDevice())
 						.startTime(lastHb.getTime()) // TODO: wft is happening?!
 						.endTime(new DateTime())
 						.duration(interval)
 						.build());
 			}
 			lastHb.setTime(hb.getTime());
-			return super.update(context, lastHb);
+			return updateTime(context, lastHb);
 		} else {
-			log.info("Creating heartbeat for " + hb.getDeviceId());
+			log.info("Creating heartbeat for " + hb.getDevice());
 			return super.insert(context, hb);
 		}
 	}
 	
-	public Heartbeat findByDeviceId(String deviceId) {
+	public HeartbeatModel updateTime(SimpleSearchContext context, HeartbeatModel model) {
+		return getDao().updateTime(model);
+	}
+	
+	public HeartbeatModel findByDeviceId(Integer deviceId) {
 		return getDao().findByDeviceId(deviceId);
 	}
 

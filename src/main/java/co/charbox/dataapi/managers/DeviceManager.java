@@ -1,40 +1,25 @@
 package co.charbox.dataapi.managers;
 
-import java.util.List;
-
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.dataapi.data.elasticsearch.DeviceDAO;
-import co.charbox.domain.model.Device;
-import co.charbox.domain.model.DeviceConfiguration;
-import co.charbox.domain.model.Heartbeat;
-import co.charbox.domain.model.Outage;
-import co.charbox.domain.model.PingResults;
-import co.charbox.domain.model.SstResults;
-import co.charbox.domain.model.TestCase;
-import co.charbox.domain.model.TimerResult;
+import co.charbox.domain.data.mysql.DeviceDAO;
+import co.charbox.domain.model.DeviceConfigurationModel;
+import co.charbox.domain.model.DeviceModel;
+import co.charbox.domain.model.HeartbeatModel;
+import co.charbox.domain.model.OutageModel;
+import co.charbox.domain.model.PingResultModel;
+import co.charbox.domain.model.SstResultsModel;
 
-import com.google.common.collect.Lists;
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.context.SearchWindow;
 import com.tpofof.core.data.dao.context.SimpleSearchContext;
-import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class DeviceManager extends CharbotModelManager<Device, DeviceDAO> {
+public class DeviceManager extends CharbotModelManager<DeviceModel, DeviceDAO> {
 
 	private int defualtLimit;
-	
-	@Autowired private DeviceConfigurationManager deviceConfigMan;
-	@Autowired private TestCaseManager testCaseManager;
-	@Autowired private TimerResultManager timerResultsManager;
-	@Autowired private HeartbeatManager hbManager;
-	@Autowired private PingResultsManager pingManager;
-	@Autowired private OutageManager outageManager;
-	@Autowired private SstResultManager sstManager;
 	
 	@Autowired
 	public DeviceManager(DeviceDAO deviceDao, Config config) {
@@ -42,83 +27,26 @@ public class DeviceManager extends CharbotModelManager<Device, DeviceDAO> {
 		this.defualtLimit = config.getInt("device.limit", 10);
 	}
 	
-	/**
-	 * 
-	 * @param deviceId
-	 * @return Never {@code null}. Only deviceId field is populated if device is not activated.
-	 */
-	public Device findByDeviceId(String deviceId) {
-		ResultsSet<Device> devices = getDao().findByDeviceId(deviceId);
-		Device device = devices.getResults().size() == 1 ? devices.getResults().get(0) : null;
-		return device != null 
-				? device
-				: Device.builder()
-					.deviceId(deviceId)
-					.registered(false)
-					.build();
-	}
-	
-	public Device register(String deviceId) {
-		Device device = findByDeviceId(deviceId);
-		if (!device.isRegistered()) {
-			DeviceConfiguration config = deviceConfigMan.getNewConfig();
-			if (config != null) {
-				device.setConfigId(config.getId());
-				device.setRegistered(true);
-				Device temp = getDao().insert(device);
-				if (temp == null) {
-					device.setRegistered(false);
-				} else {
-					device = temp;
-				}
-			}
+	public DeviceModel register(DeviceModel device) {
+		DeviceConfigurationModel conf = getManProvider().getDeviceConfigurationManager().findByDeviceId(device.getId());
+		if (!conf.isRegistered()) {
+			conf.setRegistered(true);
+			conf = getManProvider().getDeviceConfigurationManager().updateRegistered(conf);
 		}
-		return device;
-	}
-
-	/**
-	 * Use {@link DeviceManager#register(int)}
-	 */
-	@Deprecated
-	public Device insert(Device model) {
-		throw new UnsupportedOperationException("Use {@link DeviceManager#register(int)}");
-	}
-	
-	public List<TestCase> getTestCases(Device model) {
-		List<TestCase> cases = Lists.newArrayList();
-		if (model != null) {
-			cases = testCaseManager.find(SimpleSearchContext.builder()
-					.window(SearchWindow.builder().limit(10).offset(0).build())
-					.build())
-					.getResults(); // TODO: do this better
-		}
-		return cases;
+		return conf == null ? null : device;
 	}
 
 	@Override
 	public int getDefualtLimit() {
-		return defualtLimit; // TODO: config or setting
+		return defualtLimit;
 	}
 	
-	public ResultsSet<TimerResult> getResults(String deviceId) {
-		return timerResultsManager.getByDevice(deviceId);
+	public HeartbeatModel heartbeat(SimpleSearchContext context, Integer deviceId, DateTime time) {
+		return getManProvider().getHeartbeatManager().insert(context, deviceId, time);
 	}
 	
-	public ResultsSet<TimerResult> getResults(String deviceId, SearchWindow window, SimpleSort sort) {
-		return timerResultsManager.getByDevice(deviceId, window, sort);
-	}
-	
-	public Heartbeat heartbeat(SimpleSearchContext context, String deviceId, DateTime time) {
-		return hbManager.insert(context, deviceId, time);
-	}
-	
-	public Heartbeat getHeartbeats(String deviceId) {
-		return hbManager.findByDeviceId(deviceId);
-	}
-
-	@Override
-	public String getDefaultId() {
-		return "";
+	public HeartbeatModel getHeartbeat(Integer deviceId) {
+		return getManProvider().getHeartbeatManager().findByDeviceId(deviceId);
 	}
 
 	@Override
@@ -126,15 +54,15 @@ public class DeviceManager extends CharbotModelManager<Device, DeviceDAO> {
 		return false;
 	}
 
-	public ResultsSet<PingResults> getPingResults(SimpleSearchContext context, String deviceId) {
-		return pingManager.getByDeviceId(context, deviceId);
+	public ResultsSet<PingResultModel> getPingResults(SimpleSearchContext context, Integer deviceId) {
+		return getManProvider().getPingResultsManager().getByDeviceId(context, deviceId);
 	}
 
-	public ResultsSet<Outage> getOutages(SimpleSearchContext context, String deviceId) {
-		return outageManager.getOutagesByDeviceId(context, deviceId);
+	public ResultsSet<OutageModel> getOutages(SimpleSearchContext context, Integer deviceId) {
+		return getManProvider().getOutageManager().getByDeviceId(context, deviceId);
 	}
 
-	public ResultsSet<SstResults> getSstResults(SimpleSearchContext context, String deviceId) {
-		return sstManager.getByDeviceId(context, deviceId);
+	public ResultsSet<SstResultsModel> getSstResults(SimpleSearchContext context, Integer deviceId) {
+		return getManProvider().getSstResultManager().getByDeviceId(context, deviceId);
 	}
 }

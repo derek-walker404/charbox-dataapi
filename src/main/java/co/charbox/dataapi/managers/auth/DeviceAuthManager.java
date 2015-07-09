@@ -5,13 +5,17 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import co.charbox.dataapi.data.elasticsearch.auth.DeviceAuthDAO;
 import co.charbox.dataapi.managers.CharbotModelManager;
+import co.charbox.dataapi.managers.CharbotModelManagerProvider;
+import co.charbox.domain.data.mysql.auth.DeviceAuthDAO;
+import co.charbox.domain.model.DeviceModel;
 import co.charbox.domain.model.auth.DeviceAuthModel;
 
 @Component
 public class DeviceAuthManager extends CharbotModelManager<DeviceAuthModel, DeviceAuthDAO> {
 
+	@Autowired private CharbotModelManagerProvider manPro;
+	
 	@Autowired
 	public DeviceAuthManager(DeviceAuthDAO dao) {
 		super(dao);
@@ -23,22 +27,22 @@ public class DeviceAuthManager extends CharbotModelManager<DeviceAuthModel, Devi
 	}
 
 	@Override
-	public String getDefaultId() {
-		return "";
+	public Integer getDefaultId() {
+		return -1;
 	}
 	
-	public DeviceAuthModel isValid(String deviceId, String apiKey) {
+	public DeviceAuthModel isValid(Integer deviceId, String apiKey) {
 		DeviceAuthModel auth = DeviceAuthModel.builder()
 				.deviceId(deviceId)
-				.apiKey(apiKey)
+				.key(apiKey)
 				.build();
 		DeviceAuthModel devAuth = find(auth);
 		boolean validAuth = devAuth != null && devAuth.isActivated();
 		return validAuth ? devAuth : null;
 	}
 	
-	public DeviceAuthModel find(DeviceAuthModel auth) {
-		return auth != null ? getDao().find(auth) : null;
+	public DeviceAuthModel find(DeviceAuthModel model) {
+		return getDao().find(model);
 	}
 
 	@Override
@@ -47,19 +51,14 @@ public class DeviceAuthManager extends CharbotModelManager<DeviceAuthModel, Devi
 	}
 
 	public DeviceAuthModel newInstall() {
-		String deviceId = null;
-		while (deviceId == null || deviceIdExists(deviceId)) {
-			deviceId = UUID.randomUUID().toString().substring(4, 13);
-		}
+		DeviceModel device = manPro.getDeviceManager().insert(null, DeviceModel.builder()
+				.name("New Device")
+				.build());
 		DeviceAuthModel model = getDao().insert(DeviceAuthModel.builder()
-				.deviceId(deviceId)
-				.apiKey(UUID.randomUUID().toString().substring(0, 13))
+				.deviceId(device.getId())
+				.key(UUID.randomUUID().toString())
 				.activated(true)
 				.build());
 		return model;
-	}
-	
-	protected boolean deviceIdExists(String deviceId) {
-		return getDao().findByDeviceId(deviceId) != null;
 	}
 }
