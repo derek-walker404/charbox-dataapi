@@ -9,7 +9,7 @@
 		<tpofof-dwa.version>0.1.1-SNAPSHOT</tpofof-dwa.version>
 		<charbox-core.version>0.1.0-SNAPSHOT</charbox-core.version>
 	</properties>
-	<version>0.1.1-SNAPSHOT</version>
+	<version>0.1.2-SNAPSHOT</version>
 	<dependencies>
 		<dependency>
 			<groupId>co.charbox</groupId>
