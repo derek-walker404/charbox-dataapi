@@ -2,12 +2,11 @@ package co.charbox.dataapi.resources.crud;
 
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.tpofof.dwa.error.HttpBadRequestException;
-
 import co.charbox.dataapi.managers.DeviceManager;
 import co.charbox.domain.model.DeviceModel;
 import co.charbox.domain.model.test.DeviceModelProvider;
+
+import com.tpofof.dwa.error.HttpBadRequestException;
 
 public class DeviceResourceTest extends CharbotCrudResourceTest<DeviceModel, DeviceManager, DeviceResource, DeviceModelProvider> {
 

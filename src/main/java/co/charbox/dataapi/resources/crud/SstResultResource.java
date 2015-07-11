@@ -81,11 +81,12 @@ public class SstResultResource extends CharbotAuthProtectedCrudResource<SstResul
 			serviceIp = overrideIp == null ? request.getRemoteAddr() : overrideIp;
 		}
 		String clientIp = model.getDeviceInfo().getConnection().getIp();
-		if (clientIp == null || clientIp.isEmpty()) {
+		if (clientIp == null || clientIp.isEmpty() || "127.0.0.1".equals(clientIp)) {
 			// might be a proxy or local host, but something is better than nothing.
 			clientIp = config.getString("location.ip.override");
 		}
 		clientIp = config.getString("location.client.override", clientIp);
+		serviceIp = config.getString("location.client.override", serviceIp);
 		model.setServerLocation(locationProvider.getLocation(serviceIp));
 		ConnectionInfoModel connInfo = mm.get(clientIp);
 		if (connInfo != null) {
