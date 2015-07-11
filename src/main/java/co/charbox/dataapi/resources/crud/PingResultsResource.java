@@ -17,6 +17,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.core.mm.LocationProvider;
 import co.charbox.core.mm.MaxMindService;
 import co.charbox.dataapi.managers.PingResultsManager;
 import co.charbox.domain.model.PingResultModel;
@@ -38,6 +39,7 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 public class PingResultsResource extends CharbotAuthProtectedCrudResource<PingResultModel, PingResultsManager> {
 
 	@Autowired private RoleValidator authValidator;
+	@Autowired private LocationProvider locationProvider;
 	@Autowired private MaxMindService mm;
 	@Autowired private Config config;
 	
@@ -72,12 +74,23 @@ public class PingResultsResource extends CharbotAuthProtectedCrudResource<PingRe
 	@POST
 	public JsonNode post(@Auth IAuthModel authModel, PingResultModel model, 
 			@Context HttpServletRequest request) throws HttpCodeException {
-		String ip = model.getConnectionInfo() != null && model.getConnectionInfo().getConnection() != null && model.getConnectionInfo().getConnection().getIp() != null
+		String serviceIp = model.getServerLocation() != null ? model.getServerLocation().getIp() : null;
+		if (serviceIp == null || serviceIp.isEmpty()) {
+			// might be a proxy or local host, but something is better than nothing.
+			String overrideIp = config.getString("location.ip.override");
+			serviceIp = overrideIp == null ? request.getRemoteAddr() : overrideIp;
+		}
+		String clientIp = model.getConnectionInfo() != null && model.getConnectionInfo().getConnection() != null && model.getConnectionInfo().getConnection().getIp() != null
 				? model.getConnectionInfo().getConnection().getIp()
 				: request.getRemoteAddr(); // TODO: do I let the device choose its own ip?
-		ip = config.getString("location.ip.override", ip);
-		ip = config.getString("location.client.override", ip);
-		ConnectionInfoModel connInfo = mm.get(ip);
+		if (clientIp == null || clientIp.isEmpty() || "127.0.0.1".equals(clientIp)) {
+			// might be a proxy or local host, but something is better than nothing.
+			clientIp = config.getString("location.ip.override");
+		}
+		clientIp = config.getString("location.ip.override", clientIp);
+		serviceIp = config.getString("client.ip.override", serviceIp);
+		model.setServerLocation(locationProvider.getLocation(serviceIp));
+		ConnectionInfoModel connInfo = mm.get(clientIp);
 		if (connInfo != null) {
 			model.setConnectionInfo(connInfo);
 		}

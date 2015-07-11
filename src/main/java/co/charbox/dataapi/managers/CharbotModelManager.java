@@ -1,5 +1,7 @@
 package co.charbox.dataapi.managers;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.tpofof.core.data.IPersistentModel;
 import com.tpofof.core.data.dao.context.SimpleSearchContext;
 import com.tpofof.core.data.dao.jdbc.AbstractSimpleJooqDAO;
@@ -8,7 +10,7 @@ import com.tpofof.core.managers.AbstractJdbcModelManager;
 public abstract class CharbotModelManager<ModelT extends IPersistentModel<ModelT, Integer>, ModelDaoT extends AbstractSimpleJooqDAO<ModelT, Integer, SimpleSearchContext>> 
 		extends AbstractJdbcModelManager<ModelT, ModelDaoT, Integer, SimpleSearchContext, SimpleSearchContext, SimpleSearchContext> {
 
-	private CharbotModelManagerProvider manProvider;
+	@Autowired private CharbotModelManagerProvider manProvider;
 	
 	public CharbotModelManager(ModelDaoT dao) {
 		super(dao);

@@ -42,7 +42,8 @@ public class DeviceManager extends CharbotModelManager<DeviceModel, DeviceDAO> {
 	}
 	
 	public HeartbeatModel heartbeat(SimpleSearchContext context, Integer deviceId, DateTime time) {
-		return getManProvider().getHeartbeatManager().insert(context, deviceId, time);
+		HeartbeatManager man = getManProvider().getHeartbeatManager();
+		return man.insert(context, deviceId, time);
 	}
 	
 	public HeartbeatModel getHeartbeat(Integer deviceId) {
