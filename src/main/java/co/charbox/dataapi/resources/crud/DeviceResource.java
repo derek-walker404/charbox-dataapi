@@ -98,8 +98,8 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 		DeviceModel device = getManager().find(getAuthContext(authModel), deviceId);
 		if (device != null) {
 			DeviceConfigurationModel conf = configMan.findByDeviceId(deviceId);
-			if (!conf.isRegistered()) {
-				device = getManager().register(device);
+			if (conf == null || !conf.isRegistered()) {
+				device = getManager().register(getAuthContext(authModel), device);
 			}
 		}
 		return res().success(res().modelData(device));
