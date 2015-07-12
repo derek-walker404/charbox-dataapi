@@ -1,5 +1,8 @@
 package co.charbox.dataapi.managers;
 
+import java.util.List;
+import java.util.Map;
+
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -8,10 +11,12 @@ import co.charbox.domain.data.mysql.DeviceDAO;
 import co.charbox.domain.model.DeviceConfigurationModel;
 import co.charbox.domain.model.DeviceModel;
 import co.charbox.domain.model.HeartbeatModel;
+import co.charbox.domain.model.JobSchedule;
 import co.charbox.domain.model.OutageModel;
 import co.charbox.domain.model.PingResultModel;
 import co.charbox.domain.model.SstResultsModel;
 
+import com.google.api.client.util.Maps;
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.data.dao.context.SimpleSearchContext;
 import com.tpofof.core.utils.Config;
@@ -27,9 +32,20 @@ public class DeviceManager extends CharbotModelManager<DeviceModel, DeviceDAO> {
 		this.defualtLimit = config.getInt("device.limit", 10);
 	}
 	
-	public DeviceModel register(DeviceModel device) {
+	public DeviceModel register(SimpleSearchContext authContext, DeviceModel device) {
 		DeviceConfigurationModel conf = getManProvider().getDeviceConfigurationManager().findByDeviceId(device.getId());
-		if (!conf.isRegistered()) {
+		if (conf == null) {
+			Map<String, String> schedules = Maps.newHashMap();
+			List<JobSchedule> jobs = JobSchedule.getAllJobs();
+			for (JobSchedule job : jobs) {
+				schedules.put(job.getName(), job.getSchedule());
+			}
+			conf = getManProvider().getDeviceConfigurationManager().insert(authContext, DeviceConfigurationModel.builder()
+					.device(device)
+					.registered(true)
+					.schedules(schedules)
+					.build());
+		} else if (!conf.isRegistered()) {
 			conf.setRegistered(true);
 			conf = getManProvider().getDeviceConfigurationManager().updateRegistered(conf);
 		}
