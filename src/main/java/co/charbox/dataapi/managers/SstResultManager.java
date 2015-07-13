@@ -41,14 +41,14 @@ public class SstResultManager extends CharbotModelManager<SstResultsModel, SstRe
 	@Override
 	protected SimpleSort getDefaultSort() {
 		return SimpleSort.builder()
-				.field("testStartTime")
+				.field("startTime")
 				.direction(-1)
 				.build();
 	}
 	
 	@Override
 	protected Set<String> getDefaultValidSorts() {
-		return Sets.newHashSet("testStartTime", "downloadSpeed", "uploadSpeed", "pingDuration");
+		return Sets.newHashSet("startTime", "downloadSpeed", "uploadSpeed", "pingDuration");
 	}
 	
 	@Override

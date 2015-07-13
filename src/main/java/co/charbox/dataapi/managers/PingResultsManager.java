@@ -39,17 +39,18 @@ public class PingResultsManager extends CharbotModelManager<PingResultModel, Pin
 	@Override
 	protected SimpleSort getDefaultSort() {
 		return SimpleSort.builder()
-				.field("testStartTime")
+				.field("startTime")
 				.direction(-1)
 				.build();
 	}
 	
 	@Override
 	protected Set<String> getDefaultValidSorts() {
-		return Sets.newHashSet("testStartTime", "packetLoss", "avgLatency");
+		return Sets.newHashSet("startTime", "packetLoss", "avgLatency");
 	}
 
 	public ResultsSet<PingResultModel> getByDeviceId(SimpleSearchContext context, Integer deviceId) {
+		validateSearchContext(context);
 		return getDao().findByDeviceId(context, deviceId);
 	}
 }
