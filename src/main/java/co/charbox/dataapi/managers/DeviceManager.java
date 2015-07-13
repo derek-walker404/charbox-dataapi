@@ -57,9 +57,9 @@ public class DeviceManager extends CharbotModelManager<DeviceModel, DeviceDAO> {
 		return defualtLimit;
 	}
 	
-	public HeartbeatModel heartbeat(SimpleSearchContext context, Integer deviceId, DateTime time) {
+	public HeartbeatModel heartbeat(SimpleSearchContext context, Integer deviceId, DateTime time, String ipAdress) {
 		HeartbeatManager man = getManProvider().getHeartbeatManager();
-		return man.insert(context, deviceId, time);
+		return man.insert(context, deviceId, time, ipAdress);
 	}
 	
 	public HeartbeatModel getHeartbeat(Integer deviceId) {

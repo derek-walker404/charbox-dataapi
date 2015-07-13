@@ -50,4 +50,8 @@ public class CharbotModelManagerProvider {
 	public SstResultManager getSstResultManager() {
 		return App.getContext().getBean(SstResultManager.class);
 	}
+
+	public ConnectionInfoManager getConnectionInfoManager() {
+		return App.getContext().getBean(ConnectionInfoManager.class);
+	}
 }
