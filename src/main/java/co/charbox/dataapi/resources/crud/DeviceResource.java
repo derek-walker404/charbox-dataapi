@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.security.IAuthModel;
+import com.tpofof.core.utils.Config;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpBadRequestException;
@@ -55,6 +56,7 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 	@Autowired private RoleValidator authValidator;
 	@Autowired private TokenAuthManager tokenAuthManager;
 	@Autowired private DeviceConfigurationManager configMan;
+	@Autowired private Config config;
 	
 	@Autowired
 	public DeviceResource(DeviceManager man) {
@@ -108,12 +110,20 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 	@Path("/id/{deviceId}/hb")
 	@POST
 	@Timed
-	public JsonNode heartbeat(@Auth IAuthModel authModel, @PathParam("deviceId") Integer deviceId) throws HttpCodeException {
+	public JsonNode heartbeat(@Auth IAuthModel authModel,
+			@PathParam("deviceId") Integer deviceId,
+			@Context HttpServletRequest request) throws HttpCodeException {
 		authValidator.validate(authModel, deviceId, Sets.newHashSet("ADMIN", deviceId + ""));
 		if (getManager().find(getAuthContext(authModel), deviceId) == null) {
 			throw new HttpNotFoundException("Could not find device with id " + deviceId);
 		}
-		HeartbeatModel heartBeat = getManager().heartbeat(getContext(authModel), deviceId, new DateTime());;
+		String clientIp = request.getRemoteAddr();
+		if (clientIp == null || clientIp.isEmpty() || "127.0.0.1".equals(clientIp)) {
+			// might be a proxy or local host, but something is better than nothing.
+			clientIp = config.getString("location.ip.override");
+		}
+		clientIp = config.getString("location.ip.override", clientIp);
+		HeartbeatModel heartBeat = getManager().heartbeat(getContext(authModel), deviceId, new DateTime(), clientIp);
 		if (heartBeat == null) {
 			throw new HttpInternalServerErrorException("Could not register heartbeat for device with id " + deviceId);
 		}

@@ -11,10 +11,13 @@ import org.elasticsearch.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.core.mm.MaxMindService;
+import co.charbox.dataapi.managers.ConnectionInfoManager;
 import co.charbox.dataapi.managers.HeartbeatManager;
 import co.charbox.domain.model.HeartbeatModel;
 
 import com.tpofof.core.security.IAuthModel;
+import com.tpofof.core.utils.Config;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
@@ -27,6 +30,9 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 public class HeartbeatResource extends CharbotAuthProtectedCrudResource<HeartbeatModel, HeartbeatManager> {
 
 	@Autowired private RoleValidator authValidator;
+	@Autowired private Config config;
+	@Autowired private MaxMindService mm;
+	@Autowired private ConnectionInfoManager ciMan;
 	
 	@Autowired
 	public HeartbeatResource(HeartbeatManager man) {

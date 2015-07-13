@@ -19,6 +19,7 @@ import com.tpofof.core.utils.Config;
 public class HeartbeatManager extends CharbotModelManager<HeartbeatModel, HeartbeatDAO> {
 	
 	@Autowired private Config config;
+	@Autowired private CharbotModelManagerProvider manPro;
 	
 	@Autowired
 	public HeartbeatManager(HeartbeatDAO dao, Config config) {
@@ -30,14 +31,16 @@ public class HeartbeatManager extends CharbotModelManager<HeartbeatModel, Heartb
 		return config.getInt("heartbeat.limit", 10);
 	}
 	
-	public HeartbeatModel insert(SimpleSearchContext context, Integer deviceId, DateTime time) {
-		return insert(context, getManProvider().getDeviceManager().find(context, deviceId), time);
+	public HeartbeatModel insert(SimpleSearchContext context, Integer deviceId, DateTime time, String ipAddress) {
+		return insert(context, getManProvider().getDeviceManager().find(context, deviceId), time, ipAddress);
 	}
 	
-	public HeartbeatModel insert(SimpleSearchContext context, DeviceModel device, DateTime time) {
+	public HeartbeatModel insert(SimpleSearchContext context, DeviceModel device, DateTime time, String ipAddress) {
+		ConnectionInfoManager ciMan = manPro.getConnectionInfoManager();
 		return insert(context, HeartbeatModel.builder()
 				.device(device)
 				.time(time)
+				.connection(ciMan.findByIp(ipAddress))
 				.build());
 	}
 
@@ -52,9 +55,10 @@ public class HeartbeatManager extends CharbotModelManager<HeartbeatModel, Heartb
 				getManProvider().getOutageManager()
 					.insert(context, OutageModel.builder()
 						.device(hb.getDevice())
-						.startTime(lastHb.getTime()) // TODO: wft is happening?!
+						.startTime(lastHb.getTime())
 						.endTime(new DateTime())
 						.duration(interval)
+						.connectionInfo(hb.getConnection())
 						.build());
 			}
 			lastHb.setTime(hb.getTime());
