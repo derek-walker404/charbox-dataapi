@@ -94,9 +94,7 @@ public class PingResultsResource extends CharbotAuthProtectedCrudResource<PingRe
 		if (connInfo != null) {
 			model.setConnectionInfo(connInfo);
 		}
-		if (model.getStartTime() == null) {
-			model.setStartTime(new DateTime());
-		}
+		model.setStartTime(new DateTime());
 		return super.post(authModel, model, request);
 	}
 }

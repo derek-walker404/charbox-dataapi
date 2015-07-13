@@ -7,6 +7,7 @@ import io.dropwizard.auth.basic.BasicAuthFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
+import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -61,6 +62,9 @@ public class CharboxDataApiApplication extends DwaApp<CharboxConfiguration> {
 		super.run(config, env);
 		
 		initializer.initializeApplicationBeans();
+		
+		// TODO: find a better place for this... DateTimeInitializable?
+		DateTimeZone.setDefault(DateTimeZone.UTC);
 		
 		/* METRICS */
 		MetricSet maxMindCacheMetrics = GuavaCacheMetrics.metricsFor("mm.service", maxMindService.getCache());

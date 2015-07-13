@@ -14,6 +14,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.elasticsearch.common.collect.Sets;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -92,6 +93,7 @@ public class SstResultResource extends CharbotAuthProtectedCrudResource<SstResul
 		if (connInfo != null) {
 			model.setDeviceInfo(connInfo);
 		}
+		model.setStartTime(new DateTime());
 		return super.post(auth, model, request);
 	}
 }
