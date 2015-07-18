@@ -7,6 +7,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Component;
 import co.charbox.dataapi.managers.auth.DeviceAuthManager;
 import co.charbox.domain.model.auth.DeviceAuthModel;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
 import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.RoleValidator;
@@ -32,7 +32,7 @@ public class InstallResource implements IDwaResource {
 	@Autowired private DeviceAuthManager deviceAuthManager;
 	
 	@POST
-	public JsonNode newInstall(@Auth IAuthModel auth) {
+	public Response newInstall(@Auth IAuthModel auth) {
 		authValidator.validate(auth, null, Sets.newHashSet("ADMIN", "INSTALL"));
 		DeviceAuthModel newAuth = deviceAuthManager.newInstall();
 		return responseUtils.success(responseUtils.modelData(newAuth));

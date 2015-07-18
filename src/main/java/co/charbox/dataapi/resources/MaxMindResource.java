@@ -11,6 +11,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,6 @@ import co.charbox.core.mm.MaxMindService;
 import co.charbox.domain.model.mm.ConnectionInfoModel;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.tpofof.core.utils.Config;
 import com.tpofof.dwa.error.HttpInternalServerErrorException;
 import com.tpofof.dwa.resources.IDwaResource;
@@ -45,11 +45,11 @@ public class MaxMindResource implements IDwaResource {
 	@Path("/{ip}")
 	@GET
 	@Timed
-	public JsonNode getIp(@PathParam("ip") String ip) throws HttpInternalServerErrorException {
-		return getConnectionInfo(ip);
+	public Response getIp(@PathParam("ip") String ip) throws HttpInternalServerErrorException {
+		return responseUtils.success(responseUtils.modelData(getConnectionInfo(ip)));
 	}
 	
-	private JsonNode getConnectionInfo(String ip) throws HttpInternalServerErrorException {
+	private Response getConnectionInfo(String ip) throws HttpInternalServerErrorException {
 		ConnectionInfoModel conInfo = mms.get(ip);
 		if (conInfo == null) {
 			throw new HttpInternalServerErrorException("Could not retrieve info for " + ip);
@@ -60,7 +60,7 @@ public class MaxMindResource implements IDwaResource {
 	@Path("/self")
 	@GET
 	@Timed
-	public JsonNode getRequestersIp(@Context HttpServletRequest request) throws HttpInternalServerErrorException {
+	public Response getRequestersIp(@Context HttpServletRequest request) throws HttpInternalServerErrorException {
 		String ip = request.getRemoteAddr();
 		try {
 			InetAddress addr = InetAddress.getByName(ip);

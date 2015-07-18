@@ -11,10 +11,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.elasticsearch.common.collect.Sets;
 import org.joda.time.DateTime;
@@ -33,7 +33,6 @@ import co.charbox.domain.model.SstResultsModel;
 import co.charbox.domain.model.auth.TokenAuthModel;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
 import com.tpofof.core.data.dao.ResultsSet;
 import com.tpofof.core.security.IAuthModel;
@@ -49,7 +48,6 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
 @Path("/devices")
 @Component
-@Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel, DeviceManager> {
 
@@ -86,7 +84,7 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 	@Path("/id/{deviceId}")
 	@GET
 	@Timed
-	public JsonNode findByDeviceId(@Auth IAuthModel authModel, @PathParam("deviceId") Integer deviceId) throws HttpCodeException {
+	public Response findByDeviceId(@Auth IAuthModel authModel, @PathParam("deviceId") Integer deviceId) throws HttpCodeException {
 		validate(authModel, deviceId, READ_ONE);
 		DeviceModel device = getManager().find(getAuthContext(authModel), deviceId);
 		return res().success(res().modelData(device));
@@ -95,7 +93,7 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 	@Path("/id/{deviceId}/register")
 	@POST
 	@Timed
-	public JsonNode register(@Auth IAuthModel authModel, @PathParam("deviceId") Integer deviceId) throws HttpCodeException {
+	public Response register(@Auth IAuthModel authModel, @PathParam("deviceId") Integer deviceId) throws HttpCodeException {
 		authValidator.validate(authModel, deviceId, Sets.newHashSet("ADMIN", deviceId + ""));
 		DeviceModel device = getManager().find(getAuthContext(authModel), deviceId);
 		if (device != null) {
@@ -110,7 +108,7 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 	@Path("/id/{deviceId}/hb")
 	@POST
 	@Timed
-	public JsonNode heartbeat(@Auth IAuthModel authModel,
+	public Response heartbeat(@Auth IAuthModel authModel,
 			@PathParam("deviceId") Integer deviceId,
 			@Context HttpServletRequest request) throws HttpCodeException {
 		authValidator.validate(authModel, deviceId, Sets.newHashSet("ADMIN", deviceId + ""));
@@ -133,7 +131,7 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 	@Path("/id/{deviceId}/hb")
 	@GET
 	@Timed
-	public JsonNode getDeviceHeartbeats(@Auth IAuthModel authModel, @PathParam("deviceId") Integer deviceId) throws HttpCodeException {
+	public Response getDeviceHeartbeats(@Auth IAuthModel authModel, @PathParam("deviceId") Integer deviceId) throws HttpCodeException {
 		validate(authModel, deviceId, READ_ONE);
 		HeartbeatModel hb = getManager().getHeartbeat(deviceId);
 		if (hb == null) {
@@ -145,7 +143,7 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 	@Path("/id/{deviceId}/pingres")
 	@GET
 	@Timed
-	public JsonNode getDevicePingResults(@Auth IAuthModel authModel, 
+	public Response getDevicePingResults(@Auth IAuthModel authModel, 
 			@PathParam("deviceId") Integer deviceId,
 			@QueryParam("limit") Optional<Integer> limit,
 			@QueryParam("offset") Optional<Integer> offset,
@@ -161,7 +159,7 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 	@Path("/id/{deviceId}/outages")
 	@GET
 	@Timed
-	public JsonNode getDeviceOutages(@Auth IAuthModel authModel, 
+	public Response getDeviceOutages(@Auth IAuthModel authModel, 
 			@PathParam("deviceId") Integer deviceId,
 			@QueryParam("limit") Optional<Integer> limit,
 			@QueryParam("offset") Optional<Integer> offset,
@@ -177,7 +175,7 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 	@Path("/id/{deviceId}/sst")
 	@GET
 	@Timed
-	public JsonNode getDeviceSstResults(@Auth IAuthModel authModel, 
+	public Response getDeviceSstResults(@Auth IAuthModel authModel, 
 			@PathParam("deviceId") Integer deviceId,
 			@QueryParam("limit") Optional<Integer> limit,
 			@QueryParam("offset") Optional<Integer> offset,
@@ -191,7 +189,7 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 	}
 	
 	@Override
-	public JsonNode post(@Auth IAuthModel authModel, DeviceModel model, 
+	public Response post(@Auth IAuthModel authModel, DeviceModel model, 
 			@Context HttpServletRequest request) throws HttpCodeException {
 		throw new HttpBadRequestException("POST not supported on Device collection. Use /device/register instead."); 
 	}
@@ -199,7 +197,7 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 	@Path("/id/{deviceId}/token/{serviceId}")
 	@POST
 	@Timed
-	public JsonNode getServiceToken(@Auth IAuthModel auth, 
+	public Response getServiceToken(@Auth IAuthModel auth, 
 			@PathParam(value="deviceId") Integer deviceId,
 			@PathParam(value="serviceId") String serviceId) {
 		authValidator.validate(auth, deviceId, Sets.newHashSet("ADMIN", deviceId + ""));

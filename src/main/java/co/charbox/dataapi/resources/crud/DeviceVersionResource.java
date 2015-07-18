@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.elasticsearch.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Component;
 import co.charbox.dataapi.managers.DeviceVersionManager;
 import co.charbox.domain.model.DeviceVersionModel;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
@@ -60,7 +60,7 @@ public class DeviceVersionResource extends CharbotAuthProtectedCrudResource<Devi
 	
 	@Path("/upgrade/{version}")
 	@GET
-	public JsonNode upgrade(@Auth IAuthModel auth, @PathParam("version") String version) {
+	public Response upgrade(@Auth IAuthModel auth, @PathParam("version") String version) {
 		authValidator.validate(auth, null, Sets.newHashSet("ADMIN", "DEVICE"));
 		DeviceVersionModel upgradeVersion = getManager().canUpgrade(version);
 		return res().success(
