@@ -12,6 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.elasticsearch.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,6 @@ import co.charbox.dataapi.resources.crud.CharbotAuthProtectedCrudResource;
 import co.charbox.domain.model.auth.DeviceAuthModel;
 import co.charbox.domain.model.auth.TokenAuthModel;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.auth.RoleValidator;
@@ -69,7 +69,7 @@ public class TokenAuthResource extends CharbotAuthProtectedCrudResource<TokenAut
 	
 	@Path("/{serviceId}/new")
 	@POST
-	public JsonNode newToken(@Auth IAuthModel auth, @PathParam("serviceId") String serviceId) {
+	public Response newToken(@Auth IAuthModel auth, @PathParam("serviceId") String serviceId) {
 		authValidator.validate(auth, null, Sets.newHashSet("DEVICE"));
 		DeviceAuthModel deviceAuth = auth.to(DeviceAuthModel.class);
 		TokenAuthModel token = tokenAuthManager.getNewToken(serviceId, deviceAuth.getDeviceId());
@@ -78,7 +78,7 @@ public class TokenAuthResource extends CharbotAuthProtectedCrudResource<TokenAut
 	
 	@Path("/expired")
 	@DELETE
-	public JsonNode deleteExpired(@Auth IAuthModel auth) {
+	public Response deleteExpired(@Auth IAuthModel auth) {
 		validate(auth, null, DELETE);
 		int count = tokenAuthManager.deleteExpired();
 		return res().success(res().rawData("deleted", count));

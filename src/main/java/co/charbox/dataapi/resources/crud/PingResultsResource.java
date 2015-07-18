@@ -11,6 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.elasticsearch.common.collect.Sets;
 import org.joda.time.DateTime;
@@ -23,7 +24,6 @@ import co.charbox.dataapi.managers.PingResultsManager;
 import co.charbox.domain.model.PingResultModel;
 import co.charbox.domain.model.mm.ConnectionInfoModel;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.tpofof.core.security.IAuthModel;
 import com.tpofof.core.utils.Config;
 import com.tpofof.dwa.auth.IAuthValidator;
@@ -72,7 +72,7 @@ public class PingResultsResource extends CharbotAuthProtectedCrudResource<PingRe
 	
 	@Override
 	@POST
-	public JsonNode post(@Auth IAuthModel authModel, PingResultModel model, 
+	public Response post(@Auth IAuthModel authModel, PingResultModel model, 
 			@Context HttpServletRequest request) throws HttpCodeException {
 		String serviceIp = model.getServerLocation() != null ? model.getServerLocation().getIp() : null;
 		if (serviceIp == null || serviceIp.isEmpty()) {

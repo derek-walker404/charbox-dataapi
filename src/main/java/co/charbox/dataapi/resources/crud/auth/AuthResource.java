@@ -7,6 +7,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Component;
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
 import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.RoleValidator;
@@ -37,7 +37,7 @@ public class AuthResource implements IDwaResource {
 	@Path("/validate/device")
 	@GET
 	@Timed
-	public JsonNode validateDevice(@Auth IAuthModel auth) throws HttpCodeException {
+	public Response validateDevice(@Auth IAuthModel auth) throws HttpCodeException {
 		authValidator.validate(auth, null, Sets.newHashSet("DEVICE"));
 		return responseUtils.success(responseUtils.rawData("valid", true));
 	}
@@ -45,7 +45,7 @@ public class AuthResource implements IDwaResource {
 	@Path("/validate/admin")
 	@GET
 	@Timed
-	public JsonNode validateAdmin(@Auth IAuthModel auth) throws HttpCodeException {
+	public Response validateAdmin(@Auth IAuthModel auth) throws HttpCodeException {
 		authValidator.validate(auth, null, Sets.newHashSet("ADMIN"));
 		return responseUtils.success(responseUtils.rawData("valid", true));
 	}
@@ -53,7 +53,7 @@ public class AuthResource implements IDwaResource {
 	@Path("/validate/server")
 	@GET
 	@Timed
-	public JsonNode validateServer(@Auth IAuthModel auth) throws HttpCodeException {
+	public Response validateServer(@Auth IAuthModel auth) throws HttpCodeException {
 		authValidator.validate(auth, null, Sets.newHashSet("SERVER"));
 		return responseUtils.success(responseUtils.rawData("valid", true));
 	}
@@ -61,7 +61,7 @@ public class AuthResource implements IDwaResource {
 	@Path("/validate/token")
 	@GET
 	@Timed
-	public JsonNode validateToken(@Auth IAuthModel auth) throws HttpCodeException {
+	public Response validateToken(@Auth IAuthModel auth) throws HttpCodeException {
 		authValidator.validate(auth, null, Sets.newHashSet("TOKEN"));
 		return responseUtils.success(responseUtils.rawData("valid", true));
 	}

@@ -8,13 +8,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.domain.model.JobSchedule;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.api.client.util.Maps;
 import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.resources.IDwaResource;
@@ -30,7 +30,7 @@ public class JobScheduleResource implements IDwaResource {
 	@Autowired private RoleValidator authValidator;
 	
 	@POST
-	public JsonNode newSchedule() {
+	public Response newSchedule() {
 		Map<String, String> schedules = Maps.newHashMap();
 		List<JobSchedule> jobs = JobSchedule.getAllJobs();
 		for (JobSchedule job : jobs) {
