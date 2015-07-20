@@ -16,12 +16,13 @@ import org.elasticsearch.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.dataapi.auth.CharbotRoleValidator;
 import co.charbox.dataapi.managers.DeviceVersionManager;
 import co.charbox.domain.model.DeviceVersionModel;
+import co.charbox.domain.model.RoleModel;
+import co.charbox.domain.model.auth.CharbotAuthModel;
 
-import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
-import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
@@ -31,7 +32,7 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 @Consumes(MediaType.APPLICATION_JSON)
 public class DeviceVersionResource extends CharbotAuthProtectedCrudResource<DeviceVersionModel, DeviceVersionManager> {
 	
-	@Autowired private RoleValidator authValidator;
+	@Autowired private CharbotRoleValidator authValidator;
 	
 	@Autowired
 	public DeviceVersionResource(DeviceVersionManager man) {
@@ -39,13 +40,13 @@ public class DeviceVersionResource extends CharbotAuthProtectedCrudResource<Devi
 	}
 	
 	@Override
-	protected IAuthValidator<IAuthModel, Integer, AuthRequestPermisionType> getValidator() {
+	protected IAuthValidator<CharbotAuthModel, Integer, AuthRequestPermisionType> getValidator() {
 		return null;
 	}
 	
 	@Override
-	protected void validate(IAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
-		Set<String> requiredRoles = Sets.newHashSet();
+	protected void validate(CharbotAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+		Set<RoleModel> requiredRoles = Sets.newHashSet();
 		switch (permType) {
 		case CREATE:
 		case COUNT:
@@ -53,16 +54,16 @@ public class DeviceVersionResource extends CharbotAuthProtectedCrudResource<Devi
 		case READ:
 		case READ_ONE:
 		case UPDATE:
-			requiredRoles = Sets.newHashSet("ADMIN");
+			requiredRoles = Sets.newHashSet(RoleModel.getAdminRole());
 		}
 		authValidator.validate(auth, assetKey, requiredRoles);
 	}
 	
 	@Path("/upgrade/{version}")
 	@GET
-	public Response upgrade(@Auth IAuthModel auth, @PathParam("version") String version) {
-		authValidator.validate(auth, null, Sets.newHashSet("ADMIN", "DEVICE"));
-		DeviceVersionModel upgradeVersion = getManager().canUpgrade(version);
+	public Response upgrade(@Auth CharbotAuthModel auth, @PathParam("version") String version) {
+		authValidator.validate(auth, null, Sets.newHashSet(RoleModel.getAdminRole(), RoleModel.getDeviceRole()));
+		DeviceVersionModel upgradeVersion = getManager().canUpgrade(getContext(auth), version);
 		return res().success(
 				upgradeVersion != null
 				? res().modelData(upgradeVersion)

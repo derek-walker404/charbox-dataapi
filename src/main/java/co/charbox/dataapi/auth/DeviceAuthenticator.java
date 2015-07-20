@@ -8,26 +8,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.managers.auth.DeviceAuthManager;
+import co.charbox.domain.model.auth.CharbotAuthModel;
 
 import com.google.common.base.Optional;
-import com.tpofof.core.security.IAuthModel;
 
 @Component
-public class DeviceAuthenticator implements Authenticator<BasicCredentials, IAuthModel> {
+public class DeviceAuthenticator implements Authenticator<BasicCredentials, CharbotAuthModel> {
 
 	@Autowired DeviceAuthManager deviceAuthManager;
 	
 	@Override
-	public Optional<IAuthModel> authenticate(BasicCredentials credentials)
+	public Optional<CharbotAuthModel> authenticate(BasicCredentials credentials)
 			throws AuthenticationException {
 		int deviceId = -1;
 		try {
 			deviceId = Integer.parseInt(credentials.getUsername());
 		} catch (NumberFormatException e) {
-			return Optional.<IAuthModel>absent();
+			return Optional.<CharbotAuthModel>absent();
 		}
-		IAuthModel iAuth = deviceAuthManager.isValid(deviceId, credentials.getPassword());
-		return iAuth != null ? Optional.of(iAuth) : Optional.<IAuthModel>absent();
+		CharbotAuthModel iAuth = deviceAuthManager.isValid(deviceId, credentials.getPassword());
+		return iAuth != null ? Optional.of(iAuth) : Optional.<CharbotAuthModel>absent();
 	}
 
 }

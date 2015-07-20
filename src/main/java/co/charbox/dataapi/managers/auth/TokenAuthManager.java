@@ -13,7 +13,7 @@ import co.charbox.domain.data.mysql.auth.TokenAuthDAO;
 import co.charbox.domain.model.auth.TokenAuthModel;
 
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.context.SimpleSearchContext;
+import com.tpofof.core.data.dao.context.PrincipalSearchContext;
 
 @Slf4j
 @Component
@@ -74,13 +74,13 @@ public class TokenAuthManager extends CharbotModelManager<TokenAuthModel, TokenA
 		return auth == null ? false : getDao().delete(auth.getId());
 	}
 	
-	public ResultsSet<TokenAuthModel> findExprired(SimpleSearchContext context) {
+	public ResultsSet<TokenAuthModel> findExprired(PrincipalSearchContext context) {
 		return getDao().findExpired(context);
 	}
 	
 	public int deleteExpired() {
 		int count = 0;
-		SimpleSearchContext defaultContext = SimpleSearchContext.builder()
+		PrincipalSearchContext defaultContext = PrincipalSearchContext.builder()
 				.window(getDefualtWindow())
 				.build();
 		ResultsSet<TokenAuthModel> expired = findExprired(defaultContext);

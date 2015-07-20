@@ -21,14 +21,15 @@ import org.springframework.stereotype.Component;
 
 import co.charbox.core.mm.LocationProvider;
 import co.charbox.core.mm.MaxMindService;
+import co.charbox.dataapi.auth.CharbotRoleValidator;
 import co.charbox.dataapi.managers.SstResultManager;
+import co.charbox.domain.model.RoleModel;
 import co.charbox.domain.model.SstResultsModel;
+import co.charbox.domain.model.auth.CharbotAuthModel;
 import co.charbox.domain.model.mm.ConnectionInfoModel;
 
-import com.tpofof.core.security.IAuthModel;
 import com.tpofof.core.utils.Config;
 import com.tpofof.dwa.auth.IAuthValidator;
-import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpCodeException;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
@@ -41,7 +42,7 @@ public class SstResultResource extends CharbotAuthProtectedCrudResource<SstResul
 
 	@Autowired private LocationProvider locationProvider;
 	@Autowired private MaxMindService mm;
-	@Autowired private RoleValidator authValidator;
+	@Autowired private CharbotRoleValidator authValidator;
 	@Autowired private Config config;
 	
 	@Autowired
@@ -50,30 +51,30 @@ public class SstResultResource extends CharbotAuthProtectedCrudResource<SstResul
 	}
 	
 	@Override
-	protected IAuthValidator<IAuthModel, Integer, AuthRequestPermisionType> getValidator() {
+	protected IAuthValidator<CharbotAuthModel, Integer, AuthRequestPermisionType> getValidator() {
 		return null;
 	}
 	
 	@Override
-	protected void validate(IAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
-		Set<String> requiredRoles = Sets.newHashSet();
+	protected void validate(CharbotAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+		Set<RoleModel> requiredRoles = Sets.newHashSet();
 		switch (permType) {
 		case CREATE:
-			requiredRoles = Sets.newHashSet("ADMIN", "SST");
+			requiredRoles = Sets.newHashSet(RoleModel.getAdminRole(), RoleModel.getServiceRole("SST"));
 			break;
 		case COUNT:
 		case DELETE:
 		case READ:
 		case READ_ONE:
 		case UPDATE:
-			requiredRoles = Sets.newHashSet("ADMIN");
+			requiredRoles = Sets.newHashSet(RoleModel.getAdminRole());
 		}
 		authValidator.validate(auth, assetKey, requiredRoles);
 	}
 	
 	@POST
 	@Override
-	public Response post(@Auth IAuthModel auth, SstResultsModel model, @Context HttpServletRequest request) throws HttpCodeException {
+	public Response post(@Auth CharbotAuthModel auth, SstResultsModel model, @Context HttpServletRequest request) throws HttpCodeException {
 		validate(auth, null, CREATE);
 		String serviceIp = model.getServerLocation().getIp();
 		if (serviceIp == null || serviceIp.isEmpty()) {

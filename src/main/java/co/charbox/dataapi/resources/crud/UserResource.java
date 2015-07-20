@@ -2,36 +2,25 @@ package co.charbox.dataapi.resources.crud;
 
 import java.util.Set;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
 import org.elasticsearch.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.auth.CharbotRoleValidator;
-import co.charbox.dataapi.managers.OutageManager;
-import co.charbox.domain.model.OutageModel;
+import co.charbox.dataapi.managers.UserManager;
 import co.charbox.domain.model.RoleModel;
+import co.charbox.domain.model.UserModel;
 import co.charbox.domain.model.auth.CharbotAuthModel;
 
 import com.tpofof.dwa.auth.IAuthValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
-@Path("/outages")
-@Component
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-public class OutageResource extends CharbotAuthProtectedCrudResource<OutageModel, OutageManager> {
+public class UserResource extends CharbotAuthProtectedCrudResource<UserModel, UserManager> {
 
 	@Autowired private CharbotRoleValidator authValidator;
 	
-	@Autowired
-	public OutageResource(OutageManager man) {
-		super(man, OutageModel.class);
+	public UserResource(UserManager man) {
+		super(man, UserModel.class);
 	}
 
 	@Override
@@ -43,11 +32,12 @@ public class OutageResource extends CharbotAuthProtectedCrudResource<OutageModel
 	protected void validate(CharbotAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
 		Set<RoleModel> requiredRoles = Sets.newHashSet();
 		switch (permType) {
+		case READ_ONE:
+			requiredRoles = Sets.newHashSet(RoleModel.getAdminRole(), RoleModel.getUserRole(assetKey));
 		case CREATE:
 		case COUNT:
 		case DELETE:
 		case READ:
-		case READ_ONE:
 		case UPDATE:
 			requiredRoles = Sets.newHashSet(RoleModel.getAdminRole());
 		}

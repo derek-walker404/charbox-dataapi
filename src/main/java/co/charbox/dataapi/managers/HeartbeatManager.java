@@ -11,7 +11,7 @@ import co.charbox.domain.model.DeviceModel;
 import co.charbox.domain.model.HeartbeatModel;
 import co.charbox.domain.model.OutageModel;
 
-import com.tpofof.core.data.dao.context.SimpleSearchContext;
+import com.tpofof.core.data.dao.context.PrincipalSearchContext;
 import com.tpofof.core.utils.Config;
 
 @Slf4j
@@ -31,21 +31,21 @@ public class HeartbeatManager extends CharbotModelManager<HeartbeatModel, Heartb
 		return config.getInt("heartbeat.limit", 10);
 	}
 	
-	public HeartbeatModel insert(SimpleSearchContext context, Integer deviceId, DateTime time, String ipAddress) {
+	public HeartbeatModel insert(PrincipalSearchContext context, Integer deviceId, DateTime time, String ipAddress) {
 		return insert(context, getManProvider().getDeviceManager().find(context, deviceId), time, ipAddress);
 	}
 	
-	public HeartbeatModel insert(SimpleSearchContext context, DeviceModel device, DateTime time, String ipAddress) {
+	public HeartbeatModel insert(PrincipalSearchContext context, DeviceModel device, DateTime time, String ipAddress) {
 		ConnectionInfoManager ciMan = manPro.getConnectionInfoManager();
 		return insert(context, HeartbeatModel.builder()
 				.device(device)
 				.time(time)
-				.connection(ciMan.findByIp(ipAddress))
+				.connection(ciMan.findByIp(context, ipAddress))
 				.build());
 	}
 
 	@Override
-	public HeartbeatModel insert(SimpleSearchContext context, HeartbeatModel hb) {
+	public HeartbeatModel insert(PrincipalSearchContext context, HeartbeatModel hb) {
 		HeartbeatModel lastHb = findByDeviceId(hb.getDevice().getId());
 		if (lastHb != null) {
 			long currTime = hb.getTime().getMillis();
@@ -69,7 +69,7 @@ public class HeartbeatManager extends CharbotModelManager<HeartbeatModel, Heartb
 		}
 	}
 	
-	public HeartbeatModel updateTime(SimpleSearchContext context, HeartbeatModel model) {
+	public HeartbeatModel updateTime(PrincipalSearchContext context, HeartbeatModel model) {
 		return getDao().updateTime(model);
 	}
 	

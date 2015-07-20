@@ -7,6 +7,8 @@ import co.charbox.domain.data.mysql.DeviceConfigurationDAO;
 import co.charbox.domain.model.DeviceConfigurationModel;
 import co.charbox.domain.model.DeviceModel;
 
+import com.tpofof.core.data.dao.context.PrincipalSearchContext;
+
 @Component
 public class DeviceConfigurationManager extends CharbotModelManager<DeviceConfigurationModel, DeviceConfigurationDAO> {
 
@@ -15,7 +17,7 @@ public class DeviceConfigurationManager extends CharbotModelManager<DeviceConfig
 		super(deviceConfigDao);
 	}
 
-	public DeviceConfigurationModel getNewConfig(DeviceModel device) {
+	public DeviceConfigurationModel getNewConfig(PrincipalSearchContext context, DeviceModel device) {
 		DeviceConfigurationModel newConfig = DeviceConfigurationModel.builder()
 				.device(device)
 				.registered(false)
@@ -35,11 +37,11 @@ public class DeviceConfigurationManager extends CharbotModelManager<DeviceConfig
 		return false;
 	}
 	
-	public DeviceConfigurationModel findByDeviceId(Integer deviceId) {
-		return getDao().findByDeviceId(deviceId);
+	public DeviceConfigurationModel findByDeviceId(PrincipalSearchContext context, Integer deviceId) {
+		return getDao().findByDeviceId(context, deviceId);
 	}
 	
-	public DeviceConfigurationModel updateRegistered(DeviceConfigurationModel model) {
+	public DeviceConfigurationModel updateRegistered(PrincipalSearchContext context, DeviceConfigurationModel model) {
 		return getDao().updateRegistered(model);
 	}
 }

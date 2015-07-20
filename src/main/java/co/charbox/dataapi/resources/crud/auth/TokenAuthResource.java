@@ -18,14 +18,15 @@ import org.elasticsearch.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.dataapi.auth.CharbotRoleValidator;
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
 import co.charbox.dataapi.resources.crud.CharbotAuthProtectedCrudResource;
+import co.charbox.domain.model.RoleModel;
+import co.charbox.domain.model.auth.CharbotAuthModel;
 import co.charbox.domain.model.auth.DeviceAuthModel;
 import co.charbox.domain.model.auth.TokenAuthModel;
 
-import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
-import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 import com.tpofof.dwa.utils.RequestUtils;
@@ -39,7 +40,7 @@ public class TokenAuthResource extends CharbotAuthProtectedCrudResource<TokenAut
 
 	@Autowired private ResponseUtils responseUtils;
 	@Autowired private RequestUtils requestUtils;
-	@Autowired private RoleValidator authValidator;
+	@Autowired private CharbotRoleValidator authValidator;
 	@Autowired private TokenAuthManager tokenAuthManager;
 	
 	@Autowired
@@ -48,13 +49,13 @@ public class TokenAuthResource extends CharbotAuthProtectedCrudResource<TokenAut
 	}
 	
 	@Override
-	protected IAuthValidator<IAuthModel, Integer, AuthRequestPermisionType> getValidator() {
+	protected IAuthValidator<CharbotAuthModel, Integer, AuthRequestPermisionType> getValidator() {
 		return null;
 	}
 	
 	@Override
-	protected void validate(IAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
-		Set<String> requiredRoles = Sets.newHashSet();
+	protected void validate(CharbotAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+		Set<RoleModel> requiredRoles = Sets.newHashSet();
 		switch (permType) {
 		case CREATE:
 		case COUNT:
@@ -62,15 +63,15 @@ public class TokenAuthResource extends CharbotAuthProtectedCrudResource<TokenAut
 		case READ:
 		case READ_ONE:
 		case UPDATE:
-			requiredRoles = Sets.newHashSet("ADMIN");
+			requiredRoles = Sets.newHashSet(RoleModel.getAdminRole());
 		}
 		authValidator.validate(auth, assetKey, requiredRoles);
 	}
 	
 	@Path("/{serviceId}/new")
 	@POST
-	public Response newToken(@Auth IAuthModel auth, @PathParam("serviceId") String serviceId) {
-		authValidator.validate(auth, null, Sets.newHashSet("DEVICE"));
+	public Response newToken(@Auth CharbotAuthModel auth, @PathParam("serviceId") String serviceId) {
+		authValidator.validate(auth, null, Sets.newHashSet(RoleModel.getDeviceRole()));
 		DeviceAuthModel deviceAuth = auth.to(DeviceAuthModel.class);
 		TokenAuthModel token = tokenAuthManager.getNewToken(serviceId, deviceAuth.getDeviceId());
 		return res().success(res().modelData(token));
@@ -78,7 +79,7 @@ public class TokenAuthResource extends CharbotAuthProtectedCrudResource<TokenAut
 	
 	@Path("/expired")
 	@DELETE
-	public Response deleteExpired(@Auth IAuthModel auth) {
+	public Response deleteExpired(@Auth CharbotAuthModel auth) {
 		validate(auth, null, DELETE);
 		int count = tokenAuthManager.deleteExpired();
 		return res().success(res().rawData("deleted", count));

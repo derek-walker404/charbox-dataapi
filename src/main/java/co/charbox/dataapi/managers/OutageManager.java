@@ -11,7 +11,7 @@ import co.charbox.domain.data.mysql.OutageDAO;
 import co.charbox.domain.model.OutageModel;
 
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.context.SimpleSearchContext;
+import com.tpofof.core.data.dao.context.PrincipalSearchContext;
 import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.utils.Config;
 
@@ -44,7 +44,7 @@ public class OutageManager extends CharbotModelManager<OutageModel, OutageDAO> {
 				.build();
 	}
 
-	public ResultsSet<OutageModel> getByDeviceId(SimpleSearchContext context, Integer deviceId) {
+	public ResultsSet<OutageModel> getByDeviceId(PrincipalSearchContext context, Integer deviceId) {
 		return getDao().findByDeviceId(context, deviceId);
 	}
 	

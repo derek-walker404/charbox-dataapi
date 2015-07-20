@@ -9,35 +9,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
+import co.charbox.domain.model.auth.CharbotAuthModel;
 
 import com.google.common.base.Optional;
-import com.tpofof.core.security.IAuthModel;
 
 @Slf4j
 @Component
-public class TokenAuthenticator implements Authenticator<BasicCredentials, IAuthModel> {
+public class TokenAuthenticator implements Authenticator<BasicCredentials, CharbotAuthModel> {
 	
 	@Autowired private TokenAuthManager tokenAuthManager;
 	
 	@Override
-	public Optional<IAuthModel> authenticate(BasicCredentials credentials)
+	public Optional<CharbotAuthModel> authenticate(BasicCredentials credentials)
 			throws AuthenticationException {
 		String[] keys = credentials.getUsername().split("@");
 		if (keys.length != 2) {
 			log.debug("invalid token credentials: " + credentials.getUsername() + ":" + credentials.getPassword());
-			return Optional.<IAuthModel>absent();
+			return Optional.<CharbotAuthModel>absent();
 		}
 		Integer deviceId = -1;
 		try {
 			deviceId = Integer.parseInt(keys[0]);
 		} catch (NumberFormatException e) {
-			return Optional.<IAuthModel>absent();
+			return Optional.<CharbotAuthModel>absent();
 		}
 		String service = keys[1];
-		IAuthModel iAuth = tokenAuthManager.isValid(service, deviceId, credentials.getPassword());
+		CharbotAuthModel iAuth = tokenAuthManager.isValid(service, deviceId, credentials.getPassword());
 		if (iAuth == null) {
 			log.debug("token not valid: " + credentials.getUsername() + ":" + credentials.getPassword());
-			return Optional.<IAuthModel>absent();
+			return Optional.<CharbotAuthModel>absent();
 		}
 		return Optional.of(iAuth);
 	}

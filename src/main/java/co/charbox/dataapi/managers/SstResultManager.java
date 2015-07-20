@@ -12,7 +12,7 @@ import co.charbox.domain.data.mysql.SstResultsDAO;
 import co.charbox.domain.model.SstResultsModel;
 
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.context.SimpleSearchContext;
+import com.tpofof.core.data.dao.context.PrincipalSearchContext;
 import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.utils.Config;
 
@@ -52,7 +52,7 @@ public class SstResultManager extends CharbotModelManager<SstResultsModel, SstRe
 	}
 	
 	@Override
-	public SstResultsModel insert(SimpleSearchContext context, SstResultsModel model) {
+	public SstResultsModel insert(PrincipalSearchContext context, SstResultsModel model) {
 		model = super.insert(context, model);
 		if (model != null) {
 			tokenManager.deleteByToken(model.getDeviceToken());
@@ -60,7 +60,7 @@ public class SstResultManager extends CharbotModelManager<SstResultsModel, SstRe
 		return model;
 	}
 
-	public ResultsSet<SstResultsModel> getByDeviceId(SimpleSearchContext context, Integer deviceId) {
+	public ResultsSet<SstResultsModel> getByDeviceId(PrincipalSearchContext context, Integer deviceId) {
 		validateSearchContext(context);
 		return getDao().findByDeviceId(context, deviceId);
 	}

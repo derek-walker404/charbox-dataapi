@@ -12,12 +12,13 @@ import javax.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.dataapi.auth.CharbotRoleValidator;
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
+import co.charbox.domain.model.RoleModel;
+import co.charbox.domain.model.auth.CharbotAuthModel;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Sets;
-import com.tpofof.core.security.IAuthModel;
-import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpCodeException;
 import com.tpofof.dwa.resources.IDwaResource;
 import com.tpofof.dwa.utils.RequestUtils;
@@ -31,38 +32,38 @@ public class AuthResource implements IDwaResource {
 
 	@Autowired private ResponseUtils responseUtils;
 	@Autowired private RequestUtils requestUtils;
-	@Autowired private RoleValidator authValidator;
+	@Autowired private CharbotRoleValidator authValidator;
 	@Autowired private TokenAuthManager tokenManager;
 	
 	@Path("/validate/device")
 	@GET
 	@Timed
-	public Response validateDevice(@Auth IAuthModel auth) throws HttpCodeException {
-		authValidator.validate(auth, null, Sets.newHashSet("DEVICE"));
+	public Response validateDevice(@Auth CharbotAuthModel auth) throws HttpCodeException {
+		authValidator.validate(auth, null, Sets.newHashSet(RoleModel.getDeviceRole()));
 		return responseUtils.success(responseUtils.rawData("valid", true));
 	}
 	
 	@Path("/validate/admin")
 	@GET
 	@Timed
-	public Response validateAdmin(@Auth IAuthModel auth) throws HttpCodeException {
-		authValidator.validate(auth, null, Sets.newHashSet("ADMIN"));
+	public Response validateAdmin(@Auth CharbotAuthModel auth) throws HttpCodeException {
+		authValidator.validate(auth, null, Sets.newHashSet(RoleModel.getAdminRole()));
 		return responseUtils.success(responseUtils.rawData("valid", true));
 	}
 	
 	@Path("/validate/server")
 	@GET
 	@Timed
-	public Response validateServer(@Auth IAuthModel auth) throws HttpCodeException {
-		authValidator.validate(auth, null, Sets.newHashSet("SERVER"));
+	public Response validateServer(@Auth CharbotAuthModel auth) throws HttpCodeException {
+		authValidator.validate(auth, null, Sets.newHashSet(RoleModel.getServiceRole()));
 		return responseUtils.success(responseUtils.rawData("valid", true));
 	}
 	
 	@Path("/validate/token")
 	@GET
 	@Timed
-	public Response validateToken(@Auth IAuthModel auth) throws HttpCodeException {
-		authValidator.validate(auth, null, Sets.newHashSet("TOKEN"));
+	public Response validateToken(@Auth CharbotAuthModel auth) throws HttpCodeException {
+		authValidator.validate(auth, null, Sets.newHashSet(RoleModel.getTokenRole()));
 		return responseUtils.success(responseUtils.rawData("valid", true));
 	}
 }

@@ -18,11 +18,11 @@ import co.charbox.dataapi.auth.ServerAuthenticator;
 import co.charbox.dataapi.auth.TokenAuthenticator;
 import co.charbox.dataapi.config.CharboxConfiguration;
 import co.charbox.dataapi.health.GuavaCacheMetrics;
+import co.charbox.domain.model.auth.CharbotAuthModel;
 
 import com.codahale.metrics.MetricSet;
 import com.tpofof.core.App;
 import com.tpofof.core.bootstrap.DefaultInitializer;
-import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.DwaApp;
 
 @Component
@@ -71,12 +71,12 @@ public class CharboxDataApiApplication extends DwaApp<CharboxConfiguration> {
 		env.metrics().registerAll(maxMindCacheMetrics);
 		
 		/* AUTH */
-		BasicAuthFactory<IAuthModel> deviceAuthFactory = new BasicAuthFactory<IAuthModel>(deviceAuthenticator, "charbot.co", IAuthModel.class);
-		BasicAuthFactory<IAuthModel> adminAuthFactory = new BasicAuthFactory<IAuthModel>(adminAuthenticator, "charbot.co", IAuthModel.class);
-		BasicAuthFactory<IAuthModel> serverAuthFactory = new BasicAuthFactory<IAuthModel>(serverAuthenticator, "charbot.co", IAuthModel.class);
-		BasicAuthFactory<IAuthModel> tokenAuthFactory = new BasicAuthFactory<IAuthModel>(tokenAuthenticator, "charbot.co", IAuthModel.class);
+		BasicAuthFactory<CharbotAuthModel> deviceAuthFactory = new BasicAuthFactory<CharbotAuthModel>(deviceAuthenticator, "charbot.co", CharbotAuthModel.class);
+		BasicAuthFactory<CharbotAuthModel> adminAuthFactory = new BasicAuthFactory<CharbotAuthModel>(adminAuthenticator, "charbot.co", CharbotAuthModel.class);
+		BasicAuthFactory<CharbotAuthModel> serverAuthFactory = new BasicAuthFactory<CharbotAuthModel>(serverAuthenticator, "charbot.co", CharbotAuthModel.class);
+		BasicAuthFactory<CharbotAuthModel> tokenAuthFactory = new BasicAuthFactory<CharbotAuthModel>(tokenAuthenticator, "charbot.co", CharbotAuthModel.class);
 		@SuppressWarnings("unchecked")
-		ChainedAuthFactory<IAuthModel> authChainFactory = new ChainedAuthFactory<IAuthModel>(deviceAuthFactory, adminAuthFactory,
+		ChainedAuthFactory<CharbotAuthModel> authChainFactory = new ChainedAuthFactory<CharbotAuthModel>(deviceAuthFactory, adminAuthFactory,
 				serverAuthFactory, tokenAuthFactory);
 		env.jersey().register(AuthFactory.binder(authChainFactory));
 	}

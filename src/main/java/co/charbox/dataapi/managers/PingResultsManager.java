@@ -11,7 +11,7 @@ import co.charbox.domain.data.mysql.PingResultsDAO;
 import co.charbox.domain.model.PingResultModel;
 
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.context.SimpleSearchContext;
+import com.tpofof.core.data.dao.context.PrincipalSearchContext;
 import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.utils.Config;
 
@@ -49,7 +49,7 @@ public class PingResultsManager extends CharbotModelManager<PingResultModel, Pin
 		return Sets.newHashSet("startTime", "packetLoss", "avgLatency");
 	}
 
-	public ResultsSet<PingResultModel> getByDeviceId(SimpleSearchContext context, Integer deviceId) {
+	public ResultsSet<PingResultModel> getByDeviceId(PrincipalSearchContext context, Integer deviceId) {
 		validateSearchContext(context);
 		return getDao().findByDeviceId(context, deviceId);
 	}

@@ -2,6 +2,7 @@ package co.charbox.dataapi.auth;
 
 import org.springframework.stereotype.Component;
 
+import co.charbox.domain.model.RoleModel;
 import co.charbox.domain.model.auth.DeviceAuthModel;
 
 import com.tpofof.core.security.IAuthModel;
@@ -10,9 +11,9 @@ import com.tpofof.dwa.error.HttpUnauthorizedException;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
 @Component
-public class DeviceViewAuthValidator implements IAuthValidator<IAuthModel, String, AuthRequestPermisionType> {
+public class DeviceViewAuthValidator implements IAuthValidator<IAuthModel<RoleModel>, String, AuthRequestPermisionType> {
 
-	public void validate(IAuthModel authModel, String assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+	public void validate(IAuthModel<RoleModel> authModel, String assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
 		if (!authModel.isActivated()) {
 			throw new HttpUnauthorizedException("Credentials are not activated");
 		}

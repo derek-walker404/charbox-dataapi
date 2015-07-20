@@ -11,12 +11,13 @@ import org.elasticsearch.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.dataapi.auth.CharbotRoleValidator;
 import co.charbox.dataapi.managers.DeviceConfigurationManager;
 import co.charbox.domain.model.DeviceConfigurationModel;
+import co.charbox.domain.model.RoleModel;
+import co.charbox.domain.model.auth.CharbotAuthModel;
 
-import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
-import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 
@@ -26,22 +27,21 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 @Consumes(MediaType.APPLICATION_JSON)
 public class DeviceConfigResource extends CharbotAuthProtectedCrudResource<DeviceConfigurationModel, DeviceConfigurationManager> {
 	
-	private final RoleValidator authValidator;
+	private CharbotRoleValidator authValidator;
 	
 	@Autowired
-	public DeviceConfigResource(DeviceConfigurationManager man, RoleValidator authValidator) {
+	public DeviceConfigResource(DeviceConfigurationManager man) {
 		super(man, DeviceConfigurationModel.class);
-		this.authValidator = authValidator;
 	}
 	
 	@Override
-	protected IAuthValidator<IAuthModel, Integer, AuthRequestPermisionType> getValidator() {
+	protected IAuthValidator<CharbotAuthModel, Integer, AuthRequestPermisionType> getValidator() {
 		return null;
 	}
 	
 	@Override
-	protected void validate(IAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
-		Set<String> requiredRoles = Sets.newHashSet();
+	protected void validate(CharbotAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+		Set<RoleModel> requiredRoles = Sets.newHashSet();
 		switch (permType) {
 		case CREATE:
 		case COUNT:
@@ -49,7 +49,7 @@ public class DeviceConfigResource extends CharbotAuthProtectedCrudResource<Devic
 		case READ:
 		case READ_ONE:
 		case UPDATE:
-			requiredRoles = Sets.newHashSet("ADMIN");
+			requiredRoles = Sets.newHashSet(RoleModel.getAdminRole());
 		}
 		authValidator.validate(auth, assetKey, requiredRoles);
 	}
