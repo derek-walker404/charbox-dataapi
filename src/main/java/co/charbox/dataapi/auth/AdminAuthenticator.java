@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.domain.model.auth.AdminAuthModel;
+import co.charbox.domain.model.auth.CharbotAuthModel;
 
 import com.google.common.base.Optional;
-import com.tpofof.core.security.IAuthModel;
 import com.tpofof.core.utils.Config;
 
 @Component
-public class AdminAuthenticator implements Authenticator<BasicCredentials, IAuthModel> {
+public class AdminAuthenticator implements Authenticator<BasicCredentials, CharbotAuthModel> {
 
 	private final String username;
 	private final String password;
@@ -26,9 +26,9 @@ public class AdminAuthenticator implements Authenticator<BasicCredentials, IAuth
 	}
 	
 	@Override
-	public Optional<IAuthModel> authenticate(BasicCredentials credentials) throws AuthenticationException {
+	public Optional<CharbotAuthModel> authenticate(BasicCredentials credentials) throws AuthenticationException {
 		boolean validAuth = this.username.equals(credentials.getUsername()) && this.password.equals(credentials.getPassword());
-		IAuthModel iAuth = new AdminAuthModel();
-		return validAuth ? Optional.of(iAuth) : Optional.<IAuthModel>absent();
+		CharbotAuthModel iAuth = new AdminAuthModel();
+		return validAuth ? Optional.of(iAuth) : Optional.<CharbotAuthModel>absent();
 	}
 }

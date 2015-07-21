@@ -1,14 +1,21 @@
 package co.charbox.dataapi.managers;
 
+import java.util.Set;
+
+import jersey.repackaged.com.google.common.collect.Sets;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.tpofof.core.data.IPersistentModel;
-import com.tpofof.core.data.dao.context.SimpleSearchContext;
-import com.tpofof.core.data.dao.jdbc.AbstractSimpleJooqDAO;
-import com.tpofof.core.managers.AbstractJdbcModelManager;
+import co.charbox.domain.data.CharbotSearchContext;
+import co.charbox.domain.data.mysql.CharbotJooqDao;
+import co.charbox.domain.model.RoleModel;
 
-public abstract class CharbotModelManager<ModelT extends IPersistentModel<ModelT, Integer>, ModelDaoT extends AbstractSimpleJooqDAO<ModelT, Integer, SimpleSearchContext>> 
-		extends AbstractJdbcModelManager<ModelT, ModelDaoT, Integer, SimpleSearchContext, SimpleSearchContext, SimpleSearchContext> {
+import com.tpofof.core.data.IPersistentModel;
+import com.tpofof.core.managers.AbstractJdbcModelManager;
+import com.tpofof.dwa.error.HttpUnauthorizedException;
+
+public abstract class CharbotModelManager<ModelT extends IPersistentModel<ModelT, Integer>, ModelDaoT extends CharbotJooqDao<ModelT>> 
+		extends AbstractJdbcModelManager<ModelT, ModelDaoT, Integer, CharbotSearchContext, CharbotSearchContext, CharbotSearchContext> {
 
 	@Autowired private CharbotModelManagerProvider manProvider;
 	
@@ -26,28 +33,50 @@ public abstract class CharbotModelManager<ModelT extends IPersistentModel<ModelT
 	}
 	
 	@Override
-	protected void checkCanView(SimpleSearchContext authContext, ModelT model) {
-		// TODO Auto-generated method stub
-		
+	protected void checkCanView(CharbotSearchContext authContext, ModelT model) {
+		check(authContext, Sets.newHashSet(RoleModel.getAdminRole()), "Principal does not have permissions to view asset.");
+	}
+	
+	@Override
+	protected void checkCanViewCollection(CharbotSearchContext authContext) {
+		check(authContext, Sets.newHashSet(RoleModel.getAdminRole()), "Principal does not have permissions to view asset.");
 	}
 
 	@Override
-	protected void checkCanInsert(SimpleSearchContext authContext, ModelT model) {
-		// TODO Auto-generated method stub
+	protected void checkCanInsert(CharbotSearchContext authContext, ModelT model) {
+		check(authContext, Sets.newHashSet(RoleModel.getAdminRole()), "Principal does not have permissions to insert asset.");
 	}
 
 	@Override
-	protected void checkCanUpdate(SimpleSearchContext authContext, ModelT model) {
-		// TODO Auto-generated method stub
+	protected void checkCanUpdate(CharbotSearchContext authContext, ModelT model) {
+		check(authContext, Sets.newHashSet(RoleModel.getAdminRole()), "Principal does not have permissions to update asset.");
 	}
 
 	@Override
-	protected void checkCanDelete(SimpleSearchContext authContext, ModelT model) {
-		// TODO Auto-generated method stub
+	protected void checkCanDelete(CharbotSearchContext authContext, ModelT model) {
+		check(authContext, Sets.newHashSet(RoleModel.getAdminRole()), "Principal does not have permissions to delete asset.");
+	}
+	
+	protected void check(CharbotSearchContext authContext, Set<RoleModel> expectedRoles) {
+		check(authContext, expectedRoles, "Principal does not have permissions to perform action.");
+	}
+	
+	protected void check(CharbotSearchContext authContext, Set<RoleModel> expectedRoles, String errorMessage) {
+		if (authContext == null || authContext.getPrincipal() == null) {
+			throw new HttpUnauthorizedException("Not authorized.");
+		} else {
+			Set<RoleModel> principalRoles = authContext.getPrincipal().getRoles();
+			for (RoleModel expected : expectedRoles) {
+				if (principalRoles.contains(expected)) {
+					return;
+				}
+			}
+			throw new HttpUnauthorizedException(errorMessage);
+		}
 	}
 
 	@Override
-	protected SimpleSearchContext convert(SimpleSearchContext context) {
+	protected CharbotSearchContext convert(CharbotSearchContext context) {
 		return context;
 	}
 }

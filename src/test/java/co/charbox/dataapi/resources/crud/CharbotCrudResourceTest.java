@@ -15,22 +15,22 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import co.charbox.domain.data.CharbotSearchContext;
 import co.charbox.domain.model.auth.AdminAuthModel;
+import co.charbox.domain.model.auth.CharbotAuthModel;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.tpofof.core.App;
 import com.tpofof.core.data.IPersistentModel;
-import com.tpofof.core.data.dao.context.SimpleSearchContext;
 import com.tpofof.core.data.dao.jdbc.JooqConnectionProvider;
 import com.tpofof.core.data.dao.test.IModelProvider;
 import com.tpofof.core.managers.IModelManager;
-import com.tpofof.core.security.IAuthModel;
 import com.tpofof.core.utils.Config;
 import com.tpofof.core.utils.json.JsonUtils;
 
-public abstract class CharbotCrudResourceTest<ModelT extends IPersistentModel<ModelT, Integer>, ModelManagerT extends IModelManager<ModelT,Integer,SimpleSearchContext,SimpleSearchContext>, ResourceT extends CharbotAuthProtectedCrudResource<ModelT, ModelManagerT>, ProviderT extends IModelProvider<ModelT, Integer>> {
+public abstract class CharbotCrudResourceTest<ModelT extends IPersistentModel<ModelT, Integer>, ModelManagerT extends IModelManager<ModelT,Integer,CharbotSearchContext,CharbotSearchContext>, ResourceT extends CharbotAuthProtectedCrudResource<ModelT, ModelManagerT>, ProviderT extends IModelProvider<ModelT, Integer>> {
 
 	private static JsonUtils json;
 	private static JooqConnectionProvider connPro;
@@ -71,7 +71,7 @@ public abstract class CharbotCrudResourceTest<ModelT extends IPersistentModel<Mo
 	
 	protected abstract Class<ModelT> getModelClass();
 	
-	protected IAuthModel getAuthModel() {
+	protected CharbotAuthModel getAuthModel() {
 		return new AdminAuthModel();
 	}
 	
@@ -149,18 +149,18 @@ public abstract class CharbotCrudResourceTest<ModelT extends IPersistentModel<Mo
 	public void testFindModels() {
 		Integer limit = null;
 		Integer offset = null;
-		JsonNode response = getResource().findModels(getAuthModel(), getLimit(limit), getOffset(offset), getSort(null), getRequest());
+		JsonNode response = (JsonNode) getResource().findModels(getAuthModel(), getLimit(limit), getOffset(offset), getSort(null), getRequest()).getEntity();
 		validateCollectionResponse(response, getDefaultLimit(), 0);
 		
 		limit = 10;
 		offset = 0;
-		response = getResource().findModels(getAuthModel(), getLimit(limit), getOffset(offset), getSort(null), getRequest());
+		response = (JsonNode) getResource().findModels(getAuthModel(), getLimit(limit), getOffset(offset), getSort(null), getRequest()).getEntity();
 		validateCollectionResponse(response, limit, offset);
 		assertNotNull(getMan().insert(null, getPro().getModel(null)));
 		
 		limit = 1;
 		offset = 0;
-		response = getResource().findModels(getAuthModel(), getLimit(limit), getOffset(offset), getSort(null), getRequest());
+		response = (JsonNode) getResource().findModels(getAuthModel(), getLimit(limit), getOffset(offset), getSort(null), getRequest()).getEntity();
 		List<ModelT> modelList = validateCollectionResponse(response, limit, offset);
 		assertNotNull(modelList);
 		assertTrue(!modelList.isEmpty());
@@ -168,17 +168,17 @@ public abstract class CharbotCrudResourceTest<ModelT extends IPersistentModel<Mo
 		
 		limit = 1;
 		offset = 1;
-		response = getResource().findModels(getAuthModel(), getLimit(limit), getOffset(offset), getSort(null), getRequest());
+		response = (JsonNode) getResource().findModels(getAuthModel(), getLimit(limit), getOffset(offset), getSort(null), getRequest()).getEntity();
 		validateCollectionResponse(response, limit, offset);
 	}
 
 	@Test
 	public void testCount() {
-		JsonNode response = getResource().count(getAuthModel(), getRequest());
+		JsonNode response = (JsonNode) getResource().count(getAuthModel(), getRequest()).getEntity();
 		validateCountResponse(response);
 		int initialCount = response.get("data").get("data").asInt();
 		assertNotNull(getMan().insert(null, getPro().getModel(null)));
-		response = getResource().count(getAuthModel(), getRequest());
+		response = (JsonNode) getResource().count(getAuthModel(), getRequest()).getEntity();
 		validateCountResponse(response);
 		int actualCount = response.get("data").get("data").asInt();
 		assertEquals(initialCount + 1, actualCount);
@@ -188,7 +188,7 @@ public abstract class CharbotCrudResourceTest<ModelT extends IPersistentModel<Mo
 	public void testFindModel() {
 		ModelT expected = getMan().insert(null, getPro().getModel(null));
 		assertNotNull(expected);
-		JsonNode response = getResource().findModel(getAuthModel(), expected.getId(), getRequest());
+		JsonNode response = (JsonNode) getResource().findModel(getAuthModel(), expected.getId(), getRequest()).getEntity();
 		ModelT actual = validateModelResponse(response);
 		assertNotNull(actual);
 		assertEquals(expected, actual);
@@ -197,7 +197,7 @@ public abstract class CharbotCrudResourceTest<ModelT extends IPersistentModel<Mo
 	@Test
 	public void testPost() {
 		ModelT expected = getPro().getModel(null);
-		JsonNode response = getResource().post(getAuthModel(), expected, getRequest());
+		JsonNode response = (JsonNode) getResource().post(getAuthModel(), expected, getRequest()).getEntity();
 		ModelT actual = validateModelResponse(response);
 		expected.setId(actual.getId());
 	}
@@ -208,7 +208,7 @@ public abstract class CharbotCrudResourceTest<ModelT extends IPersistentModel<Mo
 		for (int i=0;i<10;i++) {
 			models.add(getPro().getModel(null));
 		}
-		JsonNode response = getResource().postBulk(getAuthModel(), models, getRequest());
+		JsonNode response = (JsonNode) getResource().postBulk(getAuthModel(), models, getRequest()).getEntity();
 		List<ModelT> insertedModels = validateCollectionResponse(response, models.size(), 0);
 		for (int i=0;i<10;i++) {
 			ModelT expected = models.get(i);
@@ -249,7 +249,7 @@ public abstract class CharbotCrudResourceTest<ModelT extends IPersistentModel<Mo
 			assertNotNull(inserted);
 			ids.add(inserted.getId());
 		}
-		JsonNode response = getResource().deleteBulk(getAuthModel(), ids, getRequest());
+		JsonNode response = (JsonNode) getResource().deleteBulk(getAuthModel(), ids, getRequest()).getEntity();
 		validateBaseResponse(response);
 		for (int i=0;i<10;i++) {
 			assertNull(getMan().find(null, ids.get(i)));

@@ -12,12 +12,13 @@ import javax.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.dataapi.auth.CharbotRoleValidator;
 import co.charbox.dataapi.managers.auth.DeviceAuthManager;
+import co.charbox.domain.model.RoleModel;
+import co.charbox.domain.model.auth.CharbotAuthModel;
 import co.charbox.domain.model.auth.DeviceAuthModel;
 
 import com.google.common.collect.Sets;
-import com.tpofof.core.security.IAuthModel;
-import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.resources.IDwaResource;
 import com.tpofof.dwa.utils.ResponseUtils;
 
@@ -28,12 +29,12 @@ import com.tpofof.dwa.utils.ResponseUtils;
 public class InstallResource implements IDwaResource {
 
 	@Autowired private ResponseUtils responseUtils;
-	@Autowired private RoleValidator authValidator;
+	@Autowired private CharbotRoleValidator authValidator;
 	@Autowired private DeviceAuthManager deviceAuthManager;
 	
 	@POST
-	public Response newInstall(@Auth IAuthModel auth) {
-		authValidator.validate(auth, null, Sets.newHashSet("ADMIN", "INSTALL"));
+	public Response newInstall(@Auth CharbotAuthModel auth) {
+		authValidator.validate(auth, null, Sets.newHashSet(RoleModel.getAdminRole(), RoleModel.getServiceRole("INSTALL")));
 		DeviceAuthModel newAuth = deviceAuthManager.newInstall();
 		return responseUtils.success(responseUtils.modelData(newAuth));
 	}

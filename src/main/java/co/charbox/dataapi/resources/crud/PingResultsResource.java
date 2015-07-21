@@ -20,14 +20,15 @@ import org.springframework.stereotype.Component;
 
 import co.charbox.core.mm.LocationProvider;
 import co.charbox.core.mm.MaxMindService;
+import co.charbox.dataapi.auth.CharbotRoleValidator;
 import co.charbox.dataapi.managers.PingResultsManager;
 import co.charbox.domain.model.PingResultModel;
+import co.charbox.domain.model.RoleModel;
+import co.charbox.domain.model.auth.CharbotAuthModel;
 import co.charbox.domain.model.mm.ConnectionInfoModel;
 
-import com.tpofof.core.security.IAuthModel;
 import com.tpofof.core.utils.Config;
 import com.tpofof.dwa.auth.IAuthValidator;
-import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpCodeException;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
@@ -38,7 +39,7 @@ import com.tpofof.dwa.resources.AuthRequestPermisionType;
 @Consumes(MediaType.APPLICATION_JSON)
 public class PingResultsResource extends CharbotAuthProtectedCrudResource<PingResultModel, PingResultsManager> {
 
-	@Autowired private RoleValidator authValidator;
+	@Autowired private CharbotRoleValidator authValidator;
 	@Autowired private LocationProvider locationProvider;
 	@Autowired private MaxMindService mm;
 	@Autowired private Config config;
@@ -49,30 +50,30 @@ public class PingResultsResource extends CharbotAuthProtectedCrudResource<PingRe
 	}
 
 	@Override
-	protected IAuthValidator<IAuthModel, Integer, AuthRequestPermisionType> getValidator() {
+	protected IAuthValidator<CharbotAuthModel, Integer, AuthRequestPermisionType> getValidator() {
 		return null;
 	}
 	
 	@Override
-	protected void validate(IAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
-		Set<String> requiredRoles = Sets.newHashSet();
+	protected void validate(CharbotAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+		Set<RoleModel> requiredRoles = Sets.newHashSet();
 		switch (permType) {
 		case CREATE:
-			requiredRoles = Sets.newHashSet("ADMIN", "DEVICE");
+			requiredRoles = Sets.newHashSet(RoleModel.getAdminRole(), RoleModel.getDeviceRole());
 			break;
 		case COUNT:
 		case DELETE:
 		case READ:
 		case READ_ONE:
 		case UPDATE:
-			requiredRoles = Sets.newHashSet("ADMIN");
+			requiredRoles = Sets.newHashSet(RoleModel.getAdminRole());
 		}
 		authValidator.validate(auth, assetKey, requiredRoles);
 	}
 	
 	@Override
 	@POST
-	public Response post(@Auth IAuthModel authModel, PingResultModel model, 
+	public Response post(@Auth CharbotAuthModel authModel, PingResultModel model, 
 			@Context HttpServletRequest request) throws HttpCodeException {
 		String serviceIp = model.getServerLocation() != null ? model.getServerLocation().getIp() : null;
 		if (serviceIp == null || serviceIp.isEmpty()) {

@@ -11,13 +11,14 @@ import org.elasticsearch.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.dataapi.auth.CharbotRoleValidator;
 import co.charbox.dataapi.managers.auth.ServerAuthManager;
 import co.charbox.dataapi.resources.crud.CharbotAuthProtectedCrudResource;
+import co.charbox.domain.model.RoleModel;
+import co.charbox.domain.model.auth.CharbotAuthModel;
 import co.charbox.domain.model.auth.ServerAuthModel;
 
-import com.tpofof.core.security.IAuthModel;
 import com.tpofof.dwa.auth.IAuthValidator;
-import com.tpofof.dwa.auth.RoleValidator;
 import com.tpofof.dwa.error.HttpUnauthorizedException;
 import com.tpofof.dwa.resources.AuthRequestPermisionType;
 import com.tpofof.dwa.utils.RequestUtils;
@@ -31,7 +32,7 @@ public class ServiceAuthResource extends CharbotAuthProtectedCrudResource<Server
 
 	@Autowired private ResponseUtils responseUtils;
 	@Autowired private RequestUtils requestUtils;
-	@Autowired private RoleValidator authValidator;
+	@Autowired private CharbotRoleValidator authValidator;
 	
 	@Autowired
 	public ServiceAuthResource(ServerAuthManager man) {
@@ -39,13 +40,13 @@ public class ServiceAuthResource extends CharbotAuthProtectedCrudResource<Server
 	}
 	
 	@Override
-	protected IAuthValidator<IAuthModel, Integer, AuthRequestPermisionType> getValidator() {
+	protected IAuthValidator<CharbotAuthModel, Integer, AuthRequestPermisionType> getValidator() {
 		return null;
 	}
 	
 	@Override
-	protected void validate(IAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
-		Set<String> requiredRoles = Sets.newHashSet();
+	protected void validate(CharbotAuthModel auth, Integer assetKey, AuthRequestPermisionType permType) throws HttpUnauthorizedException {
+		Set<RoleModel> requiredRoles = Sets.newHashSet();
 		switch (permType) {
 		case CREATE:
 		case COUNT:
@@ -53,7 +54,7 @@ public class ServiceAuthResource extends CharbotAuthProtectedCrudResource<Server
 		case READ:
 		case READ_ONE:
 		case UPDATE:
-			requiredRoles = Sets.newHashSet("ADMIN");
+			requiredRoles = Sets.newHashSet(RoleModel.getAdminRole());
 		}
 		authValidator.validate(auth, assetKey, requiredRoles);
 	}

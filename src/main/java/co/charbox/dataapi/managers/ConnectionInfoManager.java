@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.core.mm.MaxMindService;
+import co.charbox.domain.data.CharbotSearchContext;
 import co.charbox.domain.data.mysql.ConnectionInfoDAO;
 import co.charbox.domain.model.mm.ConnectionInfoModel;
 
@@ -32,20 +33,20 @@ public class ConnectionInfoManager extends CharbotModelManager<ConnectionInfoMod
 		return false;
 	}
 	
-	public ConnectionInfoModel find(ConnectionInfoModel model) {
+	public ConnectionInfoModel find(CharbotSearchContext context, ConnectionInfoModel model) {
 		return model.getId() != null
 				? model
-				: getDao().find(model.getConnection().getIp(), 
+				: getDao().find(context, model.getConnection().getIp(), 
 						model.getLocation().getLat(), 
 						model.getLocation().getLon());
 	}
 
-	public ConnectionInfoModel findByIp(String ipAddress) {
+	public ConnectionInfoModel findByIp(CharbotSearchContext context, String ipAddress) {
 		ConnectionInfoModel conn = mm.get(ipAddress);
 		if (conn == null) {
 			return null;
 		}
-		ConnectionInfoModel existing = find(conn);
+		ConnectionInfoModel existing = find(context, conn);
 		return existing != null ? existing : conn;
 	}
 }

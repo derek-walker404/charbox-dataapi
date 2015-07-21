@@ -1,5 +1,6 @@
 package co.charbox.dataapi.managers;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jersey.repackaged.com.google.common.collect.Sets;
@@ -7,11 +8,12 @@ import jersey.repackaged.com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.domain.data.CharbotSearchContext;
 import co.charbox.domain.data.mysql.OutageDAO;
 import co.charbox.domain.model.OutageModel;
+import co.charbox.domain.model.RoleModel;
 
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.context.SimpleSearchContext;
 import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.utils.Config;
 
@@ -44,12 +46,18 @@ public class OutageManager extends CharbotModelManager<OutageModel, OutageDAO> {
 				.build();
 	}
 
-	public ResultsSet<OutageModel> getByDeviceId(SimpleSearchContext context, Integer deviceId) {
+	public ResultsSet<OutageModel> getByDeviceId(CharbotSearchContext context, Integer deviceId) {
 		return getDao().findByDeviceId(context, deviceId);
 	}
 	
 	@Override
 	protected Set<String> getDefaultValidSorts() {
 		return Sets.newHashSet("startTime", "duration");
+	}
+	
+	@Override
+	protected void checkCanInsert(CharbotSearchContext context, OutageModel model) {
+		HashSet<RoleModel> expectedRoles = Sets.newHashSet(RoleModel.getAdminRole(), RoleModel.getDeviceRole(model.getDevice().getId()));
+		check(context, expectedRoles);
 	}
 }
