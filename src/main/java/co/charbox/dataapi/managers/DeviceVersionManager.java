@@ -46,6 +46,7 @@ public class DeviceVersionManager extends CharbotModelManager<DeviceVersionModel
 	}
 
 	public DeviceVersionModel canUpgrade(CharbotSearchContext context, String version) {
+		validateSearchContext(context);
 		context.getWindow().setLimit(1);
 		DeviceVersionModel latestVersion = getDao().find(context)
 				.getResults()
