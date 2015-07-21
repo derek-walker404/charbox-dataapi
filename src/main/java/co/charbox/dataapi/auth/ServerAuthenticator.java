@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.managers.auth.ServerAuthManager;
+import co.charbox.domain.data.CharbotSearchContext;
 import co.charbox.domain.model.auth.CharbotAuthModel;
+import co.charbox.domain.model.auth.ServerAuthModel;
 
 import com.google.common.base.Optional;
 
@@ -26,7 +28,15 @@ public class ServerAuthenticator implements Authenticator<BasicCredentials, Char
 		}
 		String serviceId = names[0];
 		String service = names[1];
-		CharbotAuthModel iAuth = serverAuthManager.isValid(serviceId, credentials.getPassword(), service);
+		ServerAuthModel serverAuth = ServerAuthModel.builder()
+				.serverId(serviceId)
+				.key(credentials.getPassword())
+				.serviceName(service)
+				.build();
+		CharbotAuthModel iAuth = null;
+		if (serverAuthManager.isValid(CharbotSearchContext.getSystemContext(), serverAuth)) {
+			iAuth = serverAuthManager.find(serverAuth);
+		}
 		return iAuth != null ? Optional.of(iAuth) : Optional.<CharbotAuthModel>absent();
 	}
 }

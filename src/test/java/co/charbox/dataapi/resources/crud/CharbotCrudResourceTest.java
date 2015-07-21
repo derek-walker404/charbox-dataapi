@@ -15,6 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import co.charbox.domain.data.CharbotSearchContext;
 import co.charbox.domain.model.auth.AdminAuthModel;
 import co.charbox.domain.model.auth.CharbotAuthModel;
 
@@ -23,14 +24,13 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.tpofof.core.App;
 import com.tpofof.core.data.IPersistentModel;
-import com.tpofof.core.data.dao.context.PrincipalSearchContext;
 import com.tpofof.core.data.dao.jdbc.JooqConnectionProvider;
 import com.tpofof.core.data.dao.test.IModelProvider;
 import com.tpofof.core.managers.IModelManager;
 import com.tpofof.core.utils.Config;
 import com.tpofof.core.utils.json.JsonUtils;
 
-public abstract class CharbotCrudResourceTest<ModelT extends IPersistentModel<ModelT, Integer>, ModelManagerT extends IModelManager<ModelT,Integer,PrincipalSearchContext,PrincipalSearchContext>, ResourceT extends CharbotAuthProtectedCrudResource<ModelT, ModelManagerT>, ProviderT extends IModelProvider<ModelT, Integer>> {
+public abstract class CharbotCrudResourceTest<ModelT extends IPersistentModel<ModelT, Integer>, ModelManagerT extends IModelManager<ModelT,Integer,CharbotSearchContext,CharbotSearchContext>, ResourceT extends CharbotAuthProtectedCrudResource<ModelT, ModelManagerT>, ProviderT extends IModelProvider<ModelT, Integer>> {
 
 	private static JsonUtils json;
 	private static JooqConnectionProvider connPro;

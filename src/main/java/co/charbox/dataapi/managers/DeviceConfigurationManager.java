@@ -3,11 +3,10 @@ package co.charbox.dataapi.managers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.domain.data.CharbotSearchContext;
 import co.charbox.domain.data.mysql.DeviceConfigurationDAO;
 import co.charbox.domain.model.DeviceConfigurationModel;
 import co.charbox.domain.model.DeviceModel;
-
-import com.tpofof.core.data.dao.context.PrincipalSearchContext;
 
 @Component
 public class DeviceConfigurationManager extends CharbotModelManager<DeviceConfigurationModel, DeviceConfigurationDAO> {
@@ -17,7 +16,7 @@ public class DeviceConfigurationManager extends CharbotModelManager<DeviceConfig
 		super(deviceConfigDao);
 	}
 
-	public DeviceConfigurationModel getNewConfig(PrincipalSearchContext context, DeviceModel device) {
+	public DeviceConfigurationModel getNewConfig(CharbotSearchContext context, DeviceModel device) {
 		DeviceConfigurationModel newConfig = DeviceConfigurationModel.builder()
 				.device(device)
 				.registered(false)
@@ -37,11 +36,11 @@ public class DeviceConfigurationManager extends CharbotModelManager<DeviceConfig
 		return false;
 	}
 	
-	public DeviceConfigurationModel findByDeviceId(PrincipalSearchContext context, Integer deviceId) {
+	public DeviceConfigurationModel findByDeviceId(CharbotSearchContext context, Integer deviceId) {
 		return getDao().findByDeviceId(context, deviceId);
 	}
 	
-	public DeviceConfigurationModel updateRegistered(PrincipalSearchContext context, DeviceConfigurationModel model) {
+	public DeviceConfigurationModel updateRegistered(CharbotSearchContext context, DeviceConfigurationModel model) {
 		return getDao().updateRegistered(model);
 	}
 }

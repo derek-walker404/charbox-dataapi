@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.managers.auth.DeviceAuthManager;
+import co.charbox.domain.data.CharbotSearchContext;
 import co.charbox.domain.model.auth.CharbotAuthModel;
+import co.charbox.domain.model.auth.DeviceAuthModel;
 
 import com.google.common.base.Optional;
 
@@ -26,7 +28,14 @@ public class DeviceAuthenticator implements Authenticator<BasicCredentials, Char
 		} catch (NumberFormatException e) {
 			return Optional.<CharbotAuthModel>absent();
 		}
-		CharbotAuthModel iAuth = deviceAuthManager.isValid(deviceId, credentials.getPassword());
+		DeviceAuthModel deviceAuth = DeviceAuthModel.builder()
+				.deviceId(deviceId)
+				.key(credentials.getPassword())
+				.build();
+		CharbotAuthModel iAuth = null;
+		if (deviceAuthManager.isValid(CharbotSearchContext.getSystemContext(), deviceAuth)) {
+			iAuth = deviceAuthManager.find(deviceAuth);
+		}
 		return iAuth != null ? Optional.of(iAuth) : Optional.<CharbotAuthModel>absent();
 	}
 

@@ -1,17 +1,21 @@
 package co.charbox.dataapi.managers;
 
+import java.util.HashSet;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.domain.data.CharbotSearchContext;
 import co.charbox.domain.data.mysql.HeartbeatDAO;
 import co.charbox.domain.model.DeviceModel;
 import co.charbox.domain.model.HeartbeatModel;
 import co.charbox.domain.model.OutageModel;
+import co.charbox.domain.model.RoleModel;
 
-import com.tpofof.core.data.dao.context.PrincipalSearchContext;
+import com.google.common.collect.Sets;
 import com.tpofof.core.utils.Config;
 
 @Slf4j
@@ -31,11 +35,11 @@ public class HeartbeatManager extends CharbotModelManager<HeartbeatModel, Heartb
 		return config.getInt("heartbeat.limit", 10);
 	}
 	
-	public HeartbeatModel insert(PrincipalSearchContext context, Integer deviceId, DateTime time, String ipAddress) {
+	public HeartbeatModel insert(CharbotSearchContext context, Integer deviceId, DateTime time, String ipAddress) {
 		return insert(context, getManProvider().getDeviceManager().find(context, deviceId), time, ipAddress);
 	}
 	
-	public HeartbeatModel insert(PrincipalSearchContext context, DeviceModel device, DateTime time, String ipAddress) {
+	public HeartbeatModel insert(CharbotSearchContext context, DeviceModel device, DateTime time, String ipAddress) {
 		ConnectionInfoManager ciMan = manPro.getConnectionInfoManager();
 		return insert(context, HeartbeatModel.builder()
 				.device(device)
@@ -45,8 +49,9 @@ public class HeartbeatManager extends CharbotModelManager<HeartbeatModel, Heartb
 	}
 
 	@Override
-	public HeartbeatModel insert(PrincipalSearchContext context, HeartbeatModel hb) {
-		HeartbeatModel lastHb = findByDeviceId(hb.getDevice().getId());
+	public HeartbeatModel insert(CharbotSearchContext context, HeartbeatModel hb) {
+		checkCanUpdate(context, hb);
+		HeartbeatModel lastHb = findByDeviceId(context, hb.getDevice().getId());
 		if (lastHb != null) {
 			long currTime = hb.getTime().getMillis();
 			long lastTime = lastHb.getTime().getMillis();
@@ -69,16 +74,27 @@ public class HeartbeatManager extends CharbotModelManager<HeartbeatModel, Heartb
 		}
 	}
 	
-	public HeartbeatModel updateTime(PrincipalSearchContext context, HeartbeatModel model) {
+	public HeartbeatModel updateTime(CharbotSearchContext context, HeartbeatModel model) {
 		return getDao().updateTime(model);
 	}
 	
-	public HeartbeatModel findByDeviceId(Integer deviceId) {
+	public HeartbeatModel findByDeviceId(CharbotSearchContext context, Integer deviceId) {
 		return getDao().findByDeviceId(deviceId);
 	}
 
 	@Override
 	protected boolean hasDefaultSort() {
 		return false;
+	}
+	
+	@Override
+	protected void checkCanUpdate(CharbotSearchContext context, HeartbeatModel model) {
+		checkCanInsert(context, model);
+	}
+	
+	@Override
+	protected void checkCanInsert(CharbotSearchContext context, HeartbeatModel model) {
+		HashSet<RoleModel> expectedRoles = Sets.newHashSet(RoleModel.getAdminRole(), RoleModel.getDeviceRole(model.getDevice().getId()));
+		check(context, expectedRoles);
 	}
 }

@@ -112,7 +112,6 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 	public Response heartbeat(@Auth CharbotAuthModel authModel,
 			@PathParam("deviceId") Integer deviceId,
 			@Context HttpServletRequest request) throws HttpCodeException {
-		authValidator.validate(authModel, deviceId, Sets.newHashSet(RoleModel.getAdminRole(), RoleModel.getDeviceRole(deviceId)));
 		if (getManager().find(getAuthContext(authModel), deviceId) == null) {
 			throw new HttpNotFoundException("Could not find device with id " + deviceId);
 		}
@@ -134,7 +133,7 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 	@Timed
 	public Response getDeviceHeartbeats(@Auth CharbotAuthModel authModel, @PathParam("deviceId") Integer deviceId) throws HttpCodeException {
 		validate(authModel, deviceId, READ_ONE);
-		HeartbeatModel hb = getManager().getHeartbeat(deviceId);
+		HeartbeatModel hb = getManager().getHeartbeat(getAuthContext(authModel), deviceId);
 		if (hb == null) {
 			throw new HttpNotFoundException("Cannot find heartbeat for device with id " + deviceId);
 		}
@@ -202,7 +201,7 @@ public class DeviceResource extends CharbotAuthProtectedCrudResource<DeviceModel
 			@PathParam(value="deviceId") Integer deviceId,
 			@PathParam(value="serviceId") String serviceId) {
 		authValidator.validate(auth, deviceId, Sets.newHashSet(RoleModel.getAdminRole(), RoleModel.getDeviceRole(deviceId)));
-		TokenAuthModel token = tokenAuthManager.getNewToken(serviceId, deviceId);
+		TokenAuthModel token = tokenAuthManager.getNewToken(getAuthContext(auth), serviceId, deviceId);
 		if (token == null) {
 			throw new HttpInternalServerErrorException("Error creating token for service:" + serviceId + "\tdevice:" + deviceId);
 		}

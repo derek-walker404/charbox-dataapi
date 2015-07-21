@@ -73,7 +73,7 @@ public class TokenAuthResource extends CharbotAuthProtectedCrudResource<TokenAut
 	public Response newToken(@Auth CharbotAuthModel auth, @PathParam("serviceId") String serviceId) {
 		authValidator.validate(auth, null, Sets.newHashSet(RoleModel.getDeviceRole()));
 		DeviceAuthModel deviceAuth = auth.to(DeviceAuthModel.class);
-		TokenAuthModel token = tokenAuthManager.getNewToken(serviceId, deviceAuth.getDeviceId());
+		TokenAuthModel token = tokenAuthManager.getNewToken(getAuthContext(auth), serviceId, deviceAuth.getDeviceId());
 		return res().success(res().modelData(token));
 	}
 	
@@ -81,7 +81,7 @@ public class TokenAuthResource extends CharbotAuthProtectedCrudResource<TokenAut
 	@DELETE
 	public Response deleteExpired(@Auth CharbotAuthModel auth) {
 		validate(auth, null, DELETE);
-		int count = tokenAuthManager.deleteExpired();
+		int count = tokenAuthManager.deleteExpired(getAuthContext(auth));
 		return res().success(res().rawData("deleted", count));
 	}
 }

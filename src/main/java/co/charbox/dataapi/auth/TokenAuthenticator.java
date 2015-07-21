@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
+import co.charbox.domain.data.CharbotSearchContext;
 import co.charbox.domain.model.auth.CharbotAuthModel;
+import co.charbox.domain.model.auth.TokenAuthModel;
 
 import com.google.common.base.Optional;
 
@@ -34,7 +36,15 @@ public class TokenAuthenticator implements Authenticator<BasicCredentials, Charb
 			return Optional.<CharbotAuthModel>absent();
 		}
 		String service = keys[1];
-		CharbotAuthModel iAuth = tokenAuthManager.isValid(service, deviceId, credentials.getPassword());
+		TokenAuthModel tokenAuth = TokenAuthModel.builder()
+				.serviceName(service)
+				.authAssetId(deviceId)
+				.token(credentials.getPassword())
+				.build();
+		CharbotAuthModel iAuth = null;
+		if (tokenAuthManager.isValid(CharbotSearchContext.getSystemContext(), tokenAuth)) {
+			iAuth = tokenAuthManager.find(CharbotSearchContext.getSystemContext(), tokenAuth);
+		}
 		if (iAuth == null) {
 			log.debug("token not valid: " + credentials.getUsername() + ":" + credentials.getPassword());
 			return Optional.<CharbotAuthModel>absent();

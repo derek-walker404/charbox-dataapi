@@ -7,10 +7,10 @@ import org.elasticsearch.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import co.charbox.domain.data.CharbotSearchContext;
 import co.charbox.domain.data.mysql.DeviceVersionDAO;
 import co.charbox.domain.model.DeviceVersionModel;
 
-import com.tpofof.core.data.dao.context.PrincipalSearchContext;
 import com.tpofof.core.data.dao.context.SimpleSort;
 
 @Component
@@ -45,7 +45,7 @@ public class DeviceVersionManager extends CharbotModelManager<DeviceVersionModel
 		return DEFAULT_VALID_SORTS;
 	}
 
-	public DeviceVersionModel canUpgrade(PrincipalSearchContext context, String version) {
+	public DeviceVersionModel canUpgrade(CharbotSearchContext context, String version) {
 		context.getWindow().setLimit(1);
 		DeviceVersionModel latestVersion = getDao().find(context)
 				.getResults()

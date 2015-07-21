@@ -8,11 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.managers.auth.TokenAuthManager;
+import co.charbox.domain.data.CharbotSearchContext;
 import co.charbox.domain.data.mysql.SstResultsDAO;
+import co.charbox.domain.model.RoleModel;
 import co.charbox.domain.model.SstResultsModel;
 
 import com.tpofof.core.data.dao.ResultsSet;
-import com.tpofof.core.data.dao.context.PrincipalSearchContext;
 import com.tpofof.core.data.dao.context.SimpleSort;
 import com.tpofof.core.utils.Config;
 
@@ -52,16 +53,21 @@ public class SstResultManager extends CharbotModelManager<SstResultsModel, SstRe
 	}
 	
 	@Override
-	public SstResultsModel insert(PrincipalSearchContext context, SstResultsModel model) {
+	public SstResultsModel insert(CharbotSearchContext context, SstResultsModel model) {
 		model = super.insert(context, model);
 		if (model != null) {
-			tokenManager.deleteByToken(model.getDeviceToken());
+			tokenManager.deleteByToken(CharbotSearchContext.getSystemContext(), model.getDeviceToken());
 		}
 		return model;
 	}
 
-	public ResultsSet<SstResultsModel> getByDeviceId(PrincipalSearchContext context, Integer deviceId) {
+	public ResultsSet<SstResultsModel> getByDeviceId(CharbotSearchContext context, Integer deviceId) {
 		validateSearchContext(context);
 		return getDao().findByDeviceId(context, deviceId);
+	}
+
+	@Override
+	protected void checkCanInsert(CharbotSearchContext authContext, SstResultsModel model) {
+		check(authContext, Sets.newHashSet(RoleModel.getAdminRole(), RoleModel.getServiceRole("SST")));
 	}
 }

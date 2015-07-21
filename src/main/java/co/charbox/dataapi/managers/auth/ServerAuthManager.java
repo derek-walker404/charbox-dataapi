@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.managers.CharbotModelManager;
+import co.charbox.domain.data.CharbotSearchContext;
 import co.charbox.domain.data.mysql.auth.ServerAuthDAO;
 import co.charbox.domain.model.auth.ServerAuthModel;
 
@@ -20,15 +21,10 @@ public class ServerAuthManager extends CharbotModelManager<ServerAuthModel, Serv
 		return 10;
 	}
 	
-	public ServerAuthModel isValid(String serverId, String key, String serviceName) {
-		ServerAuthModel auth = ServerAuthModel.builder()
-				.serverId(serverId)
-				.key(key)
-				.serviceName(serviceName)
-				.build();
+	public boolean  isValid(CharbotSearchContext context, ServerAuthModel auth) {
 		ServerAuthModel devAuth = find(auth);
 		boolean validAuth = devAuth != null && devAuth.isActivated();
-		return validAuth ? devAuth : null;
+		return validAuth;
 	}
 	
 	public ServerAuthModel find(ServerAuthModel auth) {

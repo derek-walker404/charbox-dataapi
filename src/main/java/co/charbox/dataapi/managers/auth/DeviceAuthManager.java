@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import co.charbox.dataapi.managers.CharbotModelManager;
 import co.charbox.dataapi.managers.CharbotModelManagerProvider;
+import co.charbox.domain.data.CharbotSearchContext;
 import co.charbox.domain.data.mysql.auth.DeviceAuthDAO;
 import co.charbox.domain.model.DeviceModel;
 import co.charbox.domain.model.auth.DeviceAuthModel;
@@ -31,14 +32,10 @@ public class DeviceAuthManager extends CharbotModelManager<DeviceAuthModel, Devi
 		return -1;
 	}
 	
-	public DeviceAuthModel isValid(Integer deviceId, String apiKey) {
-		DeviceAuthModel auth = DeviceAuthModel.builder()
-				.deviceId(deviceId)
-				.key(apiKey)
-				.build();
+	public boolean isValid(CharbotSearchContext context, DeviceAuthModel auth) {
 		DeviceAuthModel devAuth = find(auth);
 		boolean validAuth = devAuth != null && devAuth.isActivated();
-		return validAuth ? devAuth : null;
+		return validAuth;
 	}
 	
 	public DeviceAuthModel find(DeviceAuthModel model) {
